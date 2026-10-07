@@ -2,6 +2,8 @@
 
 A scroll-driven particle website about ocean life. Every creature is drawn in fluorescent particles that dissolve into drifting plankton and re-form as the next animal while you scroll. A score generated live in the browser plays underneath.
 
+**Live site (GitHub Pages):** https://zhongkailongneu-cmd.github.io/claude/ (served from `docs/`; see "Publish" below).
+
 **Open `dist/index.html` directly.** It is a single self-contained file (three.js inlined), so double-clicking it works offline.
 
 ---
@@ -77,6 +79,10 @@ npm install
 npm run build      # writes dist/index.html
 npm run dev        # rebuilds on change, serves dist/ at http://localhost:8000
 ```
+
+## Publish (GitHub Pages)
+
+`npm run build` also writes `docs/index.html`. In the repository: Settings → Pages → Build and deployment → Source "Deploy from a branch", pick the branch and the `/docs` folder. The site is a single self-contained file, so no other setup is needed.
 
 URL options: `?n=30000` sets the particle count.
 
