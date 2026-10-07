@@ -1,5 +1,5 @@
 // Builds two single-file pages from src/:
-//   dist/index.html + docs/index.html  everything inlined (three.js included); works offline,
+//   dist/index.html            everything inlined (three.js included); works offline,
 //                              even opened straight from disk.
 //   .artifact/luminous-deep.html  a body fragment that loads three.js from jsDelivr
 //                              through an import map (used for the claude.ai preview).
@@ -63,12 +63,8 @@ ${body}
 `;
 
   await fs.mkdir(r('dist'), { recursive: true });
-  await fs.mkdir(r('docs'), { recursive: true });
   await fs.mkdir(r('.artifact'), { recursive: true });
   await fs.writeFile(r('dist/index.html'), standalone);
-  // docs/ is what GitHub Pages serves (Settings → Pages → Deploy from a branch → /docs).
-  await fs.writeFile(r('docs/index.html'), standalone);
-  await fs.writeFile(r('docs/.nojekyll'), '');
   await fs.writeFile(r('.artifact/luminous-deep.html'), artifact);
   const kb = (s) => `${(Buffer.byteLength(s) / 1024).toFixed(0)} KB`;
   console.log(`built in ${Date.now() - t0} ms · dist/index.html ${kb(standalone)} · artifact ${kb(artifact)}`);

@@ -82,7 +82,7 @@ npm run dev        # rebuilds on change, serves dist/ at http://localhost:8000
 
 ## Publish (GitHub Pages)
 
-`npm run build` also writes `docs/index.html`. In the repository: Settings → Pages → Build and deployment → Source "Deploy from a branch", pick the branch and the `/docs` folder. The site is a single self-contained file, so no other setup is needed.
+`docs/index.html` is the page GitHub Pages serves: the claude.ai artifact export of this site, which loads three.js from jsDelivr. It is not rewritten by `npm run build`; copy a new export (or `dist/index.html`, which has three.js inlined) over it to update the live site. In the repository: Settings → Pages → Build and deployment → Source "Deploy from a branch", pick the branch and the `/docs` folder.
 
 URL options: `?n=30000` sets the particle count.
 
