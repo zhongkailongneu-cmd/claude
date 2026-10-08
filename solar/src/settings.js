@@ -72,6 +72,8 @@ export function createSettings({ onChange }) {
     root.style.setProperty('--fs', String(state.size / 100));
     const g = state.textGlow / 70;
     const px = (v) => `${(v * g).toFixed(1)}px`;
+    // With little or no glow the colour choice still shows in the stroke itself.
+    root.style.setProperty('--stroke-tint', `${Math.round(Math.max(0, 1 - g) * 65)}%`);
     root.style.setProperty('--neon-filter', g < 0.01 ? 'none'
       : `drop-shadow(0 0 ${px(1)} var(--text-neon)) drop-shadow(0 0 ${px(5)} var(--text-neon)) drop-shadow(0 0 ${px(16)} var(--text-neon)) drop-shadow(0 0 ${px(34)} var(--text-neon-halo))`);
   }

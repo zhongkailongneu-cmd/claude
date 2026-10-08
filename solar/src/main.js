@@ -43,7 +43,7 @@ async function boot() {
       else if (key === 'glow') { applyGlow(state.glow); audio.slider(value / 100); }
       else if (key === 'textGlow' || key === 'size') audio.slider(key === 'size' ? (value - 80) / 45 : value / 100);
       else if (key === 'font') audio.uiClick();
-      else if (key === 'textColor') { audio.uiClick(); audio.neon(); relight(); }
+      else if (key === 'textColor') { audio.neon(); relight(); }
       else if (key === 'music' || key === 'sfx') { audio.setVolumes(state.music / 100, state.sfx / 100); audio.slider(value / 100); }
       else if (key === 'panel') audio.panel(value);
     },
@@ -299,7 +299,7 @@ async function boot() {
     if (e.target.closest('input, select, textarea')) return;
     const k = e.key.toLowerCase();
     if (k === 'c') settings.togglePalette();
-    else if (k === 't') settings.toggleTextColor();
+    else if (k === 't') { settings.toggleTextColor(); audio.uiClick(); }
     else if (k === 'm') toggleSound();
     else if (k === 's') settings.toggleOpen();
     else if (!audio.on && !userMuted && (e.key === ' ' || e.key === 'Enter' || e.key.startsWith('Arrow') || e.key.startsWith('Page'))) soundOn();

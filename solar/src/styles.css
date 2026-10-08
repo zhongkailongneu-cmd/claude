@@ -18,6 +18,7 @@
   --text-neon-core: #e6faff;
   --text-neon: #38c8ff;
   --text-neon-halo: #376392;
+  --stroke-tint: 0%;     /* how far the stroke leans to the glow colour (rises as text glow falls) */
   --neon-filter: drop-shadow(0 0 1px var(--text-neon)) drop-shadow(0 0 5px var(--text-neon)) drop-shadow(0 0 16px var(--text-neon)) drop-shadow(0 0 34px var(--text-neon-halo));
 
   --f-display: "Oswald Hollow", "Arial Narrow", sans-serif;
@@ -72,7 +73,7 @@ body.mono .panel, body.mono .rail button { --accent: var(--accent-mono, var(--la
 /* ---------- hollow neon type ---------- */
 .neon {
   color: transparent;
-  -webkit-text-stroke: var(--stroke, 1.5px) var(--text-neon-core);
+  -webkit-text-stroke: var(--stroke, 1.5px) color-mix(in srgb, var(--text-neon) var(--stroke-tint), var(--text-neon-core));
   filter: var(--neon-filter);
   font-family: var(--f-display);
   letter-spacing: var(--track);
@@ -344,6 +345,8 @@ body.mono .panel, body.mono .rail button { --accent: var(--accent-mono, var(--la
 }
 .seg b { font-weight: 500; font-size: 14px; color: var(--ink); }
 .seg small { font-size: 11px; }
+/* Buttons inside the settings drawer are interface chrome: keep them blue. */
+.settings .cta { --text-neon: var(--neon); --text-neon-core: var(--neon-core); }
 .seg .swatch { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 50%; vertical-align: 1px; }
 .swatch--blue { background: #38c8ff; box-shadow: 0 0 8px #38c8ff; }
 .swatch--orange { background: #ff9f3a; box-shadow: 0 0 8px #ff9f3a; }
