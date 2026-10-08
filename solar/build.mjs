@@ -76,21 +76,13 @@ ${body}
 `;
 
   const importMap = JSON.stringify({ imports: { three: `${CDN}/build/three.module.min.js`, 'three/addons/': `${CDN}/examples/jsm/` } });
-  const artifact = `<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>${TITLE}</title>
+  // The artifact host wraps the page in its own document skeleton.
+  const artifact = `<title>${TITLE}</title>
 ${FONTS}
 <style>${css}</style>
-</head>
-<body>
 ${body}
 <script type="importmap">${importMap}</script>
 <script type="module">${safeScript(esm.outputFiles[0].text)}</script>
-</body>
-</html>
 `;
 
   await fs.mkdir(r('dist'), { recursive: true });
