@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "dev": "node scripts/build.mjs --watch"
+    "dev": "node scripts/build.mjs --watch",
+    "build:neuro": "node neuro/scripts/build.mjs",
+    "dev:neuro": "node neuro/scripts/build.mjs --watch"
   },
   "dependencies": {
     "three": "^0.169.0"

@@ -1,5 +1,7 @@
 # Luminous Deep · 荧光深海粒子网页
 
+> This repository holds two particle sites. **Luminous Deep** (ocean life) lives at the root. **Neuroplasticity · 神经可塑性** lives in [`neuro/`](neuro/README.md): build it with `npm run build:neuro`; it is served from `docs/neuro/`.
+
 A scroll-driven particle website about ocean life. Every creature is drawn in fluorescent particles that dissolve into drifting plankton and re-form as the next animal while you scroll. A score generated live in the browser plays underneath.
 
 **Live site (GitHub Pages):** https://zhongkailongneu-cmd.github.io/claude/ (served from `docs/`; see "Publish" below).

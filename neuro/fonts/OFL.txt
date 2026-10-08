@@ -1,0 +1,13 @@
+Fonts in this folder are subsets of fonts released under the SIL Open Font
+License, Version 1.1 (https://openfontlicense.org), as distributed by Google
+Fonts / Fontsource:
+
+  Oswald      © The Oswald Project Authors (https://github.com/googlefonts/OswaldFont)
+  Bebas Neue  © Dharma Type
+  Orbitron    © The Orbitron Project Authors (https://github.com/theleagueof/orbitron)
+  Cinzel      © The Cinzel Project Authors (https://github.com/NDISCOVER/Cinzel)
+  Krona One   © Yvonne Schüttler
+
+They were instanced at fixed weights, had overlapping contours merged and were
+subset to Latin by scripts/fonts.py. These modified versions remain under the
+SIL Open Font License 1.1.
