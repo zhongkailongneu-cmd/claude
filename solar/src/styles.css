@@ -10,10 +10,15 @@
   --rule: #6c9ac4;       /* Loyel 50 */
   --deep: #263b54;       /* Loyel 100 */
   --glass: rgba(14, 24, 40, 0.72);
-  --neon-core: #e6faff;  /* the lit glass tube of the hollow letters */
-  --neon: #38c8ff;       /* fluorescent blue glow */
+  --neon-core: #e6faff;  /* interface neon: lit tube */
+  --neon: #38c8ff;       /* interface neon: fluorescent blue glow */
   --neon-halo: #376392;  /* Loyel 70, the wide outer halo */
-  --neon-filter: drop-shadow(0 0 1px var(--neon)) drop-shadow(0 0 5px var(--neon)) drop-shadow(0 0 16px var(--neon)) drop-shadow(0 0 34px var(--neon-halo));
+  /* Hollow English type and the neon buttons under it. Blue by default;
+     html.neon-orange switches them to the Sun's amber (see below). */
+  --text-neon-core: #e6faff;
+  --text-neon: #38c8ff;
+  --text-neon-halo: #376392;
+  --neon-filter: drop-shadow(0 0 1px var(--text-neon)) drop-shadow(0 0 5px var(--text-neon)) drop-shadow(0 0 16px var(--text-neon)) drop-shadow(0 0 34px var(--text-neon-halo));
 
   --f-display: "Oswald Hollow", "Arial Narrow", sans-serif;
   --w-name: 600;
@@ -26,6 +31,13 @@
 
   --gutter: clamp(16px, 5.5vw, 96px);
   color-scheme: dark;
+}
+/* Orange fluorescence close to the Sun: warm-white tube, amber glow (the
+   Sun's #FFA23A family), deep flame halo. */
+html.neon-orange {
+  --text-neon-core: #fff3e4;
+  --text-neon: #ff9f3a;
+  --text-neon-halo: #b8360a;
 }
 
 * { box-sizing: border-box; }
@@ -60,7 +72,7 @@ body.mono .panel, body.mono .rail button { --accent: var(--accent-mono, var(--la
 /* ---------- hollow neon type ---------- */
 .neon {
   color: transparent;
-  -webkit-text-stroke: var(--stroke, 1.5px) var(--neon-core);
+  -webkit-text-stroke: var(--stroke, 1.5px) var(--text-neon-core);
   filter: var(--neon-filter);
   font-family: var(--f-display);
   letter-spacing: var(--track);
@@ -189,19 +201,19 @@ body.mono .panel, body.mono .rail button { --accent: var(--accent-mono, var(--la
 .cta-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }
 .cta {
   appearance: none;
-  border: 1px solid color-mix(in srgb, var(--neon) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-neon) 70%, transparent);
   background: color-mix(in srgb, var(--space) 55%, transparent);
-  color: var(--neon-core);
+  color: var(--text-neon-core);
   font-family: var(--f-body);
   font-size: 14px;
   letter-spacing: 0.2em;
   padding: 13px 24px;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 0 18px -4px var(--neon), inset 0 0 14px -6px var(--neon);
+  box-shadow: 0 0 18px -4px var(--text-neon), inset 0 0 14px -6px var(--text-neon);
   transition: box-shadow 0.3s, background 0.3s, transform 0.3s;
 }
-.cta:hover { box-shadow: 0 0 28px -2px var(--neon), inset 0 0 18px -4px var(--neon); transform: translateY(-1px); }
+.cta:hover { box-shadow: 0 0 28px -2px var(--text-neon), inset 0 0 18px -4px var(--text-neon); transform: translateY(-1px); }
 .cta--quiet { border-color: color-mix(in srgb, var(--rule) 50%, transparent); box-shadow: none; color: var(--label); }
 .cta:focus-visible, .rail button:focus-visible, .pill:focus-visible, .brand:focus-visible, .palette button:focus-visible, .settings :focus-visible {
   outline: 2px solid var(--neon);
@@ -239,7 +251,7 @@ body.mono .panel, body.mono .rail button { --accent: var(--accent-mono, var(--la
   text-decoration: none;
   white-space: nowrap;
 }
-.brand span { color: transparent; -webkit-text-stroke: 0.8px var(--neon-core); filter: drop-shadow(0 0 4px var(--neon)); }
+.brand span { color: transparent; -webkit-text-stroke: 0.8px var(--text-neon-core); filter: drop-shadow(0 0 4px var(--text-neon)); }
 .tools { display: flex; align-items: center; gap: 8px; }
 .pill, .palette {
   display: inline-flex;
@@ -332,6 +344,9 @@ body.mono .panel, body.mono .rail button { --accent: var(--accent-mono, var(--la
 }
 .seg b { font-weight: 500; font-size: 14px; color: var(--ink); }
 .seg small { font-size: 11px; }
+.seg .swatch { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 50%; vertical-align: 1px; }
+.swatch--blue { background: #38c8ff; box-shadow: 0 0 8px #38c8ff; }
+.swatch--orange { background: #ff9f3a; box-shadow: 0 0 8px #ff9f3a; }
 .seg button[aria-checked="true"] { border-color: color-mix(in srgb, var(--neon) 70%, transparent); box-shadow: 0 0 16px -6px var(--neon), inset 0 0 12px -8px var(--neon); }
 input[type="range"] {
   -webkit-appearance: none;

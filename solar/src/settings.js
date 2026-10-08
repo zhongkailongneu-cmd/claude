@@ -1,10 +1,11 @@
-// Page settings: palette (multi / mono), particle glow, text glow, display
-// font, type size and the two volumes. Values persist per viewer in
+// Page settings: palette (multi / mono), particle glow, text glow, the colour
+// of the hollow English type (blue / orange), display font, type size and the
+// two volumes. Values persist per viewer in
 // localStorage (best effort — the page works the same without it).
 
 const KEY = 'solar-particles-settings-v1';
 
-export const DEFAULTS = { palette: 'multi', glow: 70, textGlow: 70, font: 'oswald', size: 100, music: 70, sfx: 70 };
+export const DEFAULTS = { palette: 'multi', glow: 70, textGlow: 70, textColor: 'blue', font: 'oswald', size: 100, music: 70, sfx: 70 };
 
 // Each display font with the weights used for the headline and the English line.
 export const FONTS = {
@@ -24,6 +25,7 @@ function load() {
     for (const k of Object.keys(DEFAULTS)) if (typeof v[k] === typeof DEFAULTS[k]) out[k] = v[k];
     if (!FONTS[out.font]) out.font = DEFAULTS.font;
     if (out.palette !== 'mono') out.palette = 'multi';
+    if (out.textColor !== 'orange') out.textColor = 'blue';
     return out;
   } catch {
     return { ...DEFAULTS };
@@ -71,7 +73,12 @@ export function createSettings({ onChange }) {
     const g = state.textGlow / 70;
     const px = (v) => `${(v * g).toFixed(1)}px`;
     root.style.setProperty('--neon-filter', g < 0.01 ? 'none'
-      : `drop-shadow(0 0 ${px(1)} var(--neon)) drop-shadow(0 0 ${px(5)} var(--neon)) drop-shadow(0 0 ${px(16)} var(--neon)) drop-shadow(0 0 ${px(34)} var(--neon-halo))`);
+      : `drop-shadow(0 0 ${px(1)} var(--text-neon)) drop-shadow(0 0 ${px(5)} var(--text-neon)) drop-shadow(0 0 ${px(16)} var(--text-neon)) drop-shadow(0 0 ${px(34)} var(--text-neon-halo))`);
+  }
+
+  function applyTextColor() {
+    root.classList.toggle('neon-orange', state.textColor === 'orange');
+    document.querySelectorAll('[data-textcolor]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.textcolor === state.textColor)));
   }
 
   function applyPalette() {
@@ -89,6 +96,7 @@ export function createSettings({ onChange }) {
     if (state[key] === value) return;
     state[key] = value;
     if (key === 'palette') applyPalette();
+    if (key === 'textColor') applyTextColor();
     if (key === 'font' || key === 'size' || key === 'textGlow') applyText();
     syncInputs();
     save(state);
@@ -107,6 +115,7 @@ export function createSettings({ onChange }) {
     });
   });
   document.querySelectorAll('[data-palette]').forEach((b) => b.addEventListener('click', () => set('palette', b.dataset.palette)));
+  document.querySelectorAll('[data-textcolor]').forEach((b) => b.addEventListener('click', () => set('textColor', b.dataset.textcolor)));
   panel.querySelector('[data-reset]').addEventListener('click', () => {
     for (const k of Object.keys(DEFAULTS)) set(k, DEFAULTS[k]);
   });
@@ -133,6 +142,7 @@ export function createSettings({ onChange }) {
   });
 
   applyPalette();
+  applyTextColor();
   syncInputs();
   applyText();
   // Re-measure once the inlined fonts are ready.
@@ -145,6 +155,7 @@ export function createSettings({ onChange }) {
     state,
     set,
     togglePalette: () => set('palette', state.palette === 'mono' ? 'multi' : 'mono'),
+    toggleTextColor: () => set('textColor', state.textColor === 'orange' ? 'blue' : 'orange'),
     toggleOpen: () => (isOpen() ? close() : open()),
   };
 }
