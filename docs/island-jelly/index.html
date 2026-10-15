@@ -1,0 +1,2099 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4F7FB">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Island Jelly</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="海岛果冻：一个可以戳、可以摇的方形截面果冻海微缩展台（Three.js + 自定义 GLSL）。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..800,0..100,0..1;1,9..144,300..800,0..100,0..1&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@500;700&display=swap">
+<style>
+  /* Layout: a magazine spread. Masthead band on top, the 3D specimen plate on the left,
+     a column of control cards on the right; the column drops below the plate on phones.
+     Colours are the Loyel gradient-blue ramp (10 → 100); jelly flavours are the only other hues. */
+  :root {
+    --paper: #F4F7FB;   /* Loyel 10 */
+    --wash: #E8EEF6;    /* Loyel 20 */
+    --rule: #CCDBEB;    /* Loyel 30 */
+    --soft: #9FBDDA;    /* Loyel 40 */
+    --mid: #6C9AC4;     /* Loyel 50 */
+    --accent-2: #497DAE;/* Loyel 60 */
+    --accent: #376392;  /* Loyel 70 */
+    --ink-3: #2E5076;   /* Loyel 80 */
+    --ink-2: #2B4868;   /* Loyel 90 */
+    --ink: #263B54;     /* Loyel 100 */
+    --sheet: #FFFFFF;
+
+    --f-display: "Fraunces", "Noto Serif SC", Georgia, "Times New Roman", serif;
+    --f-zh: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+    --f-body: "Hanken Grotesk", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+    --r-card: 18px;
+    color-scheme: light;
+  }
+  html, body { background: var(--paper); color: var(--ink); }
+  body { font-family: var(--f-body); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .page {
+    max-width: 1480px; margin: 0 auto;
+    padding-block: 26px 44px;
+    padding-left: max(clamp(16px, 3vw, 44px), env(safe-area-inset-left, 0px));
+    padding-right: max(clamp(16px, 3vw, 44px), env(safe-area-inset-right, 0px));
+  }
+
+  /* ---------- masthead ---------- */
+  .mast { display: grid; gap: 14px; padding-bottom: 20px; border-bottom: 1px solid var(--rule); }
+  .mast-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .kicker { font: 500 11px/1.3 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); }
+  .mast-main { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px 44px; align-items: end; }
+  .title {
+    margin: 0; font-family: var(--f-display); font-weight: 420;
+    font-size: clamp(56px, 9vw, 132px); line-height: .86; letter-spacing: -.035em;
+    font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 0; color: var(--ink);
+    text-wrap: balance;
+  }
+  .title em {
+    display: inline-block; font-style: italic; font-weight: 640; color: var(--accent);
+    font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1; transform-origin: 50% 90%;
+  }
+  .title em.wobble { animation: wobble .9s cubic-bezier(.3, .7, .3, 1); }
+  @keyframes wobble {
+    0% { transform: scale(1, 1); }
+    14% { transform: scale(1.09, .86) skewX(-4deg); }
+    32% { transform: scale(.95, 1.07) skewX(3deg); }
+    50% { transform: scale(1.03, .97) skewX(-1.5deg); }
+    70% { transform: scale(.99, 1.01); }
+    100% { transform: scale(1, 1); }
+  }
+  .mast-side { display: grid; gap: 8px; max-width: 62ch; padding-bottom: 6px; min-width: 0; }
+  .zh-title { margin: 0; font: 700 clamp(19px, 2vw, 25px)/1.3 var(--f-zh); letter-spacing: .04em; color: var(--ink-2); text-wrap: balance; }
+  .deck { margin: 0; color: var(--ink-3); font-size: 15px; }
+
+  /* ---------- spread ---------- */
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 356px; gap: 26px; margin-top: 22px; align-items: start; }
+  .plate { min-width: 0; display: grid; gap: 12px; }
+  .stage {
+    position: relative; margin: 0; height: clamp(460px, 76vh, 800px);
+    background: var(--paper); overflow: hidden; border-radius: 4px;
+  }
+  #gl { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; outline: none; }
+  #gl.is-poke { cursor: pointer; }
+  #gl.is-dragging { cursor: grabbing; }
+  #gl:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+
+  .hud { position: absolute; pointer-events: none; font: 500 11px/1.35 var(--f-mono); letter-spacing: .08em; color: var(--ink-2); }
+  .hud-tl { top: 12px; left: 14px; display: grid; gap: 3px; }
+  .hud-tl b { font-weight: 500; color: var(--accent); }
+  .hud-tr { top: 10px; right: 12px; pointer-events: auto; display: flex; gap: 6px; }
+  .hud-b { left: 14px; right: 14px; bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px;
+    background: color-mix(in srgb, var(--sheet) 82%, transparent); border: 1px solid var(--rule);
+    font: 500 11px/1.2 var(--f-body); letter-spacing: .02em; color: var(--ink-2);
+  }
+  .chip kbd { font: 500 10px/1 var(--f-mono); color: var(--accent); letter-spacing: .06em; }
+  .ghost-btn {
+    border: 1px solid var(--rule); background: var(--sheet); border-radius: 999px; padding: 6px 11px;
+    font: 500 11px/1 var(--f-mono); letter-spacing: .06em; color: var(--ink-2); cursor: pointer;
+  }
+  .ghost-btn:hover { border-color: var(--soft); color: var(--accent); }
+
+  .loading {
+    position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+    font: 400 italic 22px/1.4 var(--f-display); color: var(--accent-2); padding: 24px;
+  }
+  .loading small { display: block; font: 500 11px/1.5 var(--f-mono); font-style: normal; letter-spacing: .12em; color: var(--mid); margin-top: 6px; }
+
+  /* callouts that follow the base's left edge */
+  .callouts { position: absolute; inset: 0; pointer-events: none; }
+  .callout {
+    position: absolute; left: 0; top: 0; white-space: nowrap; transform: translate(-100%, -50%);
+    padding-right: 40px; font: 500 11px/1.2 var(--f-body); color: var(--ink-2); letter-spacing: .02em;
+  }
+  .callout .n { font-family: var(--f-mono); color: var(--accent); margin-right: 5px; }
+  .callout i { font-style: normal; color: var(--accent-2); margin-left: 4px; font-size: 10.5px; }
+  .callout::after {
+    content: ""; position: absolute; right: 4px; top: 50%; width: 30px; border-top: 1px solid var(--ink-2); opacity: .55;
+  }
+  .callout::before {
+    content: ""; position: absolute; right: 1px; top: calc(50% - 3px); width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ink-2);
+  }
+  .compact .callout { padding-right: 22px; }
+  .compact .callout::after { width: 14px; }
+  .compact .callout .t { display: none; }
+
+  .caption { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: baseline; font-size: 13px; color: var(--ink-3); }
+  .caption strong { font: 500 11px/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; padding: 0; list-style: none; }
+  .legend li { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .sw { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(38, 59, 84, .18); }
+  .legend .n { font-family: var(--f-mono); font-size: 11px; color: var(--accent); }
+
+  /* ---------- control column ---------- */
+  .panel { display: grid; gap: 14px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 14px); min-width: 0; }
+  .card { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r-card); padding: 16px 16px 18px; display: grid; gap: 12px; min-width: 0; }
+  .card-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .card-h h2 { margin: 0; font: 700 16px/1.25 var(--f-zh); color: var(--ink); letter-spacing: .03em; }
+  .card-h span { font: 500 10.5px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--mid); }
+  .note { margin: 0; font-size: 12.5px; color: var(--accent-2); line-height: 1.5; }
+
+  .drops { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .drop {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 8px; text-align: left;
+    padding: 10px; border-radius: 14px; border: 1px solid var(--rule); background: var(--paper); cursor: pointer;
+    transition: transform .18s cubic-bezier(.3, 1.6, .5, 1), border-color .15s, background .15s;
+  }
+  .drop:hover { border-color: var(--soft); background: var(--wash); }
+  .drop:active { transform: scale(.96, .93); }
+  .drop svg { width: 40px; height: 40px; color: var(--accent); }
+  .drop b { display: block; font: 700 14px/1.2 var(--f-zh); color: var(--ink); }
+  .drop small { display: block; font: 500 10.5px/1.3 var(--f-mono); letter-spacing: .06em; color: var(--accent-2); }
+
+  .log { margin: 0; padding: 0; list-style: none; display: grid; gap: 0; max-height: 168px; overflow: auto; border-top: 1px solid var(--wash); }
+  .log li { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--wash); font-size: 12.5px; }
+  .log .no { font: 500 11px/1 var(--f-mono); color: var(--accent); font-variant-numeric: tabular-nums; }
+  .log .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
+  .log .st { font: 500 10.5px/1 var(--f-mono); color: var(--mid); letter-spacing: .04em; }
+  .log .st[data-s="afloat"] { color: var(--accent); }
+  .log-empty { font-size: 12.5px; color: var(--mid); margin: 0; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  .flavors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .flavor {
+    display: grid; justify-items: center; gap: 7px; padding: 12px 6px 10px; border-radius: 14px;
+    border: 1px solid var(--rule); background: var(--paper); cursor: pointer; text-align: center;
+    transition: border-color .15s, background .15s;
+  }
+  .flavor:hover { background: var(--wash); }
+  .flavor[aria-checked="true"] { border-color: var(--accent); background: var(--sheet); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .cube {
+    width: 42px; height: 38px; border-radius: 11px 11px 9px 9px; position: relative;
+    background: linear-gradient(170deg, var(--c1) 0%, var(--c2) 55%, var(--c3) 100%);
+    box-shadow: inset 0 -6px 10px rgba(38, 59, 84, .18), inset 0 3px 0 rgba(255, 255, 255, .55);
+    transition: transform .4s cubic-bezier(.3, 1.8, .4, 1);
+  }
+  .cube::after { content: ""; position: absolute; left: 7px; top: 6px; width: 12px; height: 5px; border-radius: 4px; background: rgba(255, 255, 255, .8); }
+  .flavor[aria-checked="true"] .cube { transform: scale(1.06, .94); }
+  .flavor b { font: 700 13px/1.2 var(--f-zh); color: var(--ink); }
+  .flavor small { font: 500 10px/1 var(--f-mono); letter-spacing: .08em; color: var(--accent-2); text-transform: uppercase; }
+
+  .ctl { display: grid; gap: 7px; }
+  .ctl-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .ctl label { font: 700 13.5px/1.2 var(--f-zh); color: var(--ink); }
+  .ctl label i { font: 500 10.5px/1 var(--f-mono); font-style: normal; letter-spacing: .08em; color: var(--accent-2); margin-left: 6px; text-transform: uppercase; }
+  .ctl output { font: 500 12px/1.2 var(--f-mono); color: var(--accent); font-variant-numeric: tabular-nums; text-align: right; }
+  .ctl .scale { display: flex; justify-content: space-between; font: 500 10px/1 var(--f-mono); color: var(--mid); letter-spacing: .04em; }
+
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 26px; background: transparent; cursor: pointer; margin: 0;
+    --p: 50%;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 8px; border-radius: 99px;
+    background: linear-gradient(90deg, #CCDBEB, #9FBDDA 35%, #497DAE 70%, #2B4868) 0 0 / var(--p) 100% no-repeat, var(--wash);
+    box-shadow: inset 0 0 0 1px rgba(38, 59, 84, .08);
+  }
+  input[type="range"]::-moz-range-track { height: 8px; border-radius: 99px; background: var(--wash); }
+  input[type="range"]::-moz-range-progress { height: 8px; border-radius: 99px; background: linear-gradient(90deg, #CCDBEB, #9FBDDA 35%, #497DAE 70%, #2B4868); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px; margin-top: -7px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #FFFFFF 0 30%, #E8EEF6 70%); border: 2px solid var(--accent);
+    box-shadow: 0 2px 6px rgba(38, 59, 84, .2); transition: transform .25s cubic-bezier(.3, 1.8, .4, 1);
+  }
+  input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.18, .86); }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF; border: 2px solid var(--accent);
+    box-shadow: 0 2px 6px rgba(38, 59, 84, .2);
+  }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn {
+    flex: 1 1 auto; border: 1px solid var(--rule); background: var(--paper); border-radius: 12px; padding: 9px 12px;
+    font: 600 13px/1.2 var(--f-body); color: var(--ink-2); cursor: pointer;
+    transition: transform .18s cubic-bezier(.3, 1.6, .5, 1), background .15s, border-color .15s;
+  }
+  .btn:hover { background: var(--wash); border-color: var(--soft); }
+  .btn:active { transform: scale(.96, .92); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #FFFFFF; }
+  .btn.primary:hover { background: var(--ink-3); }
+
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .stat { display: grid; gap: 3px; min-width: 0; }
+  .stat b { font: 500 22px/1 var(--f-display); font-variation-settings: "opsz" 48, "SOFT" 100; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .stat b small { font: 500 10.5px/1 var(--f-mono); color: var(--accent-2); margin-left: 2px; }
+  .stat span { font: 500 10.5px/1.3 var(--f-mono); color: var(--mid); letter-spacing: .04em; }
+  .spark { display: grid; gap: 5px; }
+  .spark canvas { width: 100%; height: 64px; display: block; }
+  .spark-h { display: flex; justify-content: space-between; font: 500 10.5px/1 var(--f-mono); color: var(--mid); letter-spacing: .04em; }
+
+  .colophon {
+    margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--rule);
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 28px;
+    font-size: 12.5px; color: var(--ink-3);
+  }
+  .colophon h3 { margin: 0 0 4px; font: 500 10.5px/1.3 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .colophon p { margin: 0; max-width: 60ch; }
+
+  @media (max-width: 1080px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .panel { position: static; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); align-items: start; }
+    .stage { height: clamp(400px, 70vw, 640px); }
+  }
+  @media (max-width: 720px) {
+    .mast-main { grid-template-columns: minmax(0, 1fr); }
+    .stage { height: clamp(380px, 112vw, 560px); }
+    .hud-b .chip.opt { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .title em.wobble { animation: none; }
+    .drop, .btn, .cube, input[type="range"]::-webkit-slider-thumb { transition: none; }
+  }
+</style>
+
+<div class="page">
+  <header class="mast">
+    <div class="mast-top">
+      <span class="kicker">Vol. 03 · Specimen Table · 微缩展台</span>
+      <span class="kicker">No. 07 · 24 × 24 cm · 2026 秋季号</span>
+    </div>
+    <div class="mast-main">
+      <h1 class="title">Island <em id="titleJelly">Jelly</em></h1>
+      <div class="mast-side">
+        <p class="zh-title">海岛果冻 · 物理与材质微缩展台</p>
+        <p class="deck">一块 24 厘米见方的果冻海。下面压着五层沙土与岩石，中间冒出一座长着椰子树的小沙洲。戳一下，看凹陷回弹、波纹绕岛扩散；拽住它晃一晃，看整块果冻怎样 Q 弹地摆回来。</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="plate" aria-label="果冻海微缩景观">
+      <figure class="stage" id="stage">
+        <canvas id="gl" tabindex="0" aria-label="三维果冻海景观。单击果冻戳一下，拖拽果冻摇晃，拖拽空白处转动视角。键盘：空格戳一下，方向键摇晃。"></canvas>
+        <div class="callouts" id="callouts" aria-hidden="true"></div>
+        <div class="hud hud-tl" aria-hidden="true">
+          <span>FIG. 1 — 剖面 <b>Cross-section</b></span>
+          <span id="hudMode">果冻 · 静置</span>
+        </div>
+        <div class="hud hud-tr">
+          <button class="ghost-btn" id="resetView" type="button">复位视角</button>
+        </div>
+        <div class="hud hud-b" aria-hidden="true">
+          <span class="chip"><kbd>CLICK</kbd>单击果冻 · 戳一下</span>
+          <span class="chip"><kbd>DRAG</kbd>拖拽果冻 · 摇晃</span>
+          <span class="chip opt"><kbd>DRAG</kbd>拖拽空白 · 转视角</span>
+          <span class="chip opt"><kbd>TAP</kbd>点岛 · 摇椰子树</span>
+        </div>
+        <div class="loading" id="loading">正在浇筑果冻……<small>SETTING THE JELLY</small></div>
+      </figure>
+      <div class="caption">
+        <strong>图 1</strong>
+        <span>方形截面：五层基底 + 果冻海 + 沙洲。</span>
+        <ul class="legend">
+          <li><span class="n">①</span><span class="sw" style="background:#E3CC98"></span>细沙</li>
+          <li><span class="n">②</span><span class="sw" style="background:#A49B8C"></span>砾石</li>
+          <li><span class="n">③</span><span class="sw" style="background:#A0664A"></span>红黏土</li>
+          <li><span class="n">④</span><span class="sw" style="background:#7E8894"></span>卵石层</li>
+          <li><span class="n">⑤</span><span class="sw" style="background:#4E5561"></span>基岩</li>
+        </ul>
+      </div>
+    </section>
+
+    <aside class="panel" aria-label="控制面板">
+      <section class="card" aria-labelledby="h-spec">
+        <div class="card-h"><h2 id="h-spec">投放标本</h2><span>Specimens</span></div>
+        <div class="drops">
+          <button class="drop" type="button" id="dropCrab">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <ellipse cx="20" cy="23" rx="9" ry="5.5"/>
+              <path d="M16 18.5l-1-4M24 18.5l1-4"/><circle cx="15" cy="13.6" r="1.2" fill="currentColor"/><circle cx="25" cy="13.6" r="1.2" fill="currentColor"/>
+              <path d="M11.5 21c-3-1-4.5-4-3.5-7.5M28.5 21c3.5-1.5 5.5-5 4-9"/>
+              <path d="M8 13.5c-2.4-.4-3.6-2.5-2.6-4.4 1.4.6 2.3 1.6 2.6 2.7M32.5 12c-1-3.4 1-6 4-5.6-.1 2.2-1.3 3.6-3 4.2"/>
+              <path d="M12 25l-4.5 2.5M12.5 27l-3.5 4M27.5 27l3.5 4M28 25l4.5 2.5"/>
+            </svg>
+            <span><b>小螃蟹</b><small>Fiddler crab</small></span>
+          </button>
+          <button class="drop" type="button" id="dropCoco">
+            <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+              <ellipse cx="20" cy="22" rx="10.5" ry="11"/>
+              <path d="M13 15c2 4 2 10 .5 15M20 11c1 6 1 14 0 22M27 15c-2 4-2 10-.5 15" opacity=".45"/>
+              <circle cx="17.2" cy="15.6" r="1.4" fill="currentColor"/><circle cx="22.8" cy="15.6" r="1.4" fill="currentColor"/><circle cx="20" cy="19.6" r="1.4" fill="currentColor"/>
+            </svg>
+            <span><b>椰子</b><small>Coconut</small></span>
+          </button>
+        </div>
+        <p class="note">标本会落进果冻，随波浮沉、顺坡滑动。点岛上的椰子树，会摇下一颗椰子；点螃蟹，它会跳一下。</p>
+        <ol class="log" id="log" aria-live="polite"></ol>
+        <div class="row">
+          <span class="note" id="logCount">0 / 10 件</span>
+          <button class="ghost-btn" type="button" id="clearSpec">清空标本</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="h-flavor">
+        <div class="card-h"><h2 id="h-flavor">果冻口味</h2><span>Flavor</span></div>
+        <div class="flavors" role="radiogroup" aria-labelledby="h-flavor">
+          <button class="flavor" type="button" role="radio" aria-checked="true" data-flavor="lagoon" id="fl-lagoon" style="--c1:#E8EEF6;--c2:#9FBDDA;--c3:#497DAE">
+            <span class="cube" aria-hidden="true"></span><b>泻湖蓝</b><small>Lagoon</small>
+          </button>
+          <button class="flavor" type="button" role="radio" aria-checked="false" data-flavor="raspberry" id="fl-raspberry" style="--c1:#FCE4EC;--c2:#F2A1BC;--c3:#C94F7C">
+            <span class="cube" aria-hidden="true"></span><b>覆盆子粉</b><small>Raspberry</small>
+          </button>
+          <button class="flavor" type="button" role="radio" aria-checked="false" data-flavor="lime" id="fl-lime" style="--c1:#F1FAD9;--c2:#BFE27F;--c3:#6E9E32">
+            <span class="cube" aria-hidden="true"></span><b>青柠绿</b><small>Lime</small>
+          </button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="h-phys">
+        <div class="card-h"><h2 id="h-phys">物性调节</h2><span>Physics</span></div>
+        <div class="ctl">
+          <div class="ctl-h"><label for="firm">果冻硬度<i>Firmness</i></label><output id="firmOut" for="firm"></output></div>
+          <input type="range" id="firm" min="0" max="100" value="45">
+          <div class="scale"><span>嫩豆腐</span><span>布丁</span><span>果冻</span><span>软糖</span></div>
+        </div>
+        <div class="ctl">
+          <div class="ctl-h"><label for="damp">波浪阻尼<i>Wave damping</i></label><output id="dampOut" for="damp"></output></div>
+          <input type="range" id="damp" min="0" max="100" value="30">
+          <div class="scale"><span>久久回荡</span><span>迅速平息</span></div>
+        </div>
+        <div class="ctl">
+          <div class="ctl-h"><label for="tide">潮汐水位<i>Tide</i></label><output id="tideOut" for="tide"></output></div>
+          <input type="range" id="tide" min="0" max="100" value="50">
+          <div class="scale"><span>低潮</span><span>平潮</span><span>高潮</span></div>
+        </div>
+        <div class="btns">
+          <button class="btn primary" type="button" id="shakeBtn">摇一摇</button>
+          <button class="btn" type="button" id="calmBtn">抚平水面</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="h-read">
+        <div class="card-h"><h2 id="h-read">实时读数</h2><span>Readout</span></div>
+        <div class="stats">
+          <div class="stat"><b id="stC">–</b><span>波速</span></div>
+          <div class="stat"><b id="stF">–</b><span>整块摆动</span></div>
+          <div class="stat"><b id="stA">–</b><span>最大起伏</span></div>
+        </div>
+        <div class="spark">
+          <div class="spark-h"><span>表面能量（相对值）</span><span>近 12 秒</span></div>
+          <canvas id="spark" width="320" height="64" aria-label="表面波动能量的走势"></canvas>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="colophon">
+    <div>
+      <h3>材质 Material</h3>
+      <p>果冻用自定义 GLSL 着色：先把底座、岛和标本渲染到离屏纹理，再按折射方向（折射率 1.34）偏移采样，并对红绿蓝分别偏移一点做色散；穿过的厚度按 Beer–Lambert 定律吸收着色，加上包裹光照与背光透射近似次表面散射，最后叠一层摄影棚柔光箱的菲涅耳反射。</p>
+    </div>
+    <div>
+      <h3>物理 Physics</h3>
+      <p>水面是 128 × 128 网格上的二维波动方程，带回复力和阻尼；水浅处波速变慢，岛岸是固定边界。整块果冻是一个二阶弹簧阻尼系统：顶面剪切摆动、上下压扁回弹，摇晃时的加速度会反过来激起晃荡波。</p>
+    </div>
+    <div>
+      <h3>比例 Scale</h3>
+      <p>展台 24 × 24 cm，基底厚 7.2 cm。硬度读数按明胶类凝胶的杨氏模量 1–16 kPa 粗略换算，用于对比手感，不是测量值。</p>
+    </div>
+  </footer>
+</div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+/* =====================================================================
+   Island Jelly — scene, materials, physics, interaction
+   ===================================================================== */
+
+const $ = (id) => document.getElementById(id);
+const stageEl = $('stage');
+const canvas = $('gl');
+const calloutsEl = $('callouts');
+
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const smoothstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+function mulberry(seed) {
+  return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- world dimensions (1 unit = 6 cm) ----------
+const W = 4, HALF = 2;
+const BASE_BOT = -1.7, SEABED = -0.5;
+const ROUND = 0.11;                 // rounded top edge of the jelly
+const N = 128;                      // wave grid
+const DX = W / (N - 1);
+const CM = 6;
+const SIM_HZ = 120;
+const MAX_SPEC = 10;
+
+const ui = { firm: 0.45, damp: 0.30, tide: 0.5 };
+const tideToWater = (t) => lerp(0.06, 0.48, t);
+let water = tideToWater(ui.tide);
+
+// ---------- renderer ----------
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+} catch (err) {
+  $('loading').innerHTML = '这个浏览器没能启动 WebGL，果冻没法浇筑。<small>WEBGL UNAVAILABLE — TRY ANOTHER BROWSER</small>';
+  throw err;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NoToneMapping;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.autoUpdate = false;
+
+const PAPER = new THREE.Color('#F4F7FB');
+const scene = new THREE.Scene();         // everything opaque (refracted through the jelly)
+scene.background = PAPER;
+const jellyScene = new THREE.Scene();    // the jelly itself + hover ring
+
+const camera = new THREE.PerspectiveCamera(27, 1, 0.1, 80);
+const orbit = { theta: 0.62, phi: 1.02, r: 13.2, target: new THREE.Vector3(0, 0.05, 0) };
+const orbitHome = { ...orbit };
+let fitScale = 1;
+function placeCamera() {
+  const r = orbit.r * fitScale;
+  camera.position.set(
+    orbit.target.x + r * Math.sin(orbit.phi) * Math.sin(orbit.theta),
+    orbit.target.y + r * Math.cos(orbit.phi),
+    orbit.target.z + r * Math.sin(orbit.phi) * Math.cos(orbit.theta),
+  );
+  camera.lookAt(orbit.target);
+}
+
+const rt = new THREE.WebGLRenderTarget(4, 4, {
+  type: THREE.HalfFloatType,
+  depthTexture: new THREE.DepthTexture(4, 4),
+});
+const bufSize = new THREE.Vector2();
+
+// ---------- lights ----------
+const hemi = new THREE.HemisphereLight(0xF7FAFF, 0xB8C7D6, 1.9);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xFFF3E4, 3.1);
+sun.position.set(-4.2, 8.5, 3.6);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -4.5, right: 4.5, top: 4.5, bottom: -4.5, near: 2, far: 22 });
+sun.shadow.bias = -0.0005;
+sun.shadow.normalBias = 0.025;
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0xDCE7F4, 0.9);
+fill.position.set(6, 2.5, -3);
+scene.add(fill);
+const LIGHT_DIR = sun.position.clone().normalize();
+
+// ---------- shared uniforms + GLSL ----------
+const hfData = new Float32Array(N * N * 2);
+const hfTex = new THREE.DataTexture(hfData, N, N, THREE.RGFormat, THREE.FloatType);
+hfTex.minFilter = hfTex.magFilter = THREE.NearestFilter;
+hfTex.needsUpdate = true;
+
+const U = {
+  uHeight: { value: hfTex },
+  uWater: { value: water },
+  uShear: { value: new THREE.Vector2() },
+  uSquash: { value: 0 },
+  uTime: { value: 0 },
+  uCausticTint: { value: new THREE.Color('#E8EEF6') },
+  uPalmKick: { value: new THREE.Vector2() },
+};
+
+const GLSL_COMMON = /* glsl */`
+#define HALF ${HALF.toFixed(4)}
+#define WIDTH ${W.toFixed(4)}
+#define SEABED ${SEABED.toFixed(4)}
+#define ROUND ${ROUND.toFixed(4)}
+#define GRID ${N}
+uniform sampler2D uHeight;
+uniform float uWater;
+uniform vec2 uShear;
+uniform float uSquash;
+uniform float uTime;
+
+vec2 sampleHF(vec2 xz) {
+  vec2 g = clamp((xz + HALF) / WIDTH, 0.0, 1.0) * float(GRID - 1);
+  ivec2 i0 = ivec2(floor(g));
+  ivec2 i1 = min(i0 + 1, ivec2(GRID - 1));
+  vec2 f = g - vec2(i0);
+  vec2 a = texelFetch(uHeight, i0, 0).rg;
+  vec2 b = texelFetch(uHeight, ivec2(i1.x, i0.y), 0).rg;
+  vec2 c = texelFetch(uHeight, ivec2(i0.x, i1.y), 0).rg;
+  vec2 d = texelFetch(uHeight, i1, 0).rg;
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+float waveH(vec2 xz) { return sampleHF(xz).r; }
+
+// soft-body pose of the whole block: top shears, block squashes and bulges
+vec3 jellyDeform(vec3 p) {
+  float H = max(uWater - SEABED, 0.05);
+  float t = clamp((p.y - SEABED) / H, 0.0, 1.4);
+  float w = t * t * (1.5 - 0.5 * t);
+  p.xz += uShear * w;
+  p.xz *= 1.0 + uSquash * 0.55 * sin(3.14159 * clamp(t, 0.0, 1.0));
+  p.y = SEABED + (p.y - SEABED) * (1.0 - uSquash);
+  return p;
+}
+`;
+
+const GLSL_NOISE = /* glsl */`
+float hash12(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+vec2 hash22(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973)); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.xx + p3.yz) * p3.zy); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash12(i), hash12(i + vec2(1, 0)), u.x), mix(hash12(i + vec2(0, 1)), hash12(i + vec2(1, 1)), u.x), u.y);
+}
+float fbm(vec2 p) { float s = 0.0, a = 0.5; for (int i = 0; i < 4; i++) { s += a * vnoise(p); p = p * 2.03 + 17.1; a *= 0.5; } return s; }
+// x: distance to nearest site, y: F2 - F1 (edge distance), z: cell id hash
+vec3 voronoi(vec2 p) {
+  vec2 n = floor(p), f = fract(p);
+  float d1 = 8.0, d2 = 8.0; vec2 id = n;
+  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
+    vec2 g = vec2(float(i), float(j));
+    vec2 r = g + hash22(n + g) - f;
+    float d = dot(r, r);
+    if (d < d1) { d2 = d1; d1 = d; id = n + g; } else if (d < d2) { d2 = d; }
+  }
+  return vec3(sqrt(d1), sqrt(d2) - sqrt(d1), hash12(id));
+}
+`;
+
+const GLSL_CAUSTIC = /* glsl */`
+uniform vec3 uCausticTint;
+float causticLayer(vec2 p, float t) {
+  vec2 n = floor(p), f = fract(p);
+  float d1 = 8.0, d2 = 8.0;
+  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
+    vec2 g = vec2(float(i), float(j));
+    vec2 o = 0.5 + 0.42 * sin(t + 6.2831 * hash22(n + g));
+    vec2 r = g + o - f;
+    float d = dot(r, r);
+    if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) { d2 = d; }
+  }
+  return 1.0 - smoothstep(0.0, 0.2, sqrt(d2) - sqrt(d1));
+}
+// light focused by the wobbling surface onto whatever lies beneath it
+float caustics(vec3 wp) {
+  if (wp.y > uWater + 0.01 || abs(wp.x) > HALF || abs(wp.z) > HALF) return 0.0;
+  float e = 0.05;
+  float h0 = waveH(wp.xz);
+  float hx1 = waveH(wp.xz + vec2(e, 0.0)), hx0 = waveH(wp.xz - vec2(e, 0.0));
+  float hz1 = waveH(wp.xz + vec2(0.0, e)), hz0 = waveH(wp.xz - vec2(0.0, e));
+  vec2 grad = vec2(hx1 - hx0, hz1 - hz0) / (2.0 * e);
+  float lap = (hx1 + hx0 + hz1 + hz0 - 4.0 * h0) / (e * e);
+  float depth = uWater - wp.y;
+  vec2 p = wp.xz * 2.4 - grad * depth * 1.6;
+  float c = causticLayer(p, uTime * 0.8) * 0.55 + causticLayer(p * 1.6 + 4.7, uTime * 1.05 + 2.0) * 0.45;
+  c = pow(c, 3.0) * 1.1 + clamp(-lap * depth * 0.18, -0.25, 0.9);
+  return max(c, 0.0) * smoothstep(0.0, 0.05, depth) * exp(-depth * 0.7);
+}
+`;
+
+const GLSL_GROUND = /* glsl */`
+vec3 strataColor(vec3 wp, out float ao) {
+  float u = wp.x + wp.z;
+  float y = wp.y;
+  float wob = 0.018 * sin(u * 2.3 + 1.0) + 0.012 * sin(u * 5.1) + 0.03 * (fbm(vec2(u * 1.7, 3.0)) - 0.5);
+  float b1 = -0.66 + wob;
+  float b2 = -0.85 + wob * 1.3 + 0.015 * sin(u * 1.3);
+  float b3 = -1.08 + wob * 0.8 - 0.02 * sin(u * 0.9 + 2.0);
+  float b4 = -1.38 + wob * 1.5;
+  vec3 c; ao = 1.0;
+  if (y > b1) {
+    float g = hash12(floor(vec2(u, y) * 240.0));
+    c = mix(vec3(0.86, 0.76, 0.56), vec3(0.94, 0.87, 0.68), smoothstep(b1, -0.5, y));
+    c *= 0.92 + 0.12 * g;
+  } else if (y > b2) {
+    vec3 vo = voronoi(vec2(u, y * 1.2) * 24.0);
+    float stone = smoothstep(0.02, 0.09, vo.y);
+    vec3 sc = mix(vec3(0.60, 0.58, 0.54), vec3(0.80, 0.76, 0.68), vo.z);
+    if (vo.z > 0.82) sc = vec3(0.42, 0.45, 0.50);
+    sc *= 0.9 + 0.2 * (1.0 - vo.x);
+    c = mix(vec3(0.50, 0.42, 0.32), sc, stone);
+    ao = mix(0.7, 1.0, stone);
+  } else if (y > b3) {
+    float lam = 0.5 + 0.5 * sin(y * 150.0 + fbm(vec2(u * 3.0, y * 10.0)) * 5.0);
+    c = mix(vec3(0.55, 0.32, 0.22), vec3(0.69, 0.44, 0.31), lam * 0.55 + 0.45 * fbm(vec2(u * 6.0, y * 30.0)));
+  } else if (y > b4) {
+    vec3 vo = voronoi(vec2(u, y * 1.35) * 7.0);
+    float stone = smoothstep(0.03, 0.15, vo.y);
+    vec3 sc = mix(vec3(0.47, 0.52, 0.58), vec3(0.66, 0.64, 0.60), vo.z);
+    sc *= 0.8 + 0.35 * (1.0 - vo.x);
+    c = mix(vec3(0.24, 0.23, 0.22), sc, stone);
+    ao = mix(0.55, 1.0, stone);
+  } else {
+    vec3 vo = voronoi(vec2(u * 0.8, y * 2.0) * 4.5);
+    float crack = smoothstep(0.0, 0.03, vo.y);
+    c = vec3(0.30, 0.33, 0.38) * (0.82 + 0.3 * fbm(vec2(u * 4.0, y * 8.0)));
+    c *= mix(0.5, 1.0, crack);
+  }
+  float seam = min(min(abs(y - b1), abs(y - b2)), min(abs(y - b3), abs(y - b4)));
+  c *= mix(0.72, 1.0, smoothstep(0.0, 0.007, seam));
+  c *= mix(0.86, 1.0, smoothstep(${BASE_BOT.toFixed(2)}, -1.2, y));
+  return c;
+}
+vec3 seabedColor(vec2 xz) {
+  float rip = sin(dot(xz, vec2(0.8, 0.6)) * 26.0 + fbm(xz * 2.0) * 5.0);
+  vec3 c = vec3(0.88, 0.80, 0.62) * (0.94 + 0.05 * rip) * (0.95 + 0.08 * hash12(floor(xz * 200.0)));
+  vec3 vo = voronoi(xz * 9.0);
+  if (vo.z > 0.86) c = mix(c, vec3(0.60, 0.62, 0.64) * (0.8 + 0.3 * vo.z), 1.0 - smoothstep(0.17, 0.23, vo.x));
+  return c;
+}
+vec3 islandColor(vec3 wp) {
+  float d = wp.y - uWater;
+  vec3 dry = vec3(0.94, 0.87, 0.70) * (0.93 + 0.09 * hash12(floor(wp.xz * 220.0)));
+  vec3 wet = vec3(0.76, 0.66, 0.49);
+  vec3 sub = vec3(0.87, 0.78, 0.60) * (0.95 + 0.05 * sin(dot(wp.xz, vec2(0.6, 0.8)) * 30.0));
+  vec3 c = d > 0.0 ? mix(wet, dry, smoothstep(0.0, 0.045, d)) : sub;
+  float gmask = smoothstep(0.6, 0.68, fbm(wp.xz * 3.2 + 2.0)) * smoothstep(0.14, 0.24, d);
+  c = mix(c, vec3(0.52, 0.63, 0.36) * (0.85 + 0.3 * hash12(floor(wp.xz * 90.0))), gmask);
+  return c;
+}
+`;
+
+// Patch a MeshStandardMaterial: world position varying + optional colour / caustics / jelly deformation / palm sway.
+function patch(mat, opts) {
+  mat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, U);
+    let vs = sh.vertexShader, fs = sh.fragmentShader;
+    vs = 'varying vec3 vWPos;\n' + (opts.sway ? 'attribute float aSway;\nuniform vec2 uPalmKick;\n' : '') + GLSL_COMMON + vs;
+    let body = '#include <begin_vertex>\n';
+    if (opts.deform) body += 'transformed = jellyDeform(transformed);\n';
+    if (opts.sway) body += `
+      float bend = min(aSway, 1.0); bend *= bend;
+      vec2 wind = vec2(sin(uTime * 1.1 + position.y * 0.7), cos(uTime * 0.83 + position.x * 0.9)) * 0.022;
+      transformed.xz += (wind + uPalmKick) * bend;
+      float tip = max(aSway - 1.0, 0.0);
+      transformed.y += sin(uTime * 3.1 + position.x * 9.0 + position.z * 7.0) * 0.014 * tip;
+      transformed.xz += vec2(sin(uTime * 2.3 + position.z * 8.0), cos(uTime * 2.0 + position.x * 8.0)) * 0.01 * tip;
+    `;
+    body += 'vWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;\n';
+    vs = vs.replace('#include <begin_vertex>', body);
+    fs = 'varying vec3 vWPos;\n' + GLSL_COMMON + GLSL_NOISE + GLSL_CAUSTIC + GLSL_GROUND + fs;
+    if (opts.color) fs = fs.replace('#include <color_fragment>', '#include <color_fragment>\n' + opts.color);
+    if (opts.caustics) fs = fs.replace('#include <emissivemap_fragment>',
+      '#include <emissivemap_fragment>\n totalEmissiveRadiance += uCausticTint * caustics(vWPos) * diffuseColor.rgb * 1.25;');
+    sh.vertexShader = vs; sh.fragmentShader = fs;
+  };
+  mat.customProgramCacheKey = () => JSON.stringify(Object.keys(opts).filter((k) => opts[k]));
+  return mat;
+}
+
+// ---------- island shape (CPU, shared with physics) ----------
+const ISL = { x: 0.18, z: -0.12, R: 1.12, peak: 0.56 };
+function islandH(x, z) {
+  const dx = x - ISL.x, dz = z - ISL.z;
+  const a = Math.atan2(dz, dx);
+  const rr = Math.hypot(dx, dz);
+  const Rn = ISL.R * (1 + 0.12 * Math.sin(3 * a + 0.7) + 0.07 * Math.sin(5 * a + 2.1) + 0.035 * Math.sin(9 * a + 0.3));
+  const t = rr / Rn;
+  if (t >= 1) return SEABED - 0.05;
+  const f = 1 - 0.35 * smoothstep(0.0, 0.55, t) - 0.65 * smoothstep(0.4, 1.0, t);
+  return SEABED - 0.02 + (ISL.peak - SEABED) * f + 0.02 * Math.sin(x * 7.0) * Math.sin(z * 6.0) * (1 - t);
+}
+
+/* =====================================================================
+   Static scene: ground, plinth, strata base, island, palms, seabed bits
+   ===================================================================== */
+// soft page shadow
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ color: 0x263B54, opacity: 0.16 }));
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = BASE_BOT - 0.24;
+ground.receiveShadow = true;
+scene.add(ground);
+{
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(64, 64, 10, 64, 64, 64);
+  grd.addColorStop(0, 'rgba(38,59,84,0.30)'); grd.addColorStop(1, 'rgba(38,59,84,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
+  const tex = new THREE.CanvasTexture(c);
+  const blob = new THREE.Mesh(new THREE.PlaneGeometry(7.4, 7.4), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }));
+  blob.rotation.x = -Math.PI / 2; blob.position.y = BASE_BOT - 0.235;
+  scene.add(blob);
+}
+
+// plinth with a museum label
+const PLINTH_H = 0.22;
+const plinth = new THREE.Mesh(new THREE.BoxGeometry(W + 0.5, PLINTH_H, W + 0.5),
+  new THREE.MeshStandardMaterial({ color: 0xE8EEF6, roughness: 0.6 }));
+plinth.position.y = BASE_BOT - PLINTH_H / 2;
+plinth.castShadow = plinth.receiveShadow = true;
+scene.add(plinth);
+const labelCanvas = document.createElement('canvas');
+labelCanvas.width = 1024; labelCanvas.height = 96;
+const labelTex = new THREE.CanvasTexture(labelCanvas);
+labelTex.colorSpace = THREE.SRGBColorSpace;
+labelTex.anisotropy = 4;
+const label = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.3), new THREE.MeshStandardMaterial({ map: labelTex, roughness: 0.7, transparent: true }));
+label.position.set(-0.35, BASE_BOT - PLINTH_H / 2, HALF + 0.251);
+scene.add(label);
+function drawLabel() {
+  const g = labelCanvas.getContext('2d');
+  g.clearRect(0, 0, 1024, 96);
+  g.fillStyle = '#263B54';
+  g.font = 'italic 600 46px Fraunces, Georgia, serif';
+  g.textBaseline = 'middle';
+  g.fillText('Island Jelly', 20, 50);
+  g.font = '500 24px "IBM Plex Mono", monospace';
+  g.fillStyle = '#497DAE';
+  g.fillText('No.07  ·  海岛果冻  ·  24 × 24 cm  ·  GELATIN, SAND, BASALT', 330, 52);
+  labelTex.needsUpdate = true;
+}
+drawLabel();
+document.fonts?.ready.then(drawLabel);
+
+// layered sediment base
+const baseH = SEABED - BASE_BOT;
+const baseGeo = new THREE.BoxGeometry(W, baseH, W, 1, 1, 1);
+const baseMat = patch(new THREE.MeshStandardMaterial({ roughness: 0.93 }), {
+  caustics: true,
+  color: `float ao = 1.0;
+    vec3 sc = vWPos.y > SEABED - 0.003 ? seabedColor(vWPos.xz) : strataColor(vWPos, ao);
+    diffuseColor.rgb = pow(sc, vec3(2.2)) * ao;`,
+});
+const base = new THREE.Mesh(baseGeo, baseMat);
+base.position.y = BASE_BOT + baseH / 2;
+base.receiveShadow = true;
+base.castShadow = true;
+scene.add(base);
+
+// island
+function buildIsland() {
+  const rings = 56, segs = 160;
+  const pos = [], idx = [];
+  for (let i = 0; i <= rings; i++) {
+    const t = (i / rings) * 1.04;
+    for (let j = 0; j < segs; j++) {
+      const a = (j / segs) * Math.PI * 2;
+      const Rn = ISL.R * (1 + 0.12 * Math.sin(3 * a + 0.7) + 0.07 * Math.sin(5 * a + 2.1) + 0.035 * Math.sin(9 * a + 0.3));
+      const x = ISL.x + Math.cos(a) * Rn * t, z = ISL.z + Math.sin(a) * Rn * t;
+      pos.push(x, Math.max(islandH(x, z), SEABED - 0.02), z);
+    }
+  }
+  for (let i = 0; i < rings; i++) for (let j = 0; j < segs; j++) {
+    const a = i * segs + j, b = i * segs + (j + 1) % segs, c = (i + 1) * segs + j, d = (i + 1) * segs + (j + 1) % segs;
+    idx.push(a, b, c, b, d, c);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  return g;
+}
+const islandMat = patch(new THREE.MeshStandardMaterial({ roughness: 0.95 }), {
+  caustics: true,
+  color: 'diffuseColor.rgb = pow(islandColor(vWPos), vec3(2.2));',
+});
+const island = new THREE.Mesh(buildIsland(), islandMat);
+island.castShadow = island.receiveShadow = true;
+scene.add(island);
+
+// palms
+const palmMat = patch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85 }), { sway: true });
+const frondMat = patch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.7, side: THREE.DoubleSide }), { sway: true });
+const palms = [];
+const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3();
+function buildPalm(bx, bz, height, leanX, leanZ, fronds, seed) {
+  const rnd = mulberry(seed);
+  const by = islandH(bx, bz) - 0.03;
+  const pts = [];
+  for (let i = 0; i <= 5; i++) {
+    const t = i / 5;
+    pts.push(new THREE.Vector3(bx + leanX * t * t, by + height * t, bz + leanZ * t * t));
+  }
+  const curve = new THREE.CatmullRomCurve3(pts);
+  const tub = 54, rad = 10;
+  const trunk = new THREE.TubeGeometry(curve, tub, 0.05, rad, false);
+  const p = trunk.attributes.position;
+  const cols = [], sway = [];
+  const cLight = new THREE.Color('#B08D66'), cDark = new THREE.Color('#6E5440'), cc = new THREE.Color();
+  for (let i = 0; i <= tub; i++) {
+    const t = i / tub;
+    const c = curve.getPointAt(t);
+    const ring = Math.pow((t * 15) % 1, 2.4);
+    const s = lerp(1.3, 0.62, t) * (1 + 0.2 * ring);
+    for (let j = 0; j <= rad; j++) {
+      const k = i * (rad + 1) + j;
+      tmpV.fromBufferAttribute(p, k).sub(c).multiplyScalar(s).add(c);
+      p.setXYZ(k, tmpV.x, tmpV.y, tmpV.z);
+      cc.copy(cLight).lerp(cDark, ring * 0.8 + 0.1 * rnd());
+      cols.push(cc.r, cc.g, cc.b);
+      sway.push(t);
+    }
+  }
+  trunk.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+  trunk.setAttribute('aSway', new THREE.Float32BufferAttribute(sway, 1));
+  trunk.computeVertexNormals();
+  const trunkMesh = new THREE.Mesh(trunk, palmMat);
+  trunkMesh.castShadow = true;
+
+  const top = curve.getPointAt(1);
+  const fp = [], fc = [], fs = [];
+  const cSpine = new THREE.Color('#3F6E3A'), cTip = new THREE.Color('#9CC165'), cDry = new THREE.Color('#B9B26A');
+  const up = new THREE.Vector3(0, 1, 0);
+  const push = (v, col, s) => { fp.push(v.x, v.y, v.z); fc.push(col.r, col.g, col.b); fs.push(s); };
+  for (let f = 0; f < fronds; f++) {
+    const a = (f / fronds) * Math.PI * 2 + rnd() * 0.5;
+    const dir = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
+    const L = 0.62 + rnd() * 0.24;
+    const rise = 0.42 + rnd() * 0.18, droop = 0.7 + rnd() * 0.3;
+    const spine = (u) => new THREE.Vector3().copy(top).addScaledVector(dir, L * u).add(new THREE.Vector3(0, L * (rise * u - droop * u * u), 0));
+    const S = 18;
+    const dry = rnd() < 0.18;
+    for (let k = 0; k < S; k++) {
+      const u0 = k / S, u1 = (k + 1) / S;
+      const p0 = spine(u0), p1 = spine(u1);
+      const tng = tmpV2.copy(p1).sub(p0).normalize();
+      const side = new THREE.Vector3().crossVectors(tng, up).normalize();
+      const leaf = 0.25 * Math.sin(Math.PI * Math.min(u0 * 1.05 + 0.08, 1)) + 0.02;
+      for (const sg of [-1, 1]) {
+        const tip = p0.clone().addScaledVector(side, sg * leaf).add(new THREE.Vector3(0, -0.07 - 0.08 * u0, 0)).addScaledVector(tng, 0.07);
+        const tipCol = dry ? cDry : cTip;
+        push(p0, cSpine, 1 + u0); push(p1, cSpine, 1 + u1); push(tip, tipCol, 1 + u0 + 0.15);
+      }
+    }
+  }
+  const fg = new THREE.BufferGeometry();
+  fg.setAttribute('position', new THREE.Float32BufferAttribute(fp, 3));
+  fg.setAttribute('color', new THREE.Float32BufferAttribute(fc, 3));
+  fg.setAttribute('aSway', new THREE.Float32BufferAttribute(fs, 1));
+  fg.computeVertexNormals();
+  const frondMesh = new THREE.Mesh(fg, frondMat);
+  frondMesh.castShadow = true;
+
+  // coconut cluster under the crown
+  const nuts = [];
+  for (let i = 0; i < 3; i++) {
+    const m = new THREE.Mesh(cocoGeo, cocoMat);
+    m.scale.setScalar(0.75);
+    m.castShadow = true;
+    const a = i * 2.1 + rnd();
+    m.userData.off = new THREE.Vector3(Math.cos(a) * 0.07, -0.08 - rnd() * 0.03, Math.sin(a) * 0.07);
+    nuts.push(m);
+    scene.add(m);
+  }
+  scene.add(trunkMesh, frondMesh);
+  const palm = { top, trunkMesh, frondMesh, nuts };
+  palms.push(palm);
+  return palm;
+}
+
+// shared coconut geometry: fibrous husk via vertex colour
+const cocoGeo = (() => {
+  const g = new THREE.SphereGeometry(0.085, 28, 20);
+  g.scale(1, 0.94, 1.08);
+  const p = g.attributes.position, cols = [];
+  const c0 = new THREE.Color('#6B4228'), c1 = new THREE.Color('#9A6A43'), c = new THREE.Color();
+  const rnd = mulberry(7);
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+    const lon = Math.atan2(x, y);
+    const k = 0.5 + 0.5 * Math.sin(lon * 34 + z * 40) * 0.6 + rnd() * 0.25;
+    c.copy(c0).lerp(c1, clamp(k, 0, 1));
+    cols.push(c.r, c.g, c.b);
+  }
+  g.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+  return g;
+})();
+const cocoMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9 });
+const cocoEyeMat = new THREE.MeshStandardMaterial({ color: 0x2A1A12, roughness: 0.6 });
+
+buildPalm(ISL.x - 0.1, ISL.z + 0.06, 1.32, 0.42, 0.34, 10, 11);
+buildPalm(ISL.x + 0.26, ISL.z - 0.22, 0.86, 0.3, -0.28, 8, 23);
+
+// beach & seabed decorations
+const rnd = mulberry(2024);
+{
+  const rockGeo = new THREE.DodecahedronGeometry(1, 0);
+  const rockMat = new THREE.MeshStandardMaterial({ color: 0x8B8F93, roughness: 0.85, flatShading: true });
+  const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 26);
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), e = new THREE.Euler();
+  const col = new THREE.Color();
+  let n = 0;
+  // shoreline rocks
+  for (let i = 0; i < 7; i++) {
+    const a = i * 0.9 + 0.4 + rnd() * 0.4, r = ISL.R * (0.48 + rnd() * 0.12);
+    const x = ISL.x + Math.cos(a) * r, z = ISL.z + Math.sin(a) * r;
+    const sc = 0.025 + rnd() * 0.025;
+    e.set(rnd() * 3, rnd() * 3, rnd() * 3); q.setFromEuler(e); s.set(sc * 1.3, sc * 0.7, sc);
+    m.compose(new THREE.Vector3(x, islandH(x, z), z), q, s); rocks.setMatrixAt(n, m);
+    rocks.setColorAt(n++, col.set(rnd() < 0.5 ? '#A9A397' : '#8C929A'));
+  }
+  // seabed pebbles inside the jelly
+  for (let tries = 0; n < 26 && tries < 400; tries++) {
+    const x = (rnd() * 2 - 1) * (HALF - 0.15), z = (rnd() * 2 - 1) * (HALF - 0.15);
+    if (islandH(x, z) > SEABED - 0.04) continue;
+    const sc = 0.025 + rnd() * 0.05;
+    e.set(rnd() * 3, rnd() * 3, rnd() * 3); q.setFromEuler(e); s.set(sc * 1.4, sc * 0.6, sc);
+    m.compose(new THREE.Vector3(x, SEABED + sc * 0.2, z), q, s); rocks.setMatrixAt(n, m);
+    rocks.setColorAt(n++, col.set(['#7D858F', '#9A958B', '#5F6670', '#B4AA98'][Math.floor(rnd() * 4)]));
+  }
+  rocks.count = n;
+  rocks.castShadow = rocks.receiveShadow = true;
+  scene.add(rocks);
+
+  // seagrass, held in the jelly (moves with the block)
+  const sp = [], sc = [], si = [];
+  const cBase = new THREE.Color('#3E6B47'), cTip = new THREE.Color('#A8C46E'), cc = new THREE.Color();
+  let clusters = 0;
+  for (let tries = 0; clusters < 9 && tries < 300; tries++) {
+    const cx = (rnd() * 2 - 1) * (HALF - 0.3), cz = (rnd() * 2 - 1) * (HALF - 0.3);
+    if (islandH(cx, cz) > SEABED - 0.04) continue;
+    clusters++;
+    const blades = 6 + Math.floor(rnd() * 6);
+    for (let b = 0; b < blades; b++) {
+      const bx = cx + (rnd() - 0.5) * 0.18, bz = cz + (rnd() - 0.5) * 0.18;
+      const h = 0.16 + rnd() * 0.26, w = 0.012 + rnd() * 0.01;
+      const fa = rnd() * Math.PI, ba = rnd() * Math.PI * 2, bend = 0.04 + rnd() * 0.1;
+      const fx = Math.cos(fa), fz = Math.sin(fa);
+      const start = sp.length / 3;
+      const SEG = 7;
+      for (let k = 0; k <= SEG; k++) {
+        const t = k / SEG;
+        const x = bx + Math.cos(ba) * bend * t * t, z = bz + Math.sin(ba) * bend * t * t, y = SEABED + h * t;
+        const hw = w * (1 - 0.75 * t);
+        sp.push(x - fx * hw, y, z - fz * hw, x + fx * hw, y, z + fz * hw);
+        cc.copy(cBase).lerp(cTip, t);
+        sc.push(cc.r, cc.g, cc.b, cc.r, cc.g, cc.b);
+      }
+      for (let k = 0; k < SEG; k++) {
+        const a = start + k * 2;
+        si.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+      }
+    }
+  }
+  const gg = new THREE.BufferGeometry();
+  gg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
+  gg.setAttribute('color', new THREE.Float32BufferAttribute(sc, 3));
+  gg.setIndex(si);
+  gg.computeVertexNormals();
+  const grass = new THREE.Mesh(gg, patch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.6, side: THREE.DoubleSide }), { deform: true }));
+  scene.add(grass);
+
+  // two starfish: one on the seabed, one on the beach
+  const shape = new THREE.Shape();
+  for (let i = 0; i <= 10; i++) {
+    const a = (i / 10) * Math.PI * 2 + Math.PI / 2, r = i % 2 === 0 ? 0.075 : 0.032;
+    i === 0 ? shape.moveTo(Math.cos(a) * r, Math.sin(a) * r) : shape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  const starGeo = new THREE.ExtrudeGeometry(shape, { depth: 0.012, bevelEnabled: true, bevelThickness: 0.008, bevelSize: 0.008, bevelSegments: 2 });
+  starGeo.rotateX(-Math.PI / 2);
+  const starMat = new THREE.MeshStandardMaterial({ color: 0xE07A55, roughness: 0.7 });
+  for (const [x, z, r] of [[-1.15, 1.05, 0.4], [ISL.x + 0.38, ISL.z + 0.3, 1.3]]) {
+    const st = new THREE.Mesh(starGeo, starMat);
+    st.position.set(x, Math.max(islandH(x, z), SEABED) + 0.004, z);
+    st.rotation.y = r;
+    st.castShadow = true;
+    scene.add(st);
+  }
+}
+
+// bubbles suspended in the jelly
+const bubbles = (() => {
+  const count = 90, rest = [], size = [];
+  for (let i = 0; rest.length / 3 < count && i < 2000; i++) {
+    const x = (rnd() * 2 - 1) * (HALF - 0.12), z = (rnd() * 2 - 1) * (HALF - 0.12);
+    const f = 0.08 + rnd() * 0.84;
+    if (islandH(x, z) > SEABED + f * 0.5) continue;
+    rest.push(x, f, z);
+    size.push(rnd() < 0.15 ? 0.035 + rnd() * 0.025 : 0.012 + rnd() * 0.016);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(rest.length), 3));
+  g.setAttribute('aRest', new THREE.Float32BufferAttribute(rest, 3));
+  g.setAttribute('aSize', new THREE.Float32BufferAttribute(size, 1));
+  const m = new THREE.ShaderMaterial({
+    uniforms: { ...U, uPx: { value: 300 } },
+    transparent: true, depthWrite: false,
+    vertexShader: GLSL_COMMON + `
+      attribute vec3 aRest; attribute float aSize; uniform float uPx;
+      void main() {
+        vec3 p = vec3(aRest.x, SEABED + aRest.y * (uWater - SEABED), aRest.z);
+        p.y += waveH(p.xz) * aRest.y + sin(uTime * 0.7 + aRest.x * 9.0) * 0.006;
+        p = jellyDeform(p);
+        vec4 mv = modelViewMatrix * vec4(p, 1.0);
+        gl_PointSize = aSize * uPx / -mv.z;
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      void main() {
+        vec2 c = gl_PointCoord * 2.0 - 1.0; float r = length(c);
+        if (r > 1.0) discard;
+        float ring = smoothstep(0.6, 0.92, r) * (1.0 - smoothstep(0.92, 1.0, r));
+        float hl = 1.0 - smoothstep(0.0, 0.3, length(c - vec2(-0.32, 0.34)));
+        gl_FragColor = vec4(vec3(1.0), ring * 0.55 + hl * 0.75 + 0.05);
+      }`,
+  });
+  const pts = new THREE.Points(g, m);
+  pts.frustumCulled = false;
+  scene.add(pts);
+  return pts;
+})();
+
+/* =====================================================================
+   The jelly: top grid with rounded edge + four walls, custom shader
+   ===================================================================== */
+function axisCoords() {
+  const xs = [], arc = 9;
+  for (let k = 0; k < arc; k++) xs.push(-HALF + ROUND * (1 - Math.cos((k / arc) * Math.PI / 2)));
+  const inner = Math.round((W - 2 * ROUND) / 0.028);
+  for (let k = 0; k <= inner; k++) xs.push(-HALF + ROUND + (W - 2 * ROUND) * k / inner);
+  for (let k = arc - 1; k >= 0; k--) xs.push(HALF - ROUND * (1 - Math.cos((k / arc) * Math.PI / 2)));
+  return xs;
+}
+function buildJelly() {
+  const xs = axisCoords(), M = xs.length;
+  const pos = [], nrm = [], kind = [], fr = [], idx = [];
+  // top
+  for (let j = 0; j < M; j++) for (let i = 0; i < M; i++) {
+    pos.push(xs[i], 0, xs[j]); nrm.push(0, 1, 0); kind.push(0); fr.push(1);
+  }
+  for (let j = 0; j < M - 1; j++) for (let i = 0; i < M - 1; i++) {
+    const a = j * M + i, b = (j + 1) * M + i, c = j * M + i + 1, d = (j + 1) * M + i + 1;
+    idx.push(a, b, c, c, b, d);
+  }
+  // walls: s = up × n keeps the winding outward
+  const ROWS = 14;
+  const walls = [[0, 0, 1], [0, 0, -1], [1, 0, 0], [-1, 0, 0]];
+  for (const [nx, , nz] of walls) {
+    const sx = nz, sz = -nx;            // cross((0,1,0), n)
+    const start = pos.length / 3;
+    for (let r = 0; r <= ROWS; r++) {
+      const f = Math.pow(r / ROWS, 0.8);
+      for (let i = 0; i < M; i++) {
+        const s = xs[i];
+        pos.push(nx * HALF + sx * s, 0, nz * HALF + sz * s);
+        nrm.push(nx, 0, nz); kind.push(1); fr.push(f);
+      }
+    }
+    for (let r = 0; r < ROWS; r++) for (let i = 0; i < M - 1; i++) {
+      const a = start + r * M + i, b = a + 1, c = a + M, d = c + 1;
+      idx.push(a, b, d, a, d, c);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
+  g.setAttribute('aKind', new THREE.Float32BufferAttribute(kind, 1));
+  g.setAttribute('aF', new THREE.Float32BufferAttribute(fr, 1));
+  g.setIndex(idx);
+  return g;
+}
+
+const FLAVORS = {
+  lagoon:    { zh: '泻湖蓝', trans: '#9FBDDA', glow: '#CCDBEB', rim: '#F4F7FB', caustic: '#E8EEF6', density: 2.0 },
+  raspberry: { zh: '覆盆子粉', trans: '#F09AB8', glow: '#F8C3D5', rim: '#FFF0F5', caustic: '#FFE0EA', density: 1.8 },
+  lime:      { zh: '青柠绿', trans: '#B5DE72', glow: '#D9F0A8', rim: '#F7FFE6', caustic: '#F0FAD4', density: 1.75 },
+};
+function flavorTargets(key) {
+  const f = FLAVORS[key];
+  const t = new THREE.Color(f.trans);
+  return {
+    absorb: new THREE.Vector3(-Math.log(t.r), -Math.log(t.g), -Math.log(t.b)).multiplyScalar(f.density),
+    glow: new THREE.Color(f.glow), rim: new THREE.Color(f.rim), caustic: new THREE.Color(f.caustic),
+  };
+}
+let flavorKey = 'lagoon';
+let flavorT = flavorTargets(flavorKey);
+
+const jellyU = {
+  ...U,
+  uScene: { value: rt.texture },
+  uDepth: { value: rt.depthTexture },
+  uRes: { value: new THREE.Vector2(1, 1) },
+  uNear: { value: camera.near }, uFar: { value: camera.far },
+  uProjMat: { value: camera.projectionMatrix },
+  uAbsorb: { value: flavorT.absorb.clone() },
+  uGlow: { value: flavorT.glow.clone() },
+  uRim: { value: flavorT.rim.clone() },
+  uLightDir: { value: LIGHT_DIR },
+  uBoxDir: { value: new THREE.Vector3(0, 1, 0) },
+};
+const jellyMat = new THREE.ShaderMaterial({
+  uniforms: jellyU,
+  vertexShader: GLSL_COMMON + /* glsl */`
+    attribute float aKind; attribute float aF;
+    varying vec3 vWPos; varying vec3 vRest; varying vec3 vNrm; varying float vKind;
+    void main() {
+      vec3 p = position;
+      float top = uWater + waveH(p.xz);
+      vec2 e = max(abs(p.xz) - (HALF - ROUND), 0.0);
+      float q = min(length(e), ROUND);
+      float drop = ROUND - sqrt(max(ROUND * ROUND - q * q, 0.0));
+      if (aKind < 0.5) p.y = top - drop;
+      else p.y = mix(SEABED, top - ROUND, aF);
+      vRest = p; vNrm = normal; vKind = aKind;
+      vec4 wp = modelMatrix * vec4(jellyDeform(p), 1.0);
+      vWPos = wp.xyz;
+      gl_Position = projectionMatrix * viewMatrix * wp;
+    }`,
+  fragmentShader: GLSL_COMMON + GLSL_NOISE + /* glsl */`
+    uniform sampler2D uScene; uniform sampler2D uDepth;
+    uniform vec2 uRes; uniform float uNear; uniform float uFar; uniform mat4 uProjMat;
+    uniform vec3 uAbsorb; uniform vec3 uGlow; uniform vec3 uRim; uniform vec3 uLightDir;
+    varying vec3 vWPos; varying vec3 vRest; varying vec3 vNrm; varying float vKind;
+
+    float eyeDepth(float d) { float z = d * 2.0 - 1.0; return 2.0 * uNear * uFar / (uFar + uNear - z * (uFar - uNear)); }
+    float boxExit(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax) {
+      vec3 inv = 1.0 / (rd + sign(rd) * 1e-5 + vec3(1e-7));
+      vec3 t0 = (bmin - ro) * inv, t1 = (bmax - ro) * inv;
+      vec3 tm = max(t0, t1);
+      return max(min(min(tm.x, tm.y), tm.z), 0.0);
+    }
+    // a photo studio: pale cyclorama, one big overhead softbox, one tall strip light
+    float softbox(vec3 r, vec3 d, float w, float h) {
+      float k = dot(r, d);
+      if (k <= 0.0) return 0.0;
+      vec3 a = normalize(cross(d, vec3(0.0, 1.0, 0.001)));
+      vec3 b = cross(a, d);
+      vec2 uv = vec2(dot(r, a), dot(r, b)) / k;
+      return (1.0 - smoothstep(w - 0.04, w, abs(uv.x))) * (1.0 - smoothstep(h - 0.04, h, abs(uv.y)));
+    }
+    uniform vec3 uBoxDir;
+    vec3 studio(vec3 r) {
+      vec3 c = mix(vec3(0.80, 0.85, 0.91), vec3(0.97, 0.98, 1.0), smoothstep(-0.1, 0.7, r.y));
+      c = mix(c, vec3(0.52, 0.58, 0.66), smoothstep(0.0, -0.45, r.y));
+      c += softbox(r, normalize(vec3(-0.45, 0.85, 0.35)), 0.45, 0.3) * 1.5;
+      c += softbox(r, normalize(vec3(0.9, 0.25, -0.3)), 0.1, 0.55) * 0.35;
+      // the key softbox hangs where the flat top mirrors it, so dents and ripples bend its edges
+      c += softbox(r, uBoxDir, 0.5, 0.2) * 3.4;
+      return c;
+    }
+    void main() {
+      vec3 N;
+      float H = max(uWater - SEABED, 0.05);
+      if (vKind < 0.5) {
+        vec2 xz = vRest.xz; float e = 0.03;
+        vec2 g = vec2(waveH(xz + vec2(e, 0.0)) - waveH(xz - vec2(e, 0.0)), waveH(xz + vec2(0.0, e)) - waveH(xz - vec2(0.0, e))) / (2.0 * e);
+        vec2 ed = max(abs(xz) - (HALF - ROUND), 0.0);
+        float l = length(ed); if (l > ROUND * 0.995) ed *= ROUND * 0.995 / l;
+        vec3 nr = normalize(vec3(sign(xz.x) * ed.x, sqrt(max(ROUND * ROUND - dot(ed, ed), 0.0)), sign(xz.y) * ed.y));
+        N = normalize(vec3(nr.x - g.x * nr.y, nr.y, nr.z - g.y * nr.y));
+      } else {
+        float t = clamp((vRest.y - SEABED) / H, 0.0, 1.0);
+        float dw = (3.0 * t - 1.5 * t * t) / H;
+        N = normalize(vec3(vNrm.x, -dot(vNrm.xz, uShear) * dw, vNrm.z));
+      }
+      vec3 V = normalize(cameraPosition - vWPos);
+      if (dot(N, V) < 0.0) N = normalize(N + V * (0.01 - dot(N, V)));
+      float NdV = clamp(dot(N, V), 0.0, 1.0);
+
+      vec2 suv = gl_FragCoord.xy / uRes;
+      float fragEye = eyeDepth(gl_FragCoord.z);
+      vec3 rd = refract(-V, N, 1.0 / 1.34);
+      if (dot(rd, rd) < 1e-4) rd = -V;
+      vec2 sh = uShear;
+      vec3 bmin = vec3(-HALF + min(sh.x, 0.0) - 0.05, SEABED, -HALF + min(sh.y, 0.0) - 0.05);
+      vec3 bmax = vec3(HALF + max(sh.x, 0.0) + 0.05, uWater + 0.3, HALF + max(sh.y, 0.0) + 0.05);
+      float tEx = boxExit(vWPos, rd, bmin, bmax);
+      vec4 cp = uProjMat * viewMatrix * vec4(vWPos + rd * min(tEx, 1.1), 1.0);
+      vec2 ruv = clamp(cp.xy / cp.w * 0.5 + 0.5, 0.002, 0.998);
+      float sceneEye = eyeDepth(texture(uDepth, ruv).r);
+      if (sceneEye < fragEye - 0.01) { ruv = suv; sceneEye = eyeDepth(texture(uDepth, suv).r); }
+      float thick = clamp(min(tEx, sceneEye - fragEye), 0.0, 6.0);
+
+      vec2 off = ruv - suv;
+      vec3 refr;
+      refr.r = texture(uScene, clamp(suv + off * 0.97, 0.002, 0.998)).r;
+      refr.g = texture(uScene, ruv).g;
+      refr.b = texture(uScene, clamp(suv + off * 1.035, 0.002, 0.998)).b;
+
+      // Beer–Lambert absorption through the jelly
+      vec3 T = exp(-uAbsorb * thick);
+      // subsurface: wrap light + back-light transmission, stronger where the jelly is thin and lit
+      float wrap = clamp((dot(N, uLightDir) + 0.6) / 1.6, 0.0, 1.0);
+      vec3 Ht = normalize(uLightDir + N * 0.45);
+      float back = pow(clamp(dot(V, -Ht), 0.0, 1.0), 3.0);
+      float scat = 1.0 - exp(-thick * 0.6);
+      vec3 tintCol = exp(-uAbsorb * 0.5);
+      vec3 inscatter = mix(uGlow, tintCol, 0.6) * (0.35 + 0.3 * wrap + 0.9 * back) * scat;
+      vec3 col = refr * T * (1.0 - 0.18 * scat) + inscatter * 0.32;
+
+      // milky glow where light skims along the surface
+      col += uGlow * pow(1.0 - NdV, 2.0) * 0.1;
+
+      // shoreline foam where the island rises right under the surface
+      if (vKind < 0.5) {
+        float ih = sampleHF(vRest.xz).g;
+        float gap = vRest.y - ih;
+        float foam = (1.0 - smoothstep(0.0, 0.07, gap)) * step(-0.02, gap);
+        foam *= 0.55 + 0.45 * vnoise(vRest.xz * 38.0 + uTime * 0.6);
+        col = mix(col, vec3(0.98, 0.99, 1.0), foam * 0.7);
+      }
+
+      // studio reflections with Schlick Fresnel (F0 of a 1.34 medium ≈ 0.021)
+      vec3 R = reflect(-V, N);
+      float F = 0.021 + 0.979 * pow(1.0 - NdV, 5.0);
+      vec3 env = studio(R) * mix(vec3(1.0), uRim, 0.4);
+      col = mix(col, env, clamp(F * 1.6, 0.0, 1.0));
+      col += env * 0.05 * smoothstep(0.2, 1.0, R.y);
+      vec3 Hs = normalize(uLightDir + V);
+      float spec = pow(max(dot(N, Hs), 0.0), 160.0) * 2.0 + pow(max(dot(N, Hs), 0.0), 28.0) * 0.16;
+      col += vec3(1.0, 0.98, 0.95) * spec;
+      col += uRim * pow(1.0 - NdV, 4.0) * 0.25;
+      if (vKind > 0.5) {
+        float t = clamp((vRest.y - SEABED) / H, 0.0, 1.0);
+        col = mix(col, tintCol * uGlow * 0.9, 0.12 + 0.1 * t);
+      }
+
+      gl_FragColor = vec4(col, 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }`,
+});
+const jelly = new THREE.Mesh(buildJelly(), jellyMat);
+jelly.frustumCulled = false;
+jellyScene.add(jelly);
+
+const hoverRing = new THREE.Mesh(new THREE.RingGeometry(0.1, 0.118, 48),
+  new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.85, depthWrite: false }));
+hoverRing.rotation.x = -Math.PI / 2;
+hoverRing.renderOrder = 3;
+hoverRing.visible = false;
+jellyScene.add(hoverRing);
+
+/* =====================================================================
+   Physics: 2D wave equation + block wobble
+   ===================================================================== */
+const h = new Float32Array(N * N), v = new Float32Array(N * N);
+const mask = new Uint8Array(N * N), cfac = new Float32Array(N * N), islandGrid = new Float32Array(N * N);
+const cellPos = (i) => -HALF + i * DX;
+for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) islandGrid[j * N + i] = islandH(cellPos(i), cellPos(j));
+let maskWater = -99;
+function rebuildMask() {
+  for (let k = 0; k < N * N; k++) {
+    const ih = islandGrid[k];
+    mask[k] = ih > water - 0.004 ? 1 : 0;
+    const depth = water - Math.max(ih, SEABED);
+    cfac[k] = clamp(depth / 0.32, 0.18, 1);   // waves slow down over the shallows
+    if (mask[k]) { h[k] = 0; v[k] = 0; }
+  }
+  maskWater = water;
+}
+
+const phys = () => ({
+  C: lerp(0.10, 0.42, ui.firm),
+  K: lerp(0.0010, 0.0095, ui.firm),
+  D: lerp(0.0012, 0.05, Math.pow(ui.damp, 1.35)),
+  dent: lerp(0.21, 0.075, ui.firm),
+  sig: lerp(0.17, 0.12, ui.firm),
+  freq: lerp(1.0, 3.3, ui.firm),
+  zeta: lerp(0.03, 0.42, ui.damp),
+  kPa: lerp(1.2, 16, Math.pow(ui.firm, 1.2)),
+});
+let P = phys();
+
+const wob = { s: new THREE.Vector2(), sv: new THREE.Vector2(), a: new THREE.Vector2(), q: 0, qv: 0, grab: null };
+const finger = { active: false, x: 0, z: 0, press: 0 };
+
+function addImpulse(x, z, amount, radius) {
+  const ci = Math.round((x + HALF) / DX), cj = Math.round((z + HALF) / DX);
+  const rc = Math.ceil((radius * 2.5) / DX);
+  const inv = 1 / (2 * radius * radius);
+  for (let j = Math.max(0, cj - rc); j <= Math.min(N - 1, cj + rc); j++) {
+    for (let i = Math.max(0, ci - rc); i <= Math.min(N - 1, ci + rc); i++) {
+      const k = j * N + i;
+      if (mask[k]) continue;
+      const dx = cellPos(i) - x, dz = cellPos(j) - z;
+      v[k] += amount * Math.exp(-(dx * dx + dz * dz) * inv);
+    }
+  }
+}
+function applyFinger() {
+  const depth = P.dent * finger.press;
+  const sig = P.sig;
+  const ci = Math.round((finger.x + HALF) / DX), cj = Math.round((finger.z + HALF) / DX);
+  const rc = Math.ceil((sig * 2.6) / DX);
+  const inv = 1 / (2 * sig * sig);
+  for (let j = Math.max(0, cj - rc); j <= Math.min(N - 1, cj + rc); j++) {
+    for (let i = Math.max(0, ci - rc); i <= Math.min(N - 1, ci + rc); i++) {
+      const k = j * N + i;
+      if (mask[k]) continue;
+      const dx = cellPos(i) - finger.x, dz = cellPos(j) - finger.z;
+      const target = -depth * Math.exp(-(dx * dx + dz * dz) * inv);
+      if (h[k] > target) { h[k] += (target - h[k]) * 0.45; v[k] *= 0.4; }
+    }
+  }
+}
+
+function simStep(dt) {
+  const { C, K, D } = P;
+  // wobble of the whole block (2nd-order spring–damper on the top shear)
+  const w = 2 * Math.PI * P.freq, z = P.zeta;
+  const s = wob.s, sv = wob.sv;
+  let ax, az;
+  if (wob.grab) {
+    const wg = 17, zg = 0.85;
+    ax = -wg * wg * (s.x - wob.grab.tx) - 2 * zg * wg * sv.x;
+    az = -wg * wg * (s.y - wob.grab.tz) - 2 * zg * wg * sv.y;
+  } else {
+    ax = -w * w * s.x - 2 * z * w * sv.x;
+    az = -w * w * s.y - 2 * z * w * sv.y;
+  }
+  sv.x += ax * dt; sv.y += az * dt;
+  s.x += sv.x * dt; s.y += sv.y * dt;
+  const sl = s.length();
+  if (sl > 0.46) { s.multiplyScalar(0.46 / sl); sv.multiplyScalar(0.6); }
+  wob.a.set(ax, az);
+  const wq = w * 1.5;
+  wob.qv += (-wq * wq * wob.q - 2 * Math.max(z, 0.06) * wq * wob.qv) * dt;
+  wob.q = clamp(wob.q + wob.qv * dt, -0.16, 0.2);
+
+  // sloshing: the block's acceleration tilts the free surface
+  const slosh = 1.4e-5;
+  const sx = -ax * slosh, sz = -az * slosh;
+
+  if (finger.active) { finger.press = Math.min(1, finger.press + dt * 7); applyFinger(); }
+
+  for (let j = 0; j < N; j++) {
+    const jm = j > 0 ? j - 1 : j, jp = j < N - 1 ? j + 1 : j;
+    const zz = cellPos(j);
+    for (let i = 0; i < N; i++) {
+      const k = j * N + i;
+      if (mask[k]) continue;
+      const im = i > 0 ? i - 1 : i, ip = i < N - 1 ? i + 1 : i;
+      const hc = h[k];
+      const kl = j * N + im, kr = j * N + ip, ku = jm * N + i, kd = jp * N + i;
+      const lap = (mask[kl] ? 0 : h[kl]) + (mask[kr] ? 0 : h[kr]) + (mask[ku] ? 0 : h[ku]) + (mask[kd] ? 0 : h[kd]) - 4 * hc;
+      v[k] = (v[k] + C * cfac[k] * lap - K * hc + sx * cellPos(i) + sz * zz) * (1 - D);
+    }
+  }
+  for (let k = 0; k < N * N; k++) {
+    if (mask[k]) continue;
+    const nh = h[k] + v[k];
+    h[k] = nh > 0.3 ? 0.3 : nh < -0.3 ? -0.3 : nh;
+  }
+}
+
+function sampleWave(x, z) {
+  const gx = clamp((x + HALF) / DX, 0, N - 1.001), gz = clamp((z + HALF) / DX, 0, N - 1.001);
+  const i = Math.floor(gx), j = Math.floor(gz), fx = gx - i, fz = gz - j;
+  const k = j * N + i;
+  return lerp(lerp(h[k], h[k + 1], fx), lerp(h[k + N], h[k + N + 1], fx), fz);
+}
+// the walkable surface: the island where it is above the jelly, otherwise the jelly top
+const surf = { y: 0, gx: 0, gz: 0, island: false };
+function surfaceAt(x, z) {
+  const jy = water + sampleWave(x, z), iy = islandH(x, z);
+  const e = 0.03;
+  if (iy > jy) {
+    surf.island = true; surf.y = iy;
+    surf.gx = (islandH(x + e, z) - islandH(x - e, z)) / (2 * e);
+    surf.gz = (islandH(x, z + e) - islandH(x, z - e)) / (2 * e);
+  } else {
+    surf.island = false; surf.y = jy;
+    surf.gx = (sampleWave(x + e, z) - sampleWave(x - e, z)) / (2 * e);
+    surf.gz = (sampleWave(x, z + e) - sampleWave(x, z - e)) / (2 * e);
+  }
+  return surf;
+}
+function deformCPU(x, y, z, out) {
+  const H = Math.max(water - SEABED, 0.05);
+  const t = clamp((y - SEABED) / H, 0, 1.4);
+  const w = t * t * (1.5 - 0.5 * t);
+  const b = 1 + wob.q * 0.55 * Math.sin(Math.PI * Math.min(t, 1));
+  return out.set((x + wob.s.x * w) * b, SEABED + (y - SEABED) * (1 - wob.q), (z + wob.s.y * w) * b);
+}
+
+/* =====================================================================
+   Specimens: fiddler crabs and coconuts
+   ===================================================================== */
+const crabShell = new THREE.MeshStandardMaterial({ color: 0xD9573B, roughness: 0.45 });
+const crabPale = new THREE.MeshStandardMaterial({ color: 0xF2A27A, roughness: 0.5 });
+const crabDark = new THREE.MeshStandardMaterial({ color: 0x1E2430, roughness: 0.3 });
+const sphereG = new THREE.SphereGeometry(1, 20, 14);
+const cylG = new THREE.CylinderGeometry(1, 1, 1, 8);
+cylG.translate(0, 0.5, 0);
+function limb(parent, ax, ay, az, bx, by, bz, r, mat) {
+  const m = new THREE.Mesh(cylG, mat);
+  const a = new THREE.Vector3(ax, ay, az), b = new THREE.Vector3(bx, by, bz);
+  const d = b.clone().sub(a);
+  m.position.copy(a);
+  m.scale.set(r, d.length(), r);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());
+  m.castShadow = true;
+  parent.add(m);
+  return m;
+}
+function ball(parent, x, y, z, sx, sy, sz, mat) {
+  const m = new THREE.Mesh(sphereG, mat);
+  m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = true;
+  parent.add(m); return m;
+}
+function makeCrab() {
+  const g = new THREE.Group();
+  const body = new THREE.Group(); g.add(body);
+  ball(body, 0, 0.058, 0, 0.1, 0.045, 0.075, crabShell);
+  ball(body, 0, 0.05, 0.005, 0.088, 0.03, 0.066, crabPale).position.y = 0.042;
+  const eyes = [];
+  for (const sx of [-1, 1]) {
+    limb(body, sx * 0.028, 0.09, 0.05, sx * 0.034, 0.135, 0.058, 0.006, crabShell);
+    eyes.push(ball(body, sx * 0.034, 0.14, 0.058, 0.014, 0.014, 0.014, crabDark));
+  }
+  const legs = [];
+  for (const sx of [-1, 1]) for (let n = 0; n < 4; n++) {
+    const piv = new THREE.Group();
+    piv.position.set(sx * 0.08, 0.05, 0.03 - n * 0.03);
+    piv.rotation.y = sx * (n - 1.5) * 0.25;
+    limb(piv, 0, 0, 0, sx * 0.065, 0.045, 0, 0.0075, crabShell);
+    limb(piv, sx * 0.065, 0.045, 0, sx * 0.1, -0.05, 0, 0.006, crabPale);
+    body.add(piv);
+    legs.push({ piv, sx, n, ry: piv.rotation.y });
+  }
+  const claws = [];
+  for (const sx of [-1, 1]) {
+    const big = sx > 0;               // fiddler crab: one oversized claw
+    const k = big ? 1.65 : 0.9;
+    const arm = new THREE.Group();
+    arm.position.set(sx * 0.07, 0.06, 0.06);
+    limb(arm, 0, 0, 0, sx * 0.04 * k, 0.02, 0.04 * k, 0.012 * k, crabShell);
+    const hand = new THREE.Group();
+    hand.position.set(sx * 0.04 * k, 0.02, 0.04 * k);
+    ball(hand, 0, 0, 0.018 * k, 0.026 * k, 0.018 * k, 0.03 * k, big ? crabPale : crabShell);
+    const finger = new THREE.Group();
+    finger.position.set(0, 0.006 * k, 0.04 * k);
+    limb(finger, 0, 0, 0, 0, 0.004, 0.045 * k, 0.007 * k, crabShell);
+    hand.add(finger);
+    limb(hand, 0, -0.008 * k, 0.04 * k, 0, -0.01 * k, 0.08 * k, 0.006 * k, big ? crabPale : crabShell);
+    arm.add(hand);
+    body.add(arm);
+    claws.push({ arm, finger, sx });
+  }
+  g.scale.setScalar(1.45);
+  return { group: g, body, legs, claws, eyes, r: 0.14, mass: 1.0, foot: 0.0 };
+}
+function makeCoconut() {
+  const g = new THREE.Group();
+  const nut = new THREE.Group(); g.add(nut);
+  const m = new THREE.Mesh(cocoGeo, cocoMat); m.castShadow = true; nut.add(m);
+  for (let i = 0; i < 3; i++) {
+    const a = i * 2.09 + 0.5;
+    const e = new THREE.Mesh(sphereG, cocoEyeMat);
+    e.position.set(Math.cos(a) * 0.022, Math.sin(a) * 0.022, 0.09);
+    e.scale.set(0.011, 0.011, 0.005);
+    nut.add(e);
+  }
+  nut.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3);
+  g.scale.setScalar(1.25);
+  return { group: g, body: nut, r: 0.106, mass: 1.3, foot: 0.1 };
+}
+
+const specimens = [];
+let specSerial = 0;
+const NAMES = { crab: '招潮蟹 Uca', coconut: '椰子 Cocos' };
+function spawn(type, x, z, y, vy = 0) {
+  if (specimens.length >= MAX_SPEC) removeSpec(specimens[0]);
+  const parts = type === 'crab' ? makeCrab() : makeCoconut();
+  const o = {
+    ...parts, type, id: ++specSerial, x, z, vx: 0, vz: 0, y, vy, mode: 'fall',
+    yo: 0, yov: 0, yaw: rnd() * Math.PI * 2, roll: new THREE.Quaternion(),
+    walk: 0, walkT: 1 + rnd() * 2, phase: rnd() * 6, scare: 0, snap: 0, onIsland: false,
+  };
+  scene.add(o.group);
+  specimens.push(o);
+  renderLog();
+  return o;
+}
+function removeSpec(o) {
+  scene.remove(o.group);
+  specimens.splice(specimens.indexOf(o), 1);
+  renderLog();
+}
+function randomWaterSpot() {
+  for (let i = 0; i < 80; i++) {
+    const x = (rnd() * 2 - 1) * (HALF - 0.35), z = (rnd() * 2 - 1) * (HALF - 0.35);
+    if (islandH(x, z) < water - 0.06) return [x, z];
+  }
+  return [-1.3, 1.2];
+}
+function drop(type) {
+  const [x, z] = randomWaterSpot();
+  spawn(type, x, z, water + 1.9 + rnd() * 0.4, 0);
+}
+
+const up = new THREE.Vector3(0, 1, 0);
+const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), nrmV = new THREE.Vector3(), posV = new THREE.Vector3();
+function stepSpecimens(dt) {
+  const firm = ui.firm;
+  for (const o of specimens) {
+    if (o.mode === 'fall') {
+      o.vy -= 7.5 * dt;
+      o.y += o.vy * dt;
+      o.x += o.vx * dt; o.z += o.vz * dt;
+      const s = surfaceAt(o.x, o.z);
+      const restY = s.y + o.foot;
+      if (o.y <= restY) {
+        const impact = Math.min(-o.vy, 8);
+        o.mode = 'rest'; o.yo = 0;
+        if (!s.island) {
+          addImpulse(o.x, o.z, -impact * 0.012 * o.mass, 0.13);
+          wob.qv += impact * 0.05 * o.mass;
+          o.yov = -impact * lerp(0.6, 0.32, firm);
+          if (impact > 2) wobbleTitle();
+        } else {
+          o.yov = -impact * 0.12;
+        }
+        o.y = restY;
+      }
+      continue;
+    }
+    const s = surfaceAt(o.x, o.z);
+    o.onIsland = s.island;
+    // vertical: a bouncy spring on the jelly, a dull thud on sand
+    const wo = s.island ? 26 : lerp(8, 19, firm), zo = s.island ? 0.8 : lerp(0.1, 0.5, ui.damp);
+    o.yov += (-wo * wo * o.yo - 2 * zo * wo * o.yov) * dt;
+    o.yo += o.yov * dt;
+    if (!s.island) addImpulse(o.x, o.z, (o.yo * 0.02 - 0.00004) * o.mass, 0.1);
+    // horizontal: slide down slopes, lag behind the block's acceleration, walk if you are a crab
+    const G = s.island ? 4.5 : 3.2;
+    let ax = -s.gx * G, az = -s.gz * G;
+    if (!s.island) { ax -= wob.a.x * 0.012; az -= wob.a.y * 0.012; }
+    if (o.type === 'crab') {
+      o.walkT -= dt;
+      if (o.walkT <= 0) { o.walk = rnd() < 0.45 ? 0 : (rnd() < 0.5 ? -1 : 1) * (0.18 + rnd() * 0.16); o.walkT = 0.8 + rnd() * 2.2; o.yawV = (rnd() - 0.5) * 0.8; }
+      o.yaw += (o.yawV || 0) * dt * (o.walk ? 1 : 0.3);
+      const wx = Math.cos(o.yaw) * o.walk, wz = -Math.sin(o.yaw) * o.walk;
+      ax += (wx - o.vx) * 5; az += (wz - o.vz) * 5;
+      o.scare = Math.max(0, o.scare - dt * 0.8);
+      o.snap += dt * (6 + o.scare * 14);
+    }
+    const drag = s.island ? 4.5 : 1.6;
+    o.vx += (ax - o.vx * drag) * dt; o.vz += (az - o.vz * drag) * dt;
+    o.x += o.vx * dt; o.z += o.vz * dt;
+    const lim = HALF - 0.16;
+    if (Math.abs(o.x) > lim) { o.x = Math.sign(o.x) * lim; o.vx *= -0.3; if (o.type === 'crab') o.walk *= -1; }
+    if (Math.abs(o.z) > lim) { o.z = Math.sign(o.z) * lim; o.vz *= -0.3; if (o.type === 'crab') o.walk *= -1; }
+    if (o.type === 'coconut') {
+      const sp = Math.hypot(o.vx, o.vz);
+      if (sp > 1e-4) {
+        nrmV.set(o.vz, 0, -o.vx).normalize();
+        qa.setFromAxisAngle(nrmV, (sp * dt) / o.r);
+        o.roll.premultiply(qa);
+      }
+    }
+  }
+  // keep specimens from overlapping
+  for (let i = 0; i < specimens.length; i++) for (let j = i + 1; j < specimens.length; j++) {
+    const a = specimens[i], b = specimens[j];
+    if (a.mode !== 'rest' || b.mode !== 'rest') continue;
+    const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz), m = a.r + b.r;
+    if (d < m && d > 1e-5) {
+      const push = (m - d) * 0.5, nx = dx / d, nz = dz / d;
+      a.x -= nx * push; a.z -= nz * push; b.x += nx * push; b.z += nz * push;
+    }
+  }
+}
+function placeSpecimens(time) {
+  for (const o of specimens) {
+    const s = surfaceAt(o.x, o.z);
+    let y = o.mode === 'fall' ? o.y : s.y + o.foot + o.yo;
+    if (o.type === 'crab' && !s.island && o.mode === 'rest') y -= lerp(0.03, 0.008, ui.firm);
+    if (o.mode === 'rest' && !s.island) deformCPU(o.x, y, o.z, posV); else posV.set(o.x, y, o.z);
+    o.group.position.copy(posV);
+    nrmV.set(-s.gx, 1, -s.gz).normalize();
+    if (o.mode === 'fall') nrmV.set(0, 1, 0);
+    qa.setFromUnitVectors(up, nrmV);
+    qb.setFromAxisAngle(up, o.yaw);
+    o.group.quaternion.copy(qa).multiply(qb);
+    if (o.type === 'coconut') o.body.quaternion.copy(o.roll);
+    if (o.type === 'crab') {
+      const moving = Math.min(1, Math.hypot(o.vx, o.vz) * 6);
+      o.phase += moving * 0.35;
+      for (const L of o.legs) {
+        const ph = o.phase + L.n * 1.6 + (L.sx > 0 ? Math.PI : 0);
+        L.piv.rotation.z = L.sx * (Math.sin(ph) * 0.35 * moving + 0.05 * Math.sin(time * 2 + L.n));
+        L.piv.rotation.y = L.ry + Math.cos(ph) * 0.25 * moving;
+      }
+      const lift = o.scare > 0.05 ? 0.9 * Math.min(1, o.scare * 2) : 0;
+      for (const c of o.claws) {
+        c.arm.rotation.x = -lift - 0.1 * Math.sin(time * 1.3 + c.sx);
+        c.finger.rotation.x = -0.25 - 0.25 * Math.max(0, Math.sin(o.snap * (c.sx > 0 ? 1 : 1.3)));
+      }
+      o.body.position.y = 0.006 * Math.sin(time * 9 + o.id) * moving;
+    }
+  }
+}
+
+/* =====================================================================
+   Palms: click to shake, a coconut falls
+   ===================================================================== */
+const palmKick = { p: new THREE.Vector2(), v: new THREE.Vector2() };
+function stepPalm(dt) {
+  const w = 5.2, z = 0.12;
+  palmKick.v.x += (-w * w * palmKick.p.x - 2 * z * w * palmKick.v.x) * dt;
+  palmKick.v.y += (-w * w * palmKick.p.y - 2 * z * w * palmKick.v.y) * dt;
+  palmKick.p.x += palmKick.v.x * dt; palmKick.p.y += palmKick.v.y * dt;
+}
+function placePalmNuts(time) {
+  for (const pm of palms) {
+    const wind = tmpV.set(Math.sin(time * 1.1 + pm.top.y * 0.7) * 0.022 + palmKick.p.x, 0, Math.cos(time * 0.83 + pm.top.x * 0.9) * 0.022 + palmKick.p.y);
+    for (const n of pm.nuts) n.position.copy(pm.top).add(n.userData.off).add(wind);
+  }
+}
+function shakePalm() {
+  const a = rnd() * Math.PI * 2;
+  palmKick.v.x += Math.cos(a) * 0.9; palmKick.v.y += Math.sin(a) * 0.9;
+  const pm = palms[0];
+  const nut = pm.nuts[Math.floor(rnd() * pm.nuts.length)];
+  const o = spawn('coconut', nut.position.x, nut.position.z, nut.position.y, 0.4);
+  o.vx = 0.5 + rnd() * 0.3; o.vz = 0.35 + rnd() * 0.3;   // the trunk leans out over the water
+}
+
+/* =====================================================================
+   Pointer & keyboard
+   ===================================================================== */
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+const box = new THREE.Box3();
+const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+const hitV = new THREE.Vector3();
+function setRay(e) {
+  const r = canvas.getBoundingClientRect();
+  ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+}
+function pick(e) {
+  setRay(e);
+  let best = { kind: 'none', d: Infinity };
+  const specHits = raycaster.intersectObjects(specimens.map((o) => o.group), true);
+  if (specHits.length) {
+    let obj = specHits[0].object;
+    const spec = specimens.find((o) => { let p = obj; while (p) { if (p === o.group) return true; p = p.parent; } return false; });
+    if (spec) best = { kind: 'spec', d: specHits[0].distance, spec };
+  }
+  const islHits = raycaster.intersectObjects([island, ...palms.flatMap((p) => [p.trunkMesh, p.frondMesh])], false);
+  if (islHits.length && islHits[0].distance < best.d) {
+    const pt = islHits[0].point;
+    // the island counts only above the jelly; underwater hits poke the jelly instead
+    if (islHits[0].object !== island || pt.y > water + 0.01) best = { kind: 'island', d: islHits[0].distance };
+  }
+  const s = wob.s;
+  box.min.set(-HALF + Math.min(s.x, 0), SEABED, -HALF + Math.min(s.y, 0));
+  box.max.set(HALF + Math.max(s.x, 0), water + 0.12, HALF + Math.max(s.y, 0));
+  if (raycaster.ray.intersectBox(box, hitV)) {
+    const d = hitV.distanceTo(raycaster.ray.origin);
+    // prefer the top surface point under the cursor
+    plane.constant = -(water + sampleWave(hitV.x - s.x, hitV.z - s.y));
+    const onTop = raycaster.ray.intersectPlane(plane, tmpV2);
+    let x = hitV.x - s.x, z = hitV.z - s.y;
+    if (onTop && Math.abs(tmpV2.x - s.x) <= HALF && Math.abs(tmpV2.z - s.y) <= HALF) { x = tmpV2.x - s.x; z = tmpV2.z - s.y; }
+    x = clamp(x, -HALF + 0.06, HALF - 0.06); z = clamp(z, -HALF + 0.06, HALF - 0.06);
+    if (d < best.d - 0.02 && islandH(x, z) < water - 0.01) best = { kind: 'jelly', d, x, z };
+  }
+  return best;
+}
+function groundPoint(e, y, out) {
+  setRay(e);
+  plane.constant = -y;
+  return raycaster.ray.intersectPlane(plane, out);
+}
+
+let ptr = null;
+const hudMode = $('hudMode');
+function setMode(t) { hudMode.textContent = t; }
+canvas.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0 && e.pointerType === 'mouse') return;
+  canvas.setPointerCapture(e.pointerId);
+  const hit = pick(e);
+  ptr = { id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, mode: 'orbit', hit };
+  if (hit.kind === 'jelly') {
+    ptr.mode = 'poke';
+    Object.assign(finger, { active: true, x: hit.x, z: hit.z, press: 0 });
+    scareCrabs(hit.x, hit.z);
+    setMode('果冻 · 按下');
+  } else if (hit.kind === 'island') {
+    ptr.mode = 'tap';
+    shakePalm();
+    setMode('椰子树 · 摇动');
+  } else if (hit.kind === 'spec') {
+    ptr.mode = 'tap';
+    const o = hit.spec;
+    if (o.mode === 'rest') {
+      const s = surfaceAt(o.x, o.z);
+      o.mode = 'fall'; o.y = s.y + o.foot + o.yo; o.vy = 2.3; o.vx = (rnd() - 0.5) * 0.6; o.vz = (rnd() - 0.5) * 0.6;
+      if (o.type === 'crab') o.scare = 1;
+    }
+    setMode(o.type === 'crab' ? '螃蟹 · 跳' : '椰子 · 弹起');
+  } else {
+    canvas.classList.add('is-dragging');
+    setMode('视角 · 旋转');
+  }
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (!ptr || e.pointerId !== ptr.id) { hover(e); return; }
+  const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y;
+  ptr.x = e.clientX; ptr.y = e.clientY;
+  if (ptr.mode === 'poke' && Math.hypot(e.clientX - ptr.x0, e.clientY - ptr.y0) > 7) {
+    // a drag that started on the jelly grabs the whole block
+    ptr.mode = 'shake';
+    finger.active = false;
+    const st = groundPoint(e, water, new THREE.Vector3());
+    wob.grab = { start: st || new THREE.Vector3(), tx: wob.s.x, tz: wob.s.y, s0: wob.s.clone() };
+    canvas.classList.add('is-dragging');
+    hoverRing.visible = false;
+    setMode('果冻 · 拽住摇晃');
+  }
+  if (ptr.mode === 'shake' && wob.grab) {
+    const cur = groundPoint(e, water, tmpV);
+    if (cur) {
+      let gx = wob.grab.s0.x + (cur.x - wob.grab.start.x) * 0.6, gz = wob.grab.s0.y + (cur.z - wob.grab.start.z) * 0.6;
+      const l = Math.hypot(gx, gz), max = 0.42;
+      if (l > 1e-5) { const k = (max * Math.tanh(l / max)) / l; gx *= k; gz *= k; }
+      wob.grab.tx = gx; wob.grab.tz = gz;
+    }
+  } else if (ptr.mode === 'orbit') {
+    orbit.theta -= dx * 0.006;
+    orbit.phi = clamp(orbit.phi - dy * 0.005, 0.32, 1.42);
+  }
+});
+function endPointer(e) {
+  if (!ptr || e.pointerId !== ptr.id) return;
+  if (ptr.mode === 'poke') {
+    finger.active = false;
+    wob.qv += P.dent * finger.press * 1.6;
+    wobbleTitle();
+  }
+  if (ptr.mode === 'shake') wob.grab = null;
+  canvas.classList.remove('is-dragging');
+  ptr = null;
+  setMode('果冻 · 回弹中');
+}
+canvas.addEventListener('pointerup', endPointer);
+canvas.addEventListener('pointercancel', endPointer);
+canvas.addEventListener('pointerleave', () => { if (!ptr) hoverRing.visible = false; });
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  orbit.r = clamp(orbit.r * Math.exp(e.deltaY * 0.0012), 8.5, 20);
+}, { passive: false });
+
+let hoverHit = null;
+function hover(e) {
+  const hit = pick(e);
+  hoverHit = hit.kind === 'jelly' ? hit : null;
+  canvas.classList.toggle('is-poke', hit.kind !== 'none');
+}
+
+function scareCrabs(x, z) {
+  for (const o of specimens) if (o.type === 'crab' && o.mode === 'rest') {
+    const dx = o.x - x, dz = o.z - z, d = Math.hypot(dx, dz);
+    if (d < 0.75) {
+      o.scare = 1;
+      // run sideways, away from the finger
+      const side = Math.cos(o.yaw) * dx - Math.sin(o.yaw) * dz;
+      o.walk = (side >= 0 ? 1 : -1) * 0.42; o.walkT = 0.9;
+    }
+  }
+}
+
+function pokeAt(x, z, ms = 170) {
+  Object.assign(finger, { active: true, x, z, press: 0 });
+  scareCrabs(x, z);
+  setTimeout(() => { finger.active = false; wob.qv += P.dent * finger.press * 1.6; wobbleTitle(); }, ms);
+}
+function shakeImpulse(dx, dz, k = 2.4) { wob.sv.x += dx * k; wob.sv.y += dz * k; wobbleTitle(); }
+
+canvas.addEventListener('keydown', (e) => {
+  const k = e.key;
+  if (k === ' ' || k === 'Enter') { e.preventDefault(); const [x, z] = randomWaterSpot(); pokeAt(x, z); }
+  // arrow keys shake along the screen directions
+  const fx = Math.sin(orbit.theta), fz = Math.cos(orbit.theta);
+  if (k === 'ArrowLeft') { e.preventDefault(); shakeImpulse(-fz, fx); }
+  if (k === 'ArrowRight') { e.preventDefault(); shakeImpulse(fz, -fx); }
+  if (k === 'ArrowUp') { e.preventDefault(); shakeImpulse(-fx, -fz); }
+  if (k === 'ArrowDown') { e.preventDefault(); shakeImpulse(fx, fz); }
+});
+
+const titleJelly = $('titleJelly');
+let titleBusy = 0;
+function wobbleTitle() {
+  if (reduceMotion || performance.now() < titleBusy) return;
+  titleBusy = performance.now() + 700;
+  titleJelly.classList.remove('wobble');
+  void titleJelly.offsetWidth;
+  titleJelly.classList.add('wobble');
+}
+
+/* =====================================================================
+   Panel wiring
+   ===================================================================== */
+const firmEl = $('firm'), dampEl = $('damp'), tideEl = $('tide');
+const firmOut = $('firmOut'), dampOut = $('dampOut'), tideOut = $('tideOut');
+function paintRange(el) { el.style.setProperty('--p', `${el.value}%`); }
+function readControls() {
+  ui.firm = firmEl.value / 100; ui.damp = dampEl.value / 100; ui.tide = tideEl.value / 100;
+  P = phys();
+  const feel = P.kPa < 3 ? '嫩豆腐' : P.kPa < 6.5 ? '布丁' : P.kPa < 11 ? '果冻' : '软糖';
+  firmOut.textContent = `${P.kPa.toFixed(1)} kPa · ${feel}`;
+  const ring = P.zeta < 0.1 ? '回荡久' : P.zeta < 0.26 ? '适中' : '很快平息';
+  dampOut.textContent = `ζ ${P.zeta.toFixed(2)} · ${ring}`;
+  const depthCm = (tideToWater(ui.tide) - SEABED) * CM;
+  const tideWord = ui.tide < 0.34 ? '低潮' : ui.tide < 0.67 ? '平潮' : '高潮';
+  tideOut.textContent = `水深 ${depthCm.toFixed(1)} cm · ${tideWord}`;
+  [firmEl, dampEl, tideEl].forEach(paintRange);
+}
+[firmEl, dampEl, tideEl].forEach((el) => el.addEventListener('input', readControls));
+readControls();
+
+$('dropCrab').addEventListener('click', () => drop('crab'));
+$('dropCoco').addEventListener('click', () => drop('coconut'));
+$('clearSpec').addEventListener('click', () => { while (specimens.length) removeSpec(specimens[0]); });
+$('shakeBtn').addEventListener('click', () => { const a = rnd() * Math.PI * 2; shakeImpulse(Math.cos(a), Math.sin(a), 2.8); });
+$('calmBtn').addEventListener('click', () => {
+  h.fill(0); v.fill(0); wob.s.set(0, 0); wob.sv.set(0, 0); wob.q = 0; wob.qv = 0;
+  for (const o of specimens) { o.yo = 0; o.yov = 0; o.vx = 0; o.vz = 0; }
+});
+$('resetView').addEventListener('click', () => Object.assign(orbit, { theta: orbitHome.theta, phi: orbitHome.phi, r: orbitHome.r }));
+
+const flavorBtns = [...document.querySelectorAll('.flavor')];
+function setFlavor(key) {
+  flavorKey = key; flavorT = flavorTargets(key);
+  for (const b of flavorBtns) {
+    const on = b.dataset.flavor === key;
+    b.setAttribute('aria-checked', String(on));
+    b.tabIndex = on ? 0 : -1;
+  }
+  wob.qv += 0.35; wobbleTitle();
+}
+flavorBtns.forEach((b, i) => {
+  b.addEventListener('click', () => setFlavor(b.dataset.flavor));
+  b.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    const nb = flavorBtns[(i + (e.key === 'ArrowRight' ? 1 : flavorBtns.length - 1)) % flavorBtns.length];
+    setFlavor(nb.dataset.flavor); nb.focus();
+  });
+  b.tabIndex = b.dataset.flavor === flavorKey ? 0 : -1;
+});
+
+const logEl = $('log'), logCount = $('logCount');
+const STATE_TXT = { fall: '下落中', afloat: '随波漂浮', ashore: '上了岸' };
+function specState(o) { return o.mode === 'fall' ? 'fall' : o.onIsland ? 'ashore' : 'afloat'; }
+function renderLog() {
+  logEl.innerHTML = '';
+  if (!specimens.length) {
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="no">—</span><span class="nm">还没有标本，点上面的按钮投放</span><span></span>';
+    logEl.append(li);
+  }
+  for (const o of specimens) {
+    const li = document.createElement('li');
+    const st = specState(o);
+    li.innerHTML = `<span class="no">No.${String(o.id).padStart(2, '0')}</span><span class="nm">${NAMES[o.type]}</span><span class="st" data-s="${st}">${STATE_TXT[st]}</span>`;
+    li.dataset.id = o.id;
+    logEl.append(li);
+  }
+  logCount.textContent = `${specimens.length} / ${MAX_SPEC} 件`;
+}
+function refreshLogStates() {
+  for (const li of logEl.children) {
+    const o = specimens.find((s) => String(s.id) === li.dataset.id);
+    if (!o) continue;
+    const st = specState(o), el = li.querySelector('.st');
+    if (el.dataset.s !== st) { el.dataset.s = st; el.textContent = STATE_TXT[st]; }
+  }
+}
+
+// readouts + sparkline
+const stC = $('stC'), stF = $('stF'), stA = $('stA');
+const spark = $('spark'), sctx = spark.getContext('2d');
+const energy = new Float32Array(120);
+let energyHead = 0;
+function sampleEnergy() {
+  let e = 0, amp = 0;
+  for (let k = 0; k < N * N; k += 2) { const hk = h[k]; e += hk * hk + v[k] * v[k] * 30; const a = Math.abs(hk); if (a > amp) amp = a; }
+  e = Math.sqrt(e / (N * N / 2)) * 400 + wob.s.length() * 30 + wob.sv.length() * 6 + Math.abs(wob.q) * 40;
+  energy[energyHead] = e; energyHead = (energyHead + 1) % energy.length;
+  const c = Math.sqrt(P.C) * SIM_HZ * DX * CM;
+  stC.innerHTML = `${c.toFixed(1)}<small>cm/s</small>`;
+  stF.innerHTML = `${P.freq.toFixed(1)}<small>Hz</small>`;
+  stA.innerHTML = `${(amp * CM * 10).toFixed(1)}<small>mm</small>`;
+  drawSpark();
+}
+function drawSpark() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = spark.clientWidth, hh = spark.clientHeight;
+  if (spark.width !== Math.round(w * dpr)) { spark.width = Math.round(w * dpr); spark.height = Math.round(hh * dpr); }
+  sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  sctx.clearRect(0, 0, w, hh);
+  let max = 1;
+  for (const e of energy) max = Math.max(max, e);
+  max *= 1.15;
+  sctx.strokeStyle = '#CCDBEB'; sctx.lineWidth = 1;
+  for (let i = 1; i <= 3; i++) { const y = Math.round(hh * i / 4) + 0.5; sctx.beginPath(); sctx.moveTo(0, y); sctx.lineTo(w, y); sctx.stroke(); }
+  const n = energy.length, px = (i) => (i / (n - 1)) * (w - 6), py = (e) => hh - 3 - (e / max) * (hh - 8);
+  sctx.beginPath();
+  for (let i = 0; i < n; i++) { const e = energy[(energyHead + i) % n]; i ? sctx.lineTo(px(i), py(e)) : sctx.moveTo(px(i), py(e)); }
+  const grad = sctx.createLinearGradient(0, 0, 0, hh);
+  grad.addColorStop(0, 'rgba(159,189,218,0.55)'); grad.addColorStop(1, 'rgba(159,189,218,0)');
+  sctx.lineTo(px(n - 1), hh); sctx.lineTo(0, hh); sctx.closePath();
+  sctx.fillStyle = grad; sctx.fill();
+  sctx.beginPath();
+  for (let i = 0; i < n; i++) { const e = energy[(energyHead + i) % n]; i ? sctx.lineTo(px(i), py(e)) : sctx.moveTo(px(i), py(e)); }
+  sctx.strokeStyle = '#376392'; sctx.lineWidth = 1.6; sctx.lineJoin = 'round'; sctx.stroke();
+  const last = energy[(energyHead + n - 1) % n];
+  sctx.beginPath(); sctx.arc(px(n - 1), py(last), 3.2, 0, Math.PI * 2);
+  sctx.fillStyle = '#376392'; sctx.fill(); sctx.lineWidth = 1.5; sctx.strokeStyle = '#FFFFFF'; sctx.stroke();
+}
+
+// strata callouts that follow the left-most vertical edge of the base
+const LAYERS = [
+  { n: '①', t: '细沙', en: 'Sand', y: -0.58 },
+  { n: '②', t: '砾石', en: 'Gravel', y: -0.755 },
+  { n: '③', t: '红黏土', en: 'Clay', y: -0.965 },
+  { n: '④', t: '卵石层', en: 'Cobble', y: -1.23 },
+  { n: '⑤', t: '基岩', en: 'Bedrock', y: -1.54 },
+];
+const JELLY_LABEL = { n: '◇', t: '果冻海', en: 'Jelly sea' };
+const calloutNodes = [...LAYERS, JELLY_LABEL].map((L) => {
+  const d = document.createElement('div');
+  d.className = 'callout';
+  d.innerHTML = `<span class="n">${L.n}</span><span class="t">${L.t}<i>${L.en}</i></span>`;
+  calloutsEl.append(d);
+  return d;
+});
+const projV = new THREE.Vector3();
+function placeCallouts(w, hgt) {
+  let best = null, bx = Infinity;
+  for (const cx of [-HALF, HALF]) for (const cz of [-HALF, HALF]) {
+    projV.set(cx, -1.1, cz).project(camera);
+    if (projV.x < bx) { bx = projV.x; best = [cx, cz]; }
+  }
+  const ys = [];
+  LAYERS.forEach((L) => { projV.set(best[0], L.y, best[1]).project(camera); ys.push([(projV.x + 1) / 2 * w, (1 - projV.y) / 2 * hgt]); });
+  deformCPU(best[0], (SEABED + water) / 2, best[1], projV).project(camera);
+  ys.push([(projV.x + 1) / 2 * w, (1 - projV.y) / 2 * hgt]);
+  // keep labels at least 17px apart, working upward from the bottom
+  const order = ys.map((p, i) => i).sort((a, b) => ys[b][1] - ys[a][1]);
+  for (let k = 1; k < order.length; k++) {
+    const prev = ys[order[k - 1]], cur = ys[order[k]];
+    if (prev[1] - cur[1] < 17) cur[1] = prev[1] - 17;
+  }
+  ys.forEach(([x, y], i) => { calloutNodes[i].style.transform = `translate(${(x - 6).toFixed(1)}px, ${y.toFixed(1)}px) translate(-100%, -50%)`; });
+}
+
+/* =====================================================================
+   Resize + loop
+   ===================================================================== */
+let viewW = 1, viewH = 1;
+function resize() {
+  const r = stageEl.getBoundingClientRect();
+  viewW = Math.max(1, Math.round(r.width)); viewH = Math.max(1, Math.round(r.height));
+  renderer.setSize(viewW, viewH, false);
+  camera.aspect = viewW / viewH;
+  fitScale = Math.max(1, 1.02 / camera.aspect);
+  camera.updateProjectionMatrix();
+  renderer.getDrawingBufferSize(bufSize);
+  rt.setSize(bufSize.x, bufSize.y);
+  jellyU.uRes.value.copy(bufSize);
+  bubbles.material.uniforms.uPx.value = bufSize.y / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
+  stageEl.classList.toggle('compact', viewW < 640);
+}
+new ResizeObserver(resize).observe(stageEl);
+resize();
+
+// a crab and a coconut are already on the table when the page opens
+rebuildMask();
+{
+  const c = spawn('crab', -1.05, 0.95, 0); c.mode = 'rest'; c.yaw = 0.8;
+  const n = spawn('coconut', 1.2, 0.85, 0); n.mode = 'rest';
+}
+
+let last = performance.now(), acc = 0, simTime = 0, frame = 0, breezeT = 1.5;
+let firstFrame = true;
+function tick(now) {
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+
+  // tide eases toward the slider, the coastline moves with it
+  const targetW = tideToWater(ui.tide);
+  water += (targetW - water) * Math.min(1, dt * 2.5);
+  if (Math.abs(water - maskWater) > 0.004) rebuildMask();
+
+  // flavour colours ease toward their target
+  const kf = 1 - Math.exp(-dt * 5);
+  jellyU.uAbsorb.value.lerp(flavorT.absorb, kf);
+  jellyU.uGlow.value.lerp(flavorT.glow, kf);
+  jellyU.uRim.value.lerp(flavorT.rim, kf);
+  U.uCausticTint.value.lerp(flavorT.caustic, kf);
+
+  acc += dt;
+  let steps = 0;
+  while (acc >= 1 / SIM_HZ && steps < 8) {
+    simStep(1 / SIM_HZ);
+    stepSpecimens(1 / SIM_HZ);
+    stepPalm(1 / SIM_HZ);
+    acc -= 1 / SIM_HZ; steps++; simTime += 1 / SIM_HZ;
+  }
+  if (steps === 8) acc = 0;
+
+  // a light breeze keeps the surface alive at rest
+  breezeT -= dt;
+  if (breezeT <= 0 && !reduceMotion) {
+    const [x, z] = randomWaterSpot();
+    addImpulse(x, z, -0.0035 - rnd() * 0.003, 0.07);
+    breezeT = 1.2 + rnd() * 1.8;
+  }
+
+  for (let k = 0; k < N * N; k++) { hfData[2 * k] = h[k]; hfData[2 * k + 1] = islandGrid[k]; }
+  hfTex.needsUpdate = true;
+  U.uWater.value = water;
+  U.uShear.value.copy(wob.s);
+  U.uSquash.value = wob.q;
+  U.uTime.value = simTime;
+  U.uPalmKick.value.copy(palmKick.p);
+
+  placeCamera();
+  {
+    const d = jellyU.uBoxDir.value.copy(camera.position).sub(orbit.target).normalize();
+    d.set(-d.x, d.y + 0.1, -d.z).applyAxisAngle(up, 0.22).normalize();
+  }
+  placeSpecimens(simTime);
+  placePalmNuts(simTime);
+
+  if (hoverHit && !ptr) {
+    const y = water + sampleWave(hoverHit.x, hoverHit.z) + 0.006;
+    deformCPU(hoverHit.x, y, hoverHit.z, hoverRing.position);
+    hoverRing.visible = true;
+  } else hoverRing.visible = false;
+
+  renderer.shadowMap.needsUpdate = true;
+  renderer.setRenderTarget(rt);
+  renderer.render(scene, camera);
+  renderer.setRenderTarget(null);
+  renderer.autoClear = true;
+  renderer.render(scene, camera);
+  renderer.autoClear = false;
+  renderer.render(jellyScene, camera);
+  renderer.autoClear = true;
+
+  placeCallouts(viewW, viewH);
+  if (++frame % 6 === 0) sampleEnergy();
+  if (frame % 15 === 0) refreshLogStates();
+  if (firstFrame) { firstFrame = false; $('loading').hidden = true; }
+  requestAnimationFrame(tick);
+}
+renderLog();
+requestAnimationFrame(tick);
+// a first poke so the page opens with ripples running
+setTimeout(() => pokeAt(-0.55, 0.75, 220), 900);
+</script>
+
+</body>
+</html>

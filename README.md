@@ -4,6 +4,8 @@ A scroll-driven particle website about ocean life. Every creature is drawn in fl
 
 **Live site (GitHub Pages):** https://zhongkailongneu-cmd.github.io/claude/ (served from `docs/`; see "Publish" below).
 
+**Also in this repo:** [Island Jelly · 海岛果冻微缩展台](island-jelly/README.md), a poke-and-shake jelly diorama (live at https://zhongkailongneu-cmd.github.io/claude/island-jelly/).
+
 **Open `dist/index.html` directly.** It is a single self-contained file (three.js inlined), so double-clicking it works offline.
 
 ---
