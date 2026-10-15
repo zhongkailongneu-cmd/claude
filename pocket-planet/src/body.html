@@ -1,0 +1,62 @@
+<canvas id="scene" aria-label="四季掌心星球：可行走的 3D 低多边形星球"></canvas>
+
+<div class="hud">
+  <div class="hud-inner">
+    <header class="brand">
+      <p class="brand-en">Pocket Planet</p>
+      <p class="brand-zh">四季掌心星球</p>
+    </header>
+
+    <section class="card" id="card" aria-live="polite">
+      <div class="card-glyph" id="cardGlyph" aria-hidden="true">春</div>
+      <div class="card-body">
+        <p class="card-eyebrow" id="cardEyebrow">Spring · 春之境</p>
+        <h2 class="card-title" id="cardTitle">樱花溪桥</h2>
+        <p class="card-en" id="cardEn">Sakura Brook Bridge</p>
+        <p class="card-desc" id="cardDesc">朱红拱桥跨过潺潺小溪，花瓣顺着水流漂向下游。</p>
+        <p class="card-meta"><span id="cardCoord">6°N · 42°E</span><span class="chip" id="cardDist">约 3 步</span></p>
+      </div>
+    </section>
+
+    <aside class="help" aria-label="操作说明">
+      <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> 行走与转向</p>
+      <p><kbd>Shift</kbd> 奔跑 · <kbd>Space</kbd> 跳跃</p>
+      <p>拖拽 环顾 · 滚轮 缩放</p>
+      <p><kbd>1</kbd>–<kbd>4</kbd> 四季 · <kbd>V</kbd> 俯瞰</p>
+    </aside>
+
+    <div class="banner" id="banner" aria-hidden="true">
+      <strong id="bannerZh">春之境</strong>
+      <span id="bannerEn">Spring Realm</span>
+    </div>
+
+    <div class="touch">
+      <div class="joystick" id="joy" aria-label="移动摇杆"><div class="knob"></div></div>
+      <button class="jump-btn" id="jumpBtn" type="button" aria-label="跳跃">跳</button>
+    </div>
+
+    <nav class="dock" aria-label="四季视角跳转">
+      <button class="dock-btn" type="button" data-season="0" style="--accent:#E98BA8;--accent-soft:#FBE3EA" aria-current="true">
+        <span class="hex" aria-hidden="true">春</span><span class="lbl">Spring</span>
+      </button>
+      <button class="dock-btn" type="button" data-season="1" style="--accent:#4E9A52;--accent-soft:#DDEFD9">
+        <span class="hex" aria-hidden="true">夏</span><span class="lbl">Summer</span>
+      </button>
+      <button class="dock-btn" type="button" data-season="2" style="--accent:#D9693A;--accent-soft:#F8E1D2">
+        <span class="hex" aria-hidden="true">秋</span><span class="lbl">Autumn</span>
+      </button>
+      <button class="dock-btn" type="button" data-season="3" style="--accent:#497DAE;--accent-soft:#E8EEF6">
+        <span class="hex" aria-hidden="true">冬</span><span class="lbl">Winter</span>
+      </button>
+      <span class="dock-sep" aria-hidden="true"></span>
+      <button class="dock-btn overview" type="button" id="overviewBtn" aria-pressed="true" style="--accent:#376392;--accent-soft:#E8EEF6">
+        <span class="hex" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <circle cx="12" cy="12" r="6.2"></circle>
+            <ellipse cx="12" cy="12" rx="10.5" ry="3.6" transform="rotate(-20 12 12)"></ellipse>
+          </svg>
+        </span><span class="lbl">全景俯瞰</span>
+      </button>
+    </nav>
+  </div>
+</div>

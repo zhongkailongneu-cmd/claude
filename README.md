@@ -6,6 +6,8 @@ A scroll-driven particle website about ocean life. Every creature is drawn in fl
 
 **Open `dist/index.html` directly.** It is a single self-contained file (three.js inlined), so double-clicking it works offline.
 
+> 本仓库还包含第二个作品 **[Pocket Planet · 四季掌心星球](pocket-planet/README.md)**：可在球面上行走的低多边形四季小星球（`pocket-planet/dist/index.html`，线上地址 https://zhongkailongneu-cmd.github.io/claude/pocket-planet/）。
+
 ---
 
 ## 实现方案
