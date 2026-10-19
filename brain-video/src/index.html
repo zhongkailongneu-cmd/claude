@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Brain Tour</title>
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/900.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/barlow-condensed/600.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/barlow-condensed/800.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/barlow-condensed/900.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/rajdhani/600.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/rajdhani/700.css">
+<link rel="stylesheet" href="/src/style.css">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <div id="hud">
+    <svg id="callout" width="1920" height="1080" viewBox="0 0 1920 1080">
+      <polyline id="co-line" fill="none" stroke="#9FBDDA" stroke-width="2"/>
+      <rect id="co-end" width="10" height="10" fill="#E8EEF6"/>
+      <circle id="co-dot" r="6" fill="#F4F7FB"/>
+      <circle id="co-ring" r="14" fill="none" stroke="#CCDBEB" stroke-width="2"/>
+      <g id="arc-labels"></g>
+    </svg>
+    <div id="pills"></div>
+    <div id="tag"><div class="kicker"></div><div class="cn"></div><div class="en"></div><div class="meta"></div></div>
+    <div id="chips"></div>
+    <div id="counters"></div>
+    <div id="banner"><div class="cn"></div><div class="en"></div></div>
+    <div id="title"><div class="cn"></div><div class="en"></div></div>
+    <div id="ef"><div class="cn"></div><div class="en"></div></div>
+    <div id="lockup"><div class="cn"></div><div class="en"></div></div>
+    <div id="credits"></div>
+    <div id="sub"><div class="cn"></div><div class="en"></div></div>
+    <canvas id="spec" width="1920" height="64"></canvas>
+    <div id="flash"></div>
+    <div id="fade"></div>
+  </div>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

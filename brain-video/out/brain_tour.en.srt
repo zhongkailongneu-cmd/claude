@@ -1,0 +1,159 @@
+1
+00:00:03,200 --> 00:00:05,950
+An inside-out journey from lowest to highest
+
+2
+00:00:06,800 --> 00:00:09,150
+~86 billion neurons in about 1.4 kg of tissue
+
+3
+00:00:09,600 --> 00:00:12,350
+Just ~2% of body weight, yet ~20% of the body's energy
+
+4
+00:00:13,200 --> 00:00:15,950
+The life-support layer: breathing, heartbeat, arousal
+
+5
+00:00:16,400 --> 00:00:19,150
+Coordinates and fine-tunes movement — and cognition
+
+6
+00:00:19,600 --> 00:00:22,350
+The relay hub that routes signals up to the cortex
+
+7
+00:00:22,800 --> 00:00:25,550
+Homeostasis: temperature, hunger, rhythms, hormones
+
+8
+00:00:26,000 --> 00:00:28,750
+Action selection, habits, dopamine reward learning
+
+9
+00:00:29,200 --> 00:00:31,950
+Threat detection and fear; tags memories with emotion
+
+10
+00:00:32,400 --> 00:00:35,150
+Consolidates memories and supports spatial navigation
+
+11
+00:00:35,600 --> 00:00:38,350
+Blends emotion, attention, pain; monitors conflict
+
+12
+00:00:38,800 --> 00:00:41,550
+Interoception and emotional awareness of the body
+
+13
+00:00:42,000 --> 00:00:44,750
+Where vision begins: edges, orientation, colour, motion
+
+14
+00:00:45,200 --> 00:00:47,950
+Body sense and spatial integration guide attention
+
+15
+00:00:48,400 --> 00:00:51,150
+Hearing, language, object recognition, memory
+
+16
+00:00:51,600 --> 00:00:54,350
+Movement, speech, planning and decision-making
+
+17
+00:00:55,600 --> 00:00:57,550
+The higher up, the more abstract and flexible…
+
+18
+00:00:58,000 --> 00:01:00,750
+At the top: the very front of the frontal lobe
+
+19
+00:01:01,200 --> 00:01:03,950
+The prefrontal cortex (PFC): last to mature, mid-20s
+
+20
+00:01:04,000 --> 00:01:06,750
+Built from sub-regions, each with its own job
+
+21
+00:01:07,200 --> 00:01:09,950
+Let's take them apart, one by one
+
+22
+00:01:10,800 --> 00:01:13,550
+Binds goals, rules, emotion and memory into decisions
+
+23
+00:01:14,000 --> 00:01:16,750
+Seven sub-regions: lateral, polar, ventral, medial
+
+24
+00:01:17,200 --> 00:01:19,950
+Mid-lateral frontal cortex, linked to parietal cortex
+
+25
+00:01:20,000 --> 00:01:23,150
+Keeps goals online: working memory & cognitive control
+
+26
+00:01:23,600 --> 00:01:26,350
+Inferior frontal gyrus; Broca's area on the left
+
+27
+00:01:26,400 --> 00:01:29,550
+Right: the brake (response inhibition). Left: speech
+
+28
+00:01:30,000 --> 00:01:32,750
+The tip of the PFC, relatively expanded in humans
+
+29
+00:01:32,800 --> 00:01:35,950
+Coordinates sub-goals; multitasking and metacognition
+
+30
+00:01:36,400 --> 00:01:39,150
+Underside of the frontal lobe, fed by taste and smell
+
+31
+00:01:39,200 --> 00:01:42,350
+Prices options: weighs reward vs. cost, updates with rules
+
+32
+00:01:42,800 --> 00:01:45,550
+Lower medial surface, wired to amygdala and hypothalamus
+
+33
+00:01:45,600 --> 00:01:48,750
+Integrates value and emotion; lesions derail decisions
+
+34
+00:01:49,200 --> 00:01:51,950
+Upper medial surface, beside the supplementary motor area
+
+35
+00:01:52,000 --> 00:01:55,150
+Social-cognition hub: reads others' intentions
+
+36
+00:01:55,600 --> 00:01:58,350
+Wraps the corpus callosum; often counted as medial PFC
+
+37
+00:01:58,400 --> 00:02:01,550
+The conflict & error alarm: monitors and weighs effort
+
+38
+00:02:02,000 --> 00:02:04,750
+The PFC never works alone: it loops with deep structures
+
+39
+00:02:04,800 --> 00:02:07,950
+Top-down control of attention, emotion and behaviour
+
+40
+00:02:11,200 --> 00:02:14,350
+Three core executive functions: inhibition, updating, shifting

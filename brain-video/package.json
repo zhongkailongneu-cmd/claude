@@ -1,0 +1,14 @@
+{
+  "name": "brain-tour-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frame-accurate 3D brain tour video (three.js + headless Chromium + synthesized BGM).",
+  "type": "module",
+  "dependencies": {
+    "three": "^0.169.0",
+    "playwright-core": "^1.56.0",
+    "@fontsource/noto-sans-sc": "^5.1.0",
+    "@fontsource/barlow-condensed": "^5.1.0",
+    "@fontsource/rajdhani": "^5.1.0"
+  }
+}

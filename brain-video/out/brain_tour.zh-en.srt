@@ -1,0 +1,199 @@
+1
+00:00:03,200 --> 00:00:05,950
+一场由内而外、由低到高的脑区之旅
+An inside-out journey from lowest to highest
+
+2
+00:00:06,800 --> 00:00:09,150
+约 860 亿个神经元，重约 1.4 公斤
+~86 billion neurons in about 1.4 kg of tissue
+
+3
+00:00:09,600 --> 00:00:12,350
+只占体重约 2%，却消耗约 20% 的能量
+Just ~2% of body weight, yet ~20% of the body's energy
+
+4
+00:00:13,200 --> 00:00:15,950
+生命的底层系统：呼吸、心跳、觉醒
+The life-support layer: breathing, heartbeat, arousal
+
+5
+00:00:16,400 --> 00:00:19,150
+运动协调与精细校准，也参与认知
+Coordinates and fine-tunes movement — and cognition
+
+6
+00:00:19,600 --> 00:00:22,350
+感觉信息的中继站，向皮层分发信号
+The relay hub that routes signals up to the cortex
+
+7
+00:00:22,800 --> 00:00:25,550
+稳态总调度：体温、饥渴、节律与内分泌
+Homeostasis: temperature, hunger, rhythms, hormones
+
+8
+00:00:26,000 --> 00:00:28,750
+动作选择与习惯形成，多巴胺奖赏学习
+Action selection, habits, dopamine reward learning
+
+9
+00:00:29,200 --> 00:00:31,950
+威胁检测与恐惧，给记忆打上情绪标签
+Threat detection and fear; tags memories with emotion
+
+10
+00:00:32,400 --> 00:00:35,150
+把经历巩固为长期记忆，也负责空间导航
+Consolidates memories and supports spatial navigation
+
+11
+00:00:35,600 --> 00:00:38,350
+整合情绪、注意与疼痛，监测冲突与错误
+Blends emotion, attention, pain; monitors conflict
+
+12
+00:00:38,800 --> 00:00:41,550
+内脏感受与情绪觉察：感知身体的状态
+Interoception and emotional awareness of the body
+
+13
+00:00:42,000 --> 00:00:44,750
+视觉加工的起点：边缘、朝向、颜色、运动
+Where vision begins: edges, orientation, colour, motion
+
+14
+00:00:45,200 --> 00:00:47,950
+躯体感觉与空间整合，引导注意与动作
+Body sense and spatial integration guide attention
+
+15
+00:00:48,400 --> 00:00:51,150
+听觉、语言理解、物体识别与记忆
+Hearing, language, object recognition, memory
+
+16
+00:00:51,600 --> 00:00:54,350
+运动控制、语言表达，以及计划与决策
+Movement, speech, planning and decision-making
+
+17
+00:00:55,600 --> 00:00:57,550
+越往上，功能越抽象、越灵活……
+The higher up, the more abstract and flexible…
+
+18
+00:00:58,000 --> 00:01:00,750
+在这条阶梯的顶端，是额叶的最前部
+At the top: the very front of the frontal lobe
+
+19
+00:01:01,200 --> 00:01:03,950
+前额叶皮层（PFC）：最晚成熟，约至 25 岁
+The prefrontal cortex (PFC): last to mature, mid-20s
+
+20
+00:01:04,000 --> 00:01:06,750
+它由多个分工不同的亚区组成
+Built from sub-regions, each with its own job
+
+21
+00:01:07,200 --> 00:01:09,950
+让我们逐一拆解
+Let's take them apart, one by one
+
+22
+00:01:10,800 --> 00:01:13,550
+整合目标、规则、情绪与记忆，形成决策
+Binds goals, rules, emotion and memory into decisions
+
+23
+00:01:14,000 --> 00:01:16,750
+七个亚区：外侧、前端、腹侧、内侧
+Seven sub-regions: lateral, polar, ventral, medial
+
+24
+00:01:17,200 --> 00:01:19,950
+额叶外侧面中部，与顶叶紧密联结
+Mid-lateral frontal cortex, linked to parietal cortex
+
+25
+00:01:20,000 --> 00:01:23,150
+把目标“挂”在脑中：工作记忆与认知控制
+Keeps goals online: working memory & cognitive control
+
+26
+00:01:23,600 --> 00:01:26,350
+下额回：左侧含布洛卡区（44/45 区）
+Inferior frontal gyrus; Broca's area on the left
+
+27
+00:01:26,400 --> 00:01:29,550
+右侧是“刹车”：反应抑制；左侧：语言生成
+Right: the brake (response inhibition). Left: speech
+
+28
+00:01:30,000 --> 00:01:32,750
+前额叶最前端，在人类中相对更发达
+The tip of the PFC, relatively expanded in humans
+
+29
+00:01:32,800 --> 00:01:35,950
+统筹多个子目标，参与多任务与元认知
+Coordinates sub-goals; multitasking and metacognition
+
+30
+00:01:36,400 --> 00:01:39,150
+眼眶上方的额叶底面，接收味觉与嗅觉信息
+Underside of the frontal lobe, fed by taste and smell
+
+31
+00:01:39,200 --> 00:01:42,350
+给选项“估价”：权衡奖赏与代价，随规则更新
+Prices options: weighs reward vs. cost, updates with rules
+
+32
+00:01:42,800 --> 00:01:45,550
+额叶内侧面下部，紧密连接杏仁核与下丘脑
+Lower medial surface, wired to amygdala and hypothalamus
+
+33
+00:01:45,600 --> 00:01:48,750
+整合价值与情绪；损伤会使日常决策失常
+Integrates value and emotion; lesions derail decisions
+
+34
+00:01:49,200 --> 00:01:51,950
+额叶内侧面上部，邻近辅助运动区
+Upper medial surface, beside the supplementary motor area
+
+35
+00:01:52,000 --> 00:01:55,150
+社会认知枢纽：推测他人意图，区分自我与他人
+Social-cognition hub: reads others' intentions
+
+36
+00:01:55,600 --> 00:01:58,350
+环绕胼胝体前部，常被归入广义内侧前额叶
+Wraps the corpus callosum; often counted as medial PFC
+
+37
+00:01:58,400 --> 00:02:01,550
+冲突与错误的“警报器”：监测表现、权衡投入
+The conflict & error alarm: monitors and weighs effort
+
+38
+00:02:02,000 --> 00:02:04,750
+前额叶从不单独工作：与深部结构成环路
+The PFC never works alone: it loops with deep structures
+
+39
+00:02:04,800 --> 00:02:07,950
+自上而下地调节注意、情绪与行为
+Top-down control of attention, emotion and behaviour
+
+40
+00:02:11,200 --> 00:02:14,350
+三大核心执行功能：抑制、更新、转换
+Three core executive functions: inhibition, updating, shifting
