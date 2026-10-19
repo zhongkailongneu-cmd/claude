@@ -33,7 +33,7 @@ html, body { margin: 0; background: var(--c100); overflow: hidden; }
 #tag .meta { white-space: pre-line; font-weight: 500; font-size: 25px; line-height: 1.4; color: var(--c40); margin-top: 22px; max-width: 640px; }
 
 /* keyword chips */
-#chips { left: 96px; top: 640px; width: 560px; }
+#chips { left: 96px; top: 575px; width: 560px; }
 .chip { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; padding: 10px 24px 10px 0; border-radius: 6px;
   background: linear-gradient(90deg, rgba(43, 72, 104, .92), rgba(43, 72, 104, .55)); }
 .chip .bar { width: 8px; align-self: stretch; background: var(--c30); border-radius: 6px 0 0 6px; }
