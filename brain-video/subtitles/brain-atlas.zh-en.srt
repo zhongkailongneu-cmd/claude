@@ -1,0 +1,339 @@
+1
+00:00:00,000 --> 00:00:03,150
+约 1.4 公斤，仅占体重的 2%
+About 1.4 kg, just 2% of your body weight
+
+2
+00:00:03,200 --> 00:00:06,350
+约 860 亿个神经元
+Around 86 billion neurons
+
+3
+00:00:06,400 --> 00:00:09,550
+却消耗全身约 20% 的能量
+Yet it burns about 20% of your energy
+
+4
+00:00:09,600 --> 00:00:12,750
+它依靠分工明确的脑区协同运作
+It runs on specialised regions working together
+
+5
+00:00:12,800 --> 00:00:15,950
+感知、记忆、情绪、决策……
+Sensing, remembering, feeling, deciding…
+
+6
+00:00:16,000 --> 00:00:19,150
+分别由谁负责？
+Who is in charge of what?
+
+7
+00:00:19,200 --> 00:00:22,350
+从脑区到前额叶皮层
+From brain regions to the prefrontal cortex
+
+8
+00:00:22,400 --> 00:00:25,550
+第一章 · 认识大脑的主要脑区
+Chapter 1 · The major brain regions
+
+9
+00:00:25,600 --> 00:00:28,750
+大脑皮层分为四个脑叶
+The cerebral cortex has four lobes
+
+10
+00:00:28,800 --> 00:00:31,950
+下方还有小脑与脑干
+Beneath sit the cerebellum and brainstem
+
+11
+00:00:32,000 --> 00:00:35,150
+思考、计划与自主运动的中枢
+Hub of thought, planning and voluntary movement
+
+12
+00:00:35,200 --> 00:00:38,350
+后缘的初级运动皮层，指挥全身肌肉
+Its rear strip, the motor cortex, commands your muscles
+
+13
+00:00:38,400 --> 00:00:41,550
+整合触觉、痛觉与身体位置感
+Integrates touch, pain and body position
+
+14
+00:00:41,600 --> 00:00:44,750
+还负责空间注意：知道东西“在哪里”
+And spatial attention: knowing where things are
+
+15
+00:00:44,800 --> 00:00:47,950
+处理声音、理解语言、参与记忆
+Processes sound, language comprehension and memory
+
+16
+00:00:48,000 --> 00:00:51,150
+韦尼克区受损：说话流利，却难以理解
+Wernicke's area damage: fluent speech, poor comprehension
+
+17
+00:00:51,200 --> 00:00:54,350
+视觉中枢：初级视皮层 V1 所在地
+The visual centre, home of primary visual cortex V1
+
+18
+00:00:54,400 --> 00:00:57,550
+视觉信息由此分为“是什么”与“在哪里”两路
+From here, vision splits into 'what' and 'where' pathways
+
+19
+00:00:57,600 --> 00:01:00,750
+协调动作、维持平衡、学习运动技能
+Coordinates movement, balance and motor skill learning
+
+20
+00:01:00,800 --> 00:01:03,950
+只占脑重约 10%，却拥有约 80% 的神经元
+About 10% of brain mass, yet ~80% of its neurons
+
+21
+00:01:04,000 --> 00:01:07,150
+由中脑、脑桥、延髓组成，连接脊髓
+Midbrain, pons and medulla, linking brain to spinal cord
+
+22
+00:01:07,200 --> 00:01:10,350
+自动调控呼吸、心跳与觉醒
+Runs breathing, heartbeat and wakefulness on autopilot
+
+23
+00:01:10,400 --> 00:01:13,550
+感觉信息进入皮层前的中继站
+The relay hub for signals heading to the cortex
+
+24
+00:01:13,600 --> 00:01:16,750
+除嗅觉外，几乎所有感觉都先经过这里
+Nearly every sense except smell passes through here first
+
+25
+00:01:16,800 --> 00:01:19,950
+仅约 4 克，掌管体温、饥饿与睡眠节律
+Just ~4 g, it runs temperature, hunger and sleep cycles
+
+26
+00:01:20,000 --> 00:01:23,150
+通过垂体，调控全身的激素分泌
+Through the pituitary, it steers the body's hormones
+
+27
+00:01:23,200 --> 00:01:26,350
+把当下的经历写成长期记忆
+Turns today's experiences into long-term memories
+
+28
+00:01:26,400 --> 00:01:29,550
+H.M. 双侧海马大部切除后，记不住新经历
+With most of both hippocampi gone, H.M. formed no new memories
+
+29
+00:01:29,600 --> 00:01:32,750
+侦测威胁、触发恐惧的“警报器”
+The alarm that detects threats and triggers fear
+
+30
+00:01:32,800 --> 00:01:35,950
+让带有情绪的事件被记得格外牢
+It makes emotional events stick in memory
+
+31
+00:01:36,000 --> 00:01:39,150
+有一个脑区，与“人之为人”关系最密切
+One region is most tied to what makes us human
+
+32
+00:01:39,200 --> 00:01:42,350
+它最晚发育成熟，一直持续到 20 多岁
+It is among the last to mature, well into your 20s
+
+33
+00:01:42,400 --> 00:01:45,550
+计划、专注、克制、抉择
+Planning, focus, self-control, choice
+
+34
+00:01:45,600 --> 00:01:48,750
+都离不开它
+All of them depend on it
+
+35
+00:01:48,800 --> 00:01:51,950
+第二章 · 大脑的指挥中心
+Chapter 2 · The brain's command centre
+
+36
+00:01:52,000 --> 00:01:55,150
+位于额叶前部，运动相关区域之前
+The front of the frontal lobe, ahead of the motor areas
+
+37
+00:01:55,200 --> 00:01:58,350
+统筹注意、记忆与情绪，服务于目标
+It coordinates attention, memory and emotion toward goals
+
+38
+00:01:58,400 --> 00:02:01,550
+它可细分为多个功能亚区
+It divides into specialised subregions
+
+39
+00:02:01,600 --> 00:02:04,750
+位于额中回，对应布罗德曼 9 区与 46 区
+Middle frontal gyrus, Brodmann areas 9 and 46
+
+40
+00:02:04,800 --> 00:02:07,950
+工作记忆：在脑中暂存并加工信息
+Working memory: holding and working with information
+
+41
+00:02:08,000 --> 00:02:11,150
+延迟任务中，神经元在等待期持续放电
+In delay tasks, its neurons keep firing through the wait
+
+42
+00:02:11,200 --> 00:02:14,350
+认知控制：制定计划，按规则切换任务
+Cognitive control: making plans and switching rules
+
+43
+00:02:14,400 --> 00:02:17,550
+位于额下回，紧邻外侧裂
+Inferior frontal gyrus, just above the lateral fissure
+
+44
+00:02:17,600 --> 00:02:20,750
+右侧额下回：叫停冲动，抑制反应
+Right inferior frontal gyrus: stopping impulsive responses
+
+45
+00:02:20,800 --> 00:02:23,950
+左侧 44/45 区即布洛卡区，负责言语产生
+Left areas 44/45 form Broca's area, for speech production
+
+46
+00:02:24,000 --> 00:02:27,150
+还帮助从记忆中挑选、提取所需信息
+It also selects and retrieves what you need from memory
+
+47
+00:02:27,200 --> 00:02:30,350
+前额叶的最前端，在人类中相对更大
+The very tip of the PFC, relatively enlarged in humans
+
+48
+00:02:30,400 --> 00:02:33,550
+挂起主目标，先处理子任务，再切回来
+It parks a main goal, handles a subtask, then returns
+
+49
+00:02:33,600 --> 00:02:36,750
+元认知：评估“我有多确定”
+Metacognition: judging how sure you are
+
+50
+00:02:36,800 --> 00:02:39,950
+权衡探索新选项，还是利用旧经验
+Weighing exploring the new against exploiting the known
+
+51
+00:02:40,000 --> 00:02:43,150
+位于额叶底面，就在眼眶上方
+On the frontal lobe's underside, right above the eye sockets
+
+52
+00:02:43,200 --> 00:02:46,350
+计算奖励价值：这对我值多少？
+Computes reward value: what is this worth to me?
+
+53
+00:02:46,400 --> 00:02:49,550
+规则一变，迅速更新预期（逆转学习）
+Rapidly updates when rules flip: reversal learning
+
+54
+00:02:49,600 --> 00:02:52,750
+嗅觉与味觉在此汇聚，形成“美味”的感受
+Smell and taste converge here into the pleasure of flavour
+
+55
+00:02:52,800 --> 00:02:55,950
+位于前额叶内侧下部，与内侧 OFC 部分重叠
+Lower medial PFC, overlapping with the medial OFC
+
+56
+00:02:56,000 --> 00:02:59,150
+1848 年，铁棍贯穿盖奇头颅，他从此性情大变
+1848: an iron rod changed Phineas Gage's personality
+
+57
+00:02:59,200 --> 00:03:02,350
+躯体标记假说：情绪信号引导决策
+Somatic marker hypothesis: emotional signals guide choices
+
+58
+00:03:02,400 --> 00:03:05,550
+还参与调节恐惧，平复负面情绪
+It also helps regulate fear and calm negative emotion
+
+59
+00:03:05,600 --> 00:03:08,750
+环绕胼胝体前部，常被归入内侧前额叶
+Curves around the front of the corpus callosum
+
+60
+00:03:08,800 --> 00:03:11,950
+冲突监测：察觉“冲动”与“目标”打架
+Conflict monitoring: noticing when impulse and goal collide
+
+61
+00:03:12,000 --> 00:03:15,150
+一出错，脑电立刻出现“错误相关负波”
+Slip up, and an error signal (the ERN) fires within ~100 ms
+
+62
+00:03:15,200 --> 00:03:18,350
+还编码疼痛有多“难受”，而不是痛在哪
+It also encodes how much pain hurts, not where it hurts
+
+63
+00:03:18,400 --> 00:03:21,550
+六个亚区，各司其职
+Six subregions, each with its own job
+
+64
+00:03:21,600 --> 00:03:24,750
+但它们并非单打独斗，而是组成网络
+But none works alone: they form networks
+
+65
+00:03:24,800 --> 00:03:27,950
+并与杏仁核、海马、丘脑紧密相连
+And they are wired to the amygdala, hippocampus and thalamus
+
+66
+00:03:28,000 --> 00:03:31,150
+认识大脑，就是认识自己
+Know your brain, know yourself
+
+67
+00:03:31,200 --> 00:03:34,350
+图示已简化，非精确解剖比例
+Diagrams are simplified, not to anatomical scale
+
+68
+00:03:34,400 --> 00:03:37,550
+谢谢观看
+Thanks for watching

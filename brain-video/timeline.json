@@ -1,0 +1,367 @@
+{
+  "meta": {
+    "title_zh": "大脑地图：从脑区到前额叶皮层",
+    "title_en": "Brain Atlas: From Brain Regions to the Prefrontal Cortex",
+    "bpm": 150,
+    "beatsPerBar": 4,
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "totalBars": 136,
+    "note": "1 bar = 1.6 s = 48 frames; 1 beat = 0.4 s = 12 frames. Every scene starts on a downbeat."
+  },
+  "music": [
+    { "bar": 0,   "len": 8,  "section": "intro",     "desc": "暗色铺底 + 心跳式低频鼓（每拍“咚-咚”）+ 每 2 小节一次低音冲击；第 4 小节起加入低弦 16 分音符固定音型" },
+    { "bar": 8,   "len": 4,  "section": "build1",    "desc": "四拍底鼓推进，军鼓滚奏由 8 分→16 分→32 分加速，白噪声上升音效；第 11 小节最后半拍全静音制造“空拍”" },
+    { "bar": 12,  "len": 4,  "section": "drop1",     "desc": "第一次爆点：重低音冲击 + Braam 铜管长音 + 镲片；随后进入半速重鼓律动" },
+    { "bar": 16,  "len": 44, "section": "grooveA",   "desc": "第一章主律动：半速鼓（1 拍底鼓、3 拍军鼓）、8 分音符贝斯、超锯齿和弦；每 4 小节一次镲片 + 冲击，场景末拍通鼓过门；每 8~16 小节增减声部" },
+    { "bar": 60,  "len": 4,  "section": "breakdown", "desc": "鼓组撤出，只留铺底、拨弦动机与心跳低频，滤波器关闭，情绪收束" },
+    { "bar": 64,  "len": 4,  "section": "build2",    "desc": "第二次蓄力：和弦每拍重击、军鼓滚奏加速、上升音效，最后半拍静音" },
+    { "bar": 68,  "len": 8,  "section": "drop2",     "desc": "第二次爆点（全片最大）：冲击 + Braam + 全速四拍鼓 + 主旋律锯齿合成器" },
+    { "bar": 76,  "len": 48, "section": "grooveB",   "desc": "第二章主律动：全速鼓（四拍底鼓、2/4 拍军鼓）、16 分音符踩镲；每 8 小节一个亚区乐句，前 4 小节铺陈、后 4 小节加入主旋律" },
+    { "bar": 124, "len": 8,  "section": "finale",    "desc": "高潮：全部声部 + 额外打击乐；第 130 小节终极重击 + 长和弦" },
+    { "bar": 132, "len": 4,  "section": "outro",     "desc": "尾声：铺底与混响拖尾，逐渐淡出" }
+  ],
+  "scenes": [
+    {
+      "id": "S01", "bar": 0, "len": 2, "kind": "stat", "view": "none",
+      "stat": { "value": "1.4", "unit": "kg", "label_zh": "重量", "label_en": "WEIGHT" },
+      "subs": [ { "bar": 0, "len": 2, "zh": "约 1.4 公斤，仅占体重的 2%", "en": "About 1.4 kg, just 2% of your body weight" } ],
+      "visual": "深蓝底，一粒光点随心跳鼓脉动；第 1 拍光点炸开成粒子，“1.4 kg”大字随冲击砸入"
+    },
+    {
+      "id": "S02", "bar": 2, "len": 2, "kind": "stat", "view": "none",
+      "stat": { "value": "860", "unit": "亿", "label_zh": "神经元", "label_en": "86 BILLION NEURONS" },
+      "subs": [ { "bar": 2, "len": 2, "zh": "约 860 亿个神经元", "en": "Around 86 billion neurons" } ],
+      "refs": [ "Azevedo et al. (2009) J Comp Neurol" ],
+      "visual": "切镜（强拍白闪）；满屏神经元光点按节拍连线成网，数字滚动计数到 860 亿"
+    },
+    {
+      "id": "S03", "bar": 4, "len": 2, "kind": "stat", "view": "none",
+      "stat": { "value": "20", "unit": "%", "label_zh": "能量消耗", "label_en": "OF YOUR ENERGY" },
+      "subs": [ { "bar": 4, "len": 2, "zh": "却消耗全身约 20% 的能量", "en": "Yet it burns about 20% of your energy" } ],
+      "visual": "切镜；环形能量条按拍填充到 20%，外圈光环随低音冲击扩散"
+    },
+    {
+      "id": "S04", "bar": 6, "len": 2, "kind": "stat", "view": "lateral",
+      "subs": [ { "bar": 6, "len": 2, "zh": "它依靠分工明确的脑区协同运作", "en": "It runs on specialised regions working together" } ],
+      "visual": "切镜；大脑侧视轮廓第一次出现（线框），各脑叶边界随 8 分音符逐段点亮"
+    },
+    {
+      "id": "S05", "bar": 8, "len": 4, "kind": "build", "view": "lateral",
+      "words": [ { "zh": "感知", "en": "SENSE" }, { "zh": "记忆", "en": "REMEMBER" }, { "zh": "情绪", "en": "FEEL" }, { "zh": "决策", "en": "DECIDE" } ],
+      "subs": [
+        { "bar": 8,  "len": 2, "zh": "感知、记忆、情绪、决策……", "en": "Sensing, remembering, feeling, deciding…" },
+        { "bar": 10, "len": 2, "zh": "分别由谁负责？", "en": "Who is in charge of what?" }
+      ],
+      "visual": "蓄力段：大脑线框逐拍描边、脑沟纹理随军鼓滚奏加速生长；每小节强拍闪出一个关键词；第 11 小节末半拍画面骤停变暗"
+    },
+    {
+      "id": "S06", "bar": 12, "len": 4, "kind": "title", "view": "lateral",
+      "title": { "zh": "大脑地图", "en": "BRAIN ATLAS" },
+      "subs": [
+        { "bar": 12, "len": 2, "zh": "从脑区到前额叶皮层", "en": "From brain regions to the prefrontal cortex" },
+        { "bar": 14, "len": 2, "zh": "第一章 · 认识大脑的主要脑区", "en": "Chapter 1 · The major brain regions" }
+      ],
+      "visual": "爆点：白闪 + 冲击波圆环 + 镜头震动，“大脑地图 / BRAIN ATLAS”标题砸入；大脑整体发光，背景粒子随贝斯律动"
+    },
+    {
+      "id": "S07", "bar": 16, "len": 4, "kind": "overview", "view": "lateral",
+      "sequence": [ "frontal", "parietal", "temporal", "occipital", "cerebellum", "brainstem" ],
+      "subs": [
+        { "bar": 16, "len": 2, "zh": "大脑皮层分为四个脑叶", "en": "The cerebral cortex has four lobes" },
+        { "bar": 18, "len": 2, "zh": "下方还有小脑与脑干", "en": "Beneath sit the cerebellum and brainstem" }
+      ],
+      "visual": "侧视图总览：额叶→顶叶→颞叶→枕叶→小脑→脑干按拍依次点亮并弹出名称标签，最后全部同亮"
+    },
+    {
+      "id": "S08", "bar": 20, "len": 4, "kind": "region", "view": "lateral", "region": "frontal", "index": 1,
+      "title": { "zh": "额叶", "en": "FRONTAL LOBE" },
+      "chips": [ { "zh": "初级运动皮层", "en": "Primary motor cortex" }, { "zh": "布洛卡区", "en": "Broca's area" }, { "zh": "前额叶皮层", "en": "Prefrontal cortex" } ],
+      "widget": { "type": "motorStrip" },
+      "subs": [
+        { "bar": 20, "len": 2, "zh": "思考、计划与自主运动的中枢", "en": "Hub of thought, planning and voluntary movement" },
+        { "bar": 22, "len": 2, "zh": "后缘的初级运动皮层，指挥全身肌肉", "en": "Its rear strip, the motor cortex, commands your muscles" }
+      ],
+      "visual": "切镜推近额叶；额叶高亮发光，标签逐拍弹出；第 3 小节中央前回（运动皮层）条带从上到下扫光"
+    },
+    {
+      "id": "S09", "bar": 24, "len": 4, "kind": "region", "view": "lateral", "region": "parietal", "index": 2,
+      "title": { "zh": "顶叶", "en": "PARIETAL LOBE" },
+      "chips": [ { "zh": "躯体感觉皮层", "en": "Somatosensory cortex" }, { "zh": "空间注意", "en": "Spatial attention" } ],
+      "widget": { "type": "crosshair" },
+      "subs": [
+        { "bar": 24, "len": 2, "zh": "整合触觉、痛觉与身体位置感", "en": "Integrates touch, pain and body position" },
+        { "bar": 26, "len": 2, "zh": "还负责空间注意：知道东西“在哪里”", "en": "And spatial attention: knowing where things are" }
+      ],
+      "visual": "切镜到顶叶；中央后回感觉条带扫光；右侧准星图标按拍锁定目标"
+    },
+    {
+      "id": "S10", "bar": 28, "len": 4, "kind": "region", "view": "lateral", "region": "temporal", "index": 3,
+      "title": { "zh": "颞叶", "en": "TEMPORAL LOBE" },
+      "chips": [ { "zh": "听觉皮层", "en": "Auditory cortex" }, { "zh": "韦尼克区", "en": "Wernicke's area" }, { "zh": "记忆", "en": "Memory" } ],
+      "widget": { "type": "soundwave" },
+      "subs": [
+        { "bar": 28, "len": 2, "zh": "处理声音、理解语言、参与记忆", "en": "Processes sound, language comprehension and memory" },
+        { "bar": 30, "len": 2, "zh": "韦尼克区受损：说话流利，却难以理解", "en": "Wernicke's area damage: fluent speech, poor comprehension" }
+      ],
+      "visual": "切镜到颞叶；右侧声波随鼓点跳动；第 3 小节韦尼克区小圆点闪烁"
+    },
+    {
+      "id": "S11", "bar": 32, "len": 4, "kind": "region", "view": "lateral", "region": "occipital", "index": 4,
+      "title": { "zh": "枕叶", "en": "OCCIPITAL LOBE" },
+      "chips": [ { "zh": "初级视皮层 V1", "en": "Primary visual cortex" }, { "zh": "视觉通路", "en": "Visual streams" } ],
+      "widget": { "type": "visualStreams" },
+      "refs": [ "Ungerleider & Mishkin (1982)" ],
+      "subs": [
+        { "bar": 32, "len": 2, "zh": "视觉中枢：初级视皮层 V1 所在地", "en": "The visual centre, home of primary visual cortex V1" },
+        { "bar": 34, "len": 2, "zh": "视觉信息由此分为“是什么”与“在哪里”两路", "en": "From here, vision splits into 'what' and 'where' pathways" }
+      ],
+      "visual": "切镜到枕叶；第 3 小节两条光流从枕叶分别射向颞叶（腹侧“是什么”）与顶叶（背侧“在哪里”）"
+    },
+    {
+      "id": "S12", "bar": 36, "len": 4, "kind": "region", "view": "lateral", "region": "cerebellum", "index": 5,
+      "title": { "zh": "小脑", "en": "CEREBELLUM" },
+      "chips": [ { "zh": "运动协调", "en": "Coordination" }, { "zh": "平衡", "en": "Balance" }, { "zh": "运动学习", "en": "Motor learning" } ],
+      "widget": { "type": "barCompare", "items": [ { "zh": "脑重", "en": "Brain mass", "value": 10 }, { "zh": "神经元", "en": "Neurons", "value": 80 } ] },
+      "refs": [ "Azevedo et al. (2009) J Comp Neurol" ],
+      "subs": [
+        { "bar": 36, "len": 2, "zh": "协调动作、维持平衡、学习运动技能", "en": "Coordinates movement, balance and motor skill learning" },
+        { "bar": 38, "len": 2, "zh": "只占脑重约 10%，却拥有约 80% 的神经元", "en": "About 10% of brain mass, yet ~80% of its neurons" }
+      ],
+      "visual": "切镜到小脑；小脑叶片纹理逐层点亮；第 3 小节右侧柱状对比 10% vs 80% 按拍升起"
+    },
+    {
+      "id": "S13", "bar": 40, "len": 4, "kind": "region", "view": "lateral", "region": "brainstem", "index": 6,
+      "title": { "zh": "脑干", "en": "BRAINSTEM" },
+      "chips": [ { "zh": "中脑", "en": "Midbrain" }, { "zh": "脑桥", "en": "Pons" }, { "zh": "延髓", "en": "Medulla" } ],
+      "widget": { "type": "vitals" },
+      "subs": [
+        { "bar": 40, "len": 2, "zh": "由中脑、脑桥、延髓组成，连接脊髓", "en": "Midbrain, pons and medulla, linking brain to spinal cord" },
+        { "bar": 42, "len": 2, "zh": "自动调控呼吸、心跳与觉醒", "en": "Runs breathing, heartbeat and wakefulness on autopilot" }
+      ],
+      "visual": "切镜到脑干；右侧心电/呼吸曲线随底鼓跳动；最后一拍画面横向翻转（转入正中矢状面）"
+    },
+    {
+      "id": "S14", "bar": 44, "len": 4, "kind": "region", "view": "medial", "region": "thalamus", "index": 7,
+      "title": { "zh": "丘脑", "en": "THALAMUS" },
+      "chips": [ { "zh": "感觉中继", "en": "Sensory relay" }, { "zh": "丘脑—皮层环路", "en": "Thalamo-cortical loops" } ],
+      "widget": { "type": "relay" },
+      "subs": [
+        { "bar": 44, "len": 2, "zh": "感觉信息进入皮层前的中继站", "en": "The relay hub for signals heading to the cortex" },
+        { "bar": 46, "len": 2, "zh": "除嗅觉外，几乎所有感觉都先经过这里", "en": "Nearly every sense except smell passes through here first" }
+      ],
+      "visual": "翻转落地为正中矢状面（内侧视图）；丘脑高亮；第 3 小节视/听/触/味四路信号汇入丘脑，嗅觉箭头绕过"
+    },
+    {
+      "id": "S15", "bar": 48, "len": 4, "kind": "region", "view": "medial", "region": "hypothalamus", "index": 8,
+      "title": { "zh": "下丘脑", "en": "HYPOTHALAMUS" },
+      "chips": [ { "zh": "体温", "en": "Temperature" }, { "zh": "饥饿", "en": "Hunger" }, { "zh": "昼夜节律", "en": "Circadian rhythm" }, { "zh": "垂体", "en": "Pituitary" } ],
+      "widget": { "type": "bigNumber", "value": "≈4", "unit": "g" },
+      "subs": [
+        { "bar": 48, "len": 2, "zh": "仅约 4 克，掌管体温、饥饿与睡眠节律", "en": "Just ~4 g, it runs temperature, hunger and sleep cycles" },
+        { "bar": 50, "len": 2, "zh": "通过垂体，调控全身的激素分泌", "en": "Through the pituitary, it steers the body's hormones" }
+      ],
+      "visual": "切镜推近下丘脑与垂体；第 3 小节激素光点沿垂体柄向下流动"
+    },
+    {
+      "id": "S16", "bar": 52, "len": 4, "kind": "region", "view": "medial", "region": "hippocampus", "index": 9,
+      "title": { "zh": "海马", "en": "HIPPOCAMPUS" },
+      "chips": [ { "zh": "情景记忆", "en": "Episodic memory" }, { "zh": "空间导航", "en": "Spatial navigation" } ],
+      "widget": { "type": "caseCard", "zh": "患者 H.M.", "en": "Patient H.M.", "year": "1953" },
+      "refs": [ "Scoville & Milner (1957) J Neurol Neurosurg Psychiatry", "O'Keefe & Dostrovsky (1971) Brain Res" ],
+      "subs": [
+        { "bar": 52, "len": 2, "zh": "把当下的经历写成长期记忆", "en": "Turns today's experiences into long-term memories" },
+        { "bar": 54, "len": 2, "zh": "H.M. 双侧海马大部切除后，记不住新经历", "en": "With most of both hippocampi gone, H.M. formed no new memories" }
+      ],
+      "visual": "切镜；海马（投影于内侧颞叶）高亮，形似海马的弯曲结构逐段点亮；第 3 小节“病例卡 H.M. 1953”翻入"
+    },
+    {
+      "id": "S17", "bar": 56, "len": 4, "kind": "region", "view": "medial", "region": "amygdala", "index": 10,
+      "title": { "zh": "杏仁核", "en": "AMYGDALA" },
+      "chips": [ { "zh": "恐惧", "en": "Fear" }, { "zh": "威胁侦测", "en": "Threat detection" }, { "zh": "情绪记忆", "en": "Emotional memory" } ],
+      "widget": { "type": "alarm" },
+      "subs": [
+        { "bar": 56, "len": 2, "zh": "侦测威胁、触发恐惧的“警报器”", "en": "The alarm that detects threats and triggers fear" },
+        { "bar": 58, "len": 2, "zh": "让带有情绪的事件被记得格外牢", "en": "It makes emotional events stick in memory" }
+      ],
+      "visual": "切镜；杏仁核高亮，警报环随每拍向外扩散；第 3 小节与海马之间连线闪烁（情绪增强记忆）"
+    },
+    {
+      "id": "S18", "bar": 60, "len": 4, "kind": "breakdown", "view": "lateral",
+      "subs": [
+        { "bar": 60, "len": 2, "zh": "有一个脑区，与“人之为人”关系最密切", "en": "One region is most tied to what makes us human" },
+        { "bar": 62, "len": 2, "zh": "它最晚发育成熟，一直持续到 20 多岁", "en": "It is among the last to mature, well into your 20s" }
+      ],
+      "refs": [ "Gogtay et al. (2004) PNAS" ],
+      "visual": "间奏：画面回到侧视图并缓慢推向额叶前部，其余脑区渐暗；只有额叶前端呼吸式明灭"
+    },
+    {
+      "id": "S19", "bar": 64, "len": 4, "kind": "pfcbuild", "view": "lateral",
+      "words": [ { "zh": "计划", "en": "PLAN" }, { "zh": "专注", "en": "FOCUS" }, { "zh": "克制", "en": "RESTRAIN" }, { "zh": "抉择", "en": "CHOOSE" } ],
+      "subs": [
+        { "bar": 64, "len": 2, "zh": "计划、专注、克制、抉择", "en": "Planning, focus, self-control, choice" },
+        { "bar": 66, "len": 2, "zh": "都离不开它", "en": "All of them depend on it" }
+      ],
+      "visual": "蓄力：每小节强拍闪出一个关键词，前额叶区域亮度逐拍上升；第 67 小节和弦每拍重击配合快速推镜，最后半拍黑场"
+    },
+    {
+      "id": "S20", "bar": 68, "len": 2, "kind": "title", "view": "lateral",
+      "title": { "zh": "前额叶皮层", "en": "PREFRONTAL CORTEX" },
+      "subs": [ { "bar": 68, "len": 2, "zh": "第二章 · 大脑的指挥中心", "en": "Chapter 2 · The brain's command centre" } ],
+      "visual": "全片最大爆点：白闪 + 双层冲击波 + 震屏，“前额叶皮层 / PREFRONTAL CORTEX”砸入，前额叶整体爆亮"
+    },
+    {
+      "id": "S21", "bar": 70, "len": 2, "kind": "pfcintro", "view": "lateral", "highlight": [ "pfc", "premotor", "motor" ],
+      "subs": [ { "bar": 70, "len": 2, "zh": "位于额叶前部，运动相关区域之前", "en": "The front of the frontal lobe, ahead of the motor areas" } ],
+      "visual": "切镜；侧视图上依次标出初级运动皮层 → 前运动区 → 前额叶皮层三段，箭头指向前方"
+    },
+    {
+      "id": "S22", "bar": 72, "len": 2, "kind": "pfcintro", "view": "lateral", "highlight": [ "pfc" ],
+      "subs": [ { "bar": 72, "len": 2, "zh": "统筹注意、记忆与情绪，服务于目标", "en": "It coordinates attention, memory and emotion toward goals" } ],
+      "refs": [ "Miller & Cohen (2001) Annu Rev Neurosci" ],
+      "visual": "切镜；前额叶发出连线，按拍连接到顶叶（注意）、颞叶/海马（记忆）、杏仁核（情绪）"
+    },
+    {
+      "id": "S23", "bar": 74, "len": 2, "kind": "pfcmap", "view": "dual",
+      "sequence": [ "dlpfc", "vlpfc", "fpc", "ofc", "vmpfc", "acc" ],
+      "subs": [ { "bar": 74, "len": 2, "zh": "它可细分为多个功能亚区", "en": "It divides into specialised subregions" } ],
+      "visual": "分屏：左侧视图、右内侧视图；6 个亚区按拍依次亮起并标注缩写"
+    },
+    {
+      "id": "S24", "bar": 76, "len": 8, "kind": "subregion", "view": "lateral", "region": "dlpfc", "index": 1,
+      "title": { "zh": "背外侧前额叶", "en": "DLPFC", "full": "Dorsolateral prefrontal cortex", "ba": "BA 9 · 46", "analogy_zh": "大脑的工作台", "analogy_en": "The brain's workbench" },
+      "widget": { "type": "delayRaster" },
+      "refs": [ "Funahashi, Bruce & Goldman-Rakic (1989) J Neurophysiol", "Miller & Cohen (2001) Annu Rev Neurosci" ],
+      "subs": [
+        { "bar": 76, "len": 2, "zh": "位于额中回，对应布罗德曼 9 区与 46 区", "en": "Middle frontal gyrus, Brodmann areas 9 and 46" },
+        { "bar": 78, "len": 2, "zh": "工作记忆：在脑中暂存并加工信息", "en": "Working memory: holding and working with information" },
+        { "bar": 80, "len": 2, "zh": "延迟任务中，神经元在等待期持续放电", "en": "In delay tasks, its neurons keep firing through the wait" },
+        { "bar": 82, "len": 2, "zh": "认知控制：制定计划，按规则切换任务", "en": "Cognitive control: making plans and switching rules" }
+      ],
+      "visual": "切镜大幅推近 DLPFC；第 78 小节 4 个“记忆槽”按拍填入；第 80 小节延迟任务放电图（提示→延迟→反应，延迟期持续放电）；第 82 小节规则切换图标"
+    },
+    {
+      "id": "S25", "bar": 84, "len": 8, "kind": "subregion", "view": "lateral", "region": "vlpfc", "index": 2,
+      "title": { "zh": "腹外侧前额叶", "en": "VLPFC", "full": "Ventrolateral prefrontal cortex", "ba": "BA 44 · 45 · 47", "analogy_zh": "大脑的刹车", "analogy_en": "The brain's brake" },
+      "widget": { "type": "stopSignal" },
+      "refs": [ "Aron, Robbins & Poldrack (2004, 2014) Trends Cogn Sci", "Badre & Wagner (2007) Neuropsychologia" ],
+      "subs": [
+        { "bar": 84, "len": 2, "zh": "位于额下回，紧邻外侧裂", "en": "Inferior frontal gyrus, just above the lateral fissure" },
+        { "bar": 86, "len": 2, "zh": "右侧额下回：叫停冲动，抑制反应", "en": "Right inferior frontal gyrus: stopping impulsive responses" },
+        { "bar": 88, "len": 2, "zh": "左侧 44/45 区即布洛卡区，负责言语产生", "en": "Left areas 44/45 form Broca's area, for speech production" },
+        { "bar": 90, "len": 2, "zh": "还帮助从记忆中挑选、提取所需信息", "en": "It also selects and retrieves what you need from memory" }
+      ],
+      "visual": "切镜到 VLPFC；第 86 小节停止信号任务：GO 箭头冲出 → STOP 信号亮起 → 反应被截停；第 88 小节布洛卡区（44/45）单独描边"
+    },
+    {
+      "id": "S26", "bar": 92, "len": 8, "kind": "subregion", "view": "lateral", "region": "fpc", "index": 3,
+      "title": { "zh": "额极", "en": "FRONTAL POLE", "full": "Frontopolar cortex (FPC)", "ba": "BA 10", "analogy_zh": "给目标夹上书签", "analogy_en": "A bookmark for your goals" },
+      "widget": { "type": "branching" },
+      "refs": [ "Semendeferi et al. (2001) Am J Phys Anthropol", "Koechlin et al. (1999) Nature", "Fleming et al. (2010) Science", "Daw et al. (2006) Nature" ],
+      "subs": [
+        { "bar": 92, "len": 2, "zh": "前额叶的最前端，在人类中相对更大", "en": "The very tip of the PFC, relatively enlarged in humans" },
+        { "bar": 94, "len": 2, "zh": "挂起主目标，先处理子任务，再切回来", "en": "It parks a main goal, handles a subtask, then returns" },
+        { "bar": 96, "len": 2, "zh": "元认知：评估“我有多确定”", "en": "Metacognition: judging how sure you are" },
+        { "bar": 98, "len": 2, "zh": "权衡探索新选项，还是利用旧经验", "en": "Weighing exploring the new against exploiting the known" }
+      ],
+      "visual": "切镜到额极；第 94 小节分支任务图：主目标挂起（书签）→ 子任务 → 返回；第 96 小节信心刻度条；最后一拍翻转到内侧视图"
+    },
+    {
+      "id": "S27", "bar": 100, "len": 8, "kind": "subregion", "view": "medial", "region": "ofc", "index": 4,
+      "title": { "zh": "眶额皮层", "en": "OFC", "full": "Orbitofrontal cortex", "ba": "BA 11 · 13 · 47/12", "analogy_zh": "大脑的估价师", "analogy_en": "The brain's appraiser" },
+      "widget": { "type": "valueBars" },
+      "refs": [ "Padoa-Schioppa & Assad (2006) Nature", "Rolls (2004) Brain Cogn", "de Araujo et al. (2003) Eur J Neurosci" ],
+      "subs": [
+        { "bar": 100, "len": 2, "zh": "位于额叶底面，就在眼眶上方", "en": "On the frontal lobe's underside, right above the eye sockets" },
+        { "bar": 102, "len": 2, "zh": "计算奖励价值：这对我值多少？", "en": "Computes reward value: what is this worth to me?" },
+        { "bar": 104, "len": 2, "zh": "规则一变，迅速更新预期（逆转学习）", "en": "Rapidly updates when rules flip: reversal learning" },
+        { "bar": 106, "len": 2, "zh": "嗅觉与味觉在此汇聚，形成“美味”的感受", "en": "Smell and taste converge here into the pleasure of flavour" }
+      ],
+      "visual": "翻转落地为内侧视图并推近额叶底面；眼眶位置以虚线弧标出；第 102 小节 A/B 两个选项价值条按拍升降；第 104 小节价值反转"
+    },
+    {
+      "id": "S28", "bar": 108, "len": 8, "kind": "subregion", "view": "medial", "region": "vmpfc", "index": 5,
+      "title": { "zh": "腹内侧前额叶", "en": "VMPFC", "full": "Ventromedial prefrontal cortex", "ba": "BA 10m · 14 · 25 · 32", "analogy_zh": "大脑的“直觉”顾问", "analogy_en": "The brain's gut-feeling advisor" },
+      "widget": { "type": "gageRod" },
+      "refs": [ "Harlow (1868)", "Damasio et al. (1994) Science", "Bechara et al. (1994) Cognition", "Phelps et al. (2004) Neuron" ],
+      "subs": [
+        { "bar": 108, "len": 2, "zh": "位于前额叶内侧下部，与内侧 OFC 部分重叠", "en": "Lower medial PFC, overlapping with the medial OFC" },
+        { "bar": 110, "len": 2, "zh": "1848 年，铁棍贯穿盖奇头颅，他从此性情大变", "en": "1848: an iron rod changed Phineas Gage's personality" },
+        { "bar": 112, "len": 2, "zh": "躯体标记假说：情绪信号引导决策", "en": "Somatic marker hypothesis: emotional signals guide choices" },
+        { "bar": 114, "len": 2, "zh": "还参与调节恐惧，平复负面情绪", "en": "It also helps regulate fear and calm negative emotion" }
+      ],
+      "visual": "切镜到 VMPFC；第 110 小节“1848”大字 + 铁棍沿盖奇损伤轨迹贯穿额叶（重击帧）；第 112 小节身体信号曲线流向 VMPFC"
+    },
+    {
+      "id": "S29", "bar": 116, "len": 8, "kind": "subregion", "view": "medial", "region": "acc", "index": 6,
+      "title": { "zh": "前扣带皮层", "en": "ACC", "full": "Anterior cingulate cortex", "ba": "BA 24 · 32 · 33", "analogy_zh": "大脑的纠错雷达", "analogy_en": "The brain's error radar" },
+      "note": { "zh": "严格说属扣带皮层，常被归入内侧前额叶网络", "en": "Strictly cingulate cortex; often grouped with medial PFC" },
+      "widget": { "type": "flankerErn" },
+      "refs": [ "Botvinick et al. (2001) Psychol Rev", "Gehring et al. (1993) Psychol Sci", "Rainville et al. (1997) Science" ],
+      "subs": [
+        { "bar": 116, "len": 2, "zh": "环绕胼胝体前部，常被归入内侧前额叶", "en": "Curves around the front of the corpus callosum" },
+        { "bar": 118, "len": 2, "zh": "冲突监测：察觉“冲动”与“目标”打架", "en": "Conflict monitoring: noticing when impulse and goal collide" },
+        { "bar": 120, "len": 2, "zh": "一出错，脑电立刻出现“错误相关负波”", "en": "Slip up, and an error signal (the ERN) fires within ~100 ms" },
+        { "bar": 122, "len": 2, "zh": "还编码疼痛有多“难受”，而不是痛在哪", "en": "It also encodes how much pain hurts, not where it hurts" }
+      ],
+      "visual": "切镜到 ACC（胼胝体膝部周围）；第 118 小节侧翼任务箭头“← ← → ← ←”中间箭头冲突闪烁；第 120 小节脑电波形在错误后约 100 ms 出现负向波谷"
+    },
+    {
+      "id": "S30", "bar": 124, "len": 2, "kind": "finaleRapid", "view": "dual",
+      "sequence": [ "dlpfc", "vlpfc", "fpc", "ofc", "vmpfc", "acc" ],
+      "keywords": [ { "zh": "工作记忆", "en": "WORKING MEMORY" }, { "zh": "抑制", "en": "INHIBITION" }, { "zh": "元认知", "en": "METACOGNITION" }, { "zh": "价值", "en": "VALUE" }, { "zh": "情绪决策", "en": "EMOTION × CHOICE" }, { "zh": "冲突监测", "en": "CONFLICT" } ],
+      "subs": [ { "bar": 124, "len": 2, "zh": "六个亚区，各司其职", "en": "Six subregions, each with its own job" } ],
+      "visual": "高潮快切：每一拍切到一个亚区 + 关键词（共 6 拍），第 7~8 拍六区同时亮起"
+    },
+    {
+      "id": "S31", "bar": 126, "len": 2, "kind": "finaleNetwork", "view": "dual",
+      "subs": [ { "bar": 126, "len": 2, "zh": "但它们并非单打独斗，而是组成网络", "en": "But none works alone: they form networks" } ],
+      "visual": "六个亚区之间按 8 分音符依次拉出光线，形成网络"
+    },
+    {
+      "id": "S32", "bar": 128, "len": 2, "kind": "finaleDeep", "view": "medial",
+      "subs": [ { "bar": 128, "len": 2, "zh": "并与杏仁核、海马、丘脑紧密相连", "en": "And they are wired to the amygdala, hippocampus and thalamus" } ],
+      "visual": "内侧视图：前额叶向杏仁核、海马、丘脑射出光束，按拍点亮第一章的深部结构"
+    },
+    {
+      "id": "S33", "bar": 130, "len": 2, "kind": "finaleSlam", "view": "lateral",
+      "title": { "zh": "认识大脑，就是认识自己", "en": "KNOW YOUR BRAIN, KNOW YOURSELF" },
+      "subs": [ { "bar": 130, "len": 2, "zh": "认识大脑，就是认识自己", "en": "Know your brain, know yourself" } ],
+      "visual": "终极重击：全脑所有区域同时爆亮 + 冲击波，标语砸入"
+    },
+    {
+      "id": "S34", "bar": 132, "len": 4, "kind": "outro", "view": "none",
+      "subs": [
+        { "bar": 132, "len": 2, "zh": "图示已简化，非精确解剖比例", "en": "Diagrams are simplified, not to anatomical scale" },
+        { "bar": 134, "len": 2, "zh": "谢谢观看", "en": "Thanks for watching" }
+      ],
+      "visual": "尾声：参考文献滚动列表 + 片名，画面随音乐淡出"
+    }
+  ],
+  "references": [
+    "Azevedo F.A.C. et al. (2009). Equal numbers of neuronal and nonneuronal cells make the human brain an isometrically scaled-up primate brain. J Comp Neurol 513:532–541.",
+    "Ungerleider L.G. & Mishkin M. (1982). Two cortical visual systems. In Analysis of Visual Behavior, MIT Press.",
+    "Scoville W.B. & Milner B. (1957). Loss of recent memory after bilateral hippocampal lesions. J Neurol Neurosurg Psychiatry 20:11–21.",
+    "O'Keefe J. & Dostrovsky J. (1971). The hippocampus as a spatial map. Brain Res 34:171–175.",
+    "Gogtay N. et al. (2004). Dynamic mapping of human cortical development during childhood through early adulthood. PNAS 101:8174–8179.",
+    "Miller E.K. & Cohen J.D. (2001). An integrative theory of prefrontal cortex function. Annu Rev Neurosci 24:167–202.",
+    "Funahashi S., Bruce C.J. & Goldman-Rakic P.S. (1989). Mnemonic coding of visual space in the monkey's dorsolateral prefrontal cortex. J Neurophysiol 61:331–349.",
+    "Aron A.R., Robbins T.W. & Poldrack R.A. (2004; 2014). Inhibition and the right inferior frontal cortex. Trends Cogn Sci 8:170–177; 18:177–185.",
+    "Badre D. & Wagner A.D. (2007). Left ventrolateral prefrontal cortex and the cognitive control of memory. Neuropsychologia 45:2883–2901.",
+    "Semendeferi K. et al. (2001). Prefrontal cortex in humans and apes: a comparative study of area 10. Am J Phys Anthropol 114:224–241.",
+    "Koechlin E. et al. (1999). The role of the anterior prefrontal cortex in human cognition. Nature 399:148–151.",
+    "Fleming S.M. et al. (2010). Relating introspective accuracy to individual differences in brain structure. Science 329:1541–1543.",
+    "Daw N.D. et al. (2006). Cortical substrates for exploratory decisions in humans. Nature 441:876–879.",
+    "Padoa-Schioppa C. & Assad J.A. (2006). Neurons in the orbitofrontal cortex encode economic value. Nature 441:223–226.",
+    "Rolls E.T. (2004). The functions of the orbitofrontal cortex. Brain Cogn 55:11–29.",
+    "de Araujo I.E.T. et al. (2003). Taste-olfactory convergence, and the representation of the pleasantness of flavour, in the human brain. Eur J Neurosci 18:2059–2068.",
+    "Harlow J.M. (1868). Recovery from the passage of an iron bar through the head. Publ Mass Med Soc 2:327–347.",
+    "Damasio H. et al. (1994). The return of Phineas Gage: clues about the brain from the skull of a famous patient. Science 264:1102–1105.",
+    "Bechara A. et al. (1994). Insensitivity to future consequences following damage to human prefrontal cortex. Cognition 50:7–15.",
+    "Phelps E.A. et al. (2004). Extinction learning in humans: role of the amygdala and vmPFC. Neuron 43:897–905.",
+    "Botvinick M.M. et al. (2001). Conflict monitoring and cognitive control. Psychol Rev 108:624–652.",
+    "Gehring W.J. et al. (1993). A neural system for error detection and compensation. Psychol Sci 4:385–390.",
+    "Rainville P. et al. (1997). Pain affect encoded in human anterior cingulate but not somatosensory cortex. Science 277:968–971."
+  ]
+}

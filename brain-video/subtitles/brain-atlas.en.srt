@@ -1,0 +1,271 @@
+1
+00:00:00,000 --> 00:00:03,150
+About 1.4 kg, just 2% of your body weight
+
+2
+00:00:03,200 --> 00:00:06,350
+Around 86 billion neurons
+
+3
+00:00:06,400 --> 00:00:09,550
+Yet it burns about 20% of your energy
+
+4
+00:00:09,600 --> 00:00:12,750
+It runs on specialised regions working together
+
+5
+00:00:12,800 --> 00:00:15,950
+Sensing, remembering, feeling, deciding…
+
+6
+00:00:16,000 --> 00:00:19,150
+Who is in charge of what?
+
+7
+00:00:19,200 --> 00:00:22,350
+From brain regions to the prefrontal cortex
+
+8
+00:00:22,400 --> 00:00:25,550
+Chapter 1 · The major brain regions
+
+9
+00:00:25,600 --> 00:00:28,750
+The cerebral cortex has four lobes
+
+10
+00:00:28,800 --> 00:00:31,950
+Beneath sit the cerebellum and brainstem
+
+11
+00:00:32,000 --> 00:00:35,150
+Hub of thought, planning and voluntary movement
+
+12
+00:00:35,200 --> 00:00:38,350
+Its rear strip, the motor cortex, commands your muscles
+
+13
+00:00:38,400 --> 00:00:41,550
+Integrates touch, pain and body position
+
+14
+00:00:41,600 --> 00:00:44,750
+And spatial attention: knowing where things are
+
+15
+00:00:44,800 --> 00:00:47,950
+Processes sound, language comprehension and memory
+
+16
+00:00:48,000 --> 00:00:51,150
+Wernicke's area damage: fluent speech, poor comprehension
+
+17
+00:00:51,200 --> 00:00:54,350
+The visual centre, home of primary visual cortex V1
+
+18
+00:00:54,400 --> 00:00:57,550
+From here, vision splits into 'what' and 'where' pathways
+
+19
+00:00:57,600 --> 00:01:00,750
+Coordinates movement, balance and motor skill learning
+
+20
+00:01:00,800 --> 00:01:03,950
+About 10% of brain mass, yet ~80% of its neurons
+
+21
+00:01:04,000 --> 00:01:07,150
+Midbrain, pons and medulla, linking brain to spinal cord
+
+22
+00:01:07,200 --> 00:01:10,350
+Runs breathing, heartbeat and wakefulness on autopilot
+
+23
+00:01:10,400 --> 00:01:13,550
+The relay hub for signals heading to the cortex
+
+24
+00:01:13,600 --> 00:01:16,750
+Nearly every sense except smell passes through here first
+
+25
+00:01:16,800 --> 00:01:19,950
+Just ~4 g, it runs temperature, hunger and sleep cycles
+
+26
+00:01:20,000 --> 00:01:23,150
+Through the pituitary, it steers the body's hormones
+
+27
+00:01:23,200 --> 00:01:26,350
+Turns today's experiences into long-term memories
+
+28
+00:01:26,400 --> 00:01:29,550
+With most of both hippocampi gone, H.M. formed no new memories
+
+29
+00:01:29,600 --> 00:01:32,750
+The alarm that detects threats and triggers fear
+
+30
+00:01:32,800 --> 00:01:35,950
+It makes emotional events stick in memory
+
+31
+00:01:36,000 --> 00:01:39,150
+One region is most tied to what makes us human
+
+32
+00:01:39,200 --> 00:01:42,350
+It is among the last to mature, well into your 20s
+
+33
+00:01:42,400 --> 00:01:45,550
+Planning, focus, self-control, choice
+
+34
+00:01:45,600 --> 00:01:48,750
+All of them depend on it
+
+35
+00:01:48,800 --> 00:01:51,950
+Chapter 2 · The brain's command centre
+
+36
+00:01:52,000 --> 00:01:55,150
+The front of the frontal lobe, ahead of the motor areas
+
+37
+00:01:55,200 --> 00:01:58,350
+It coordinates attention, memory and emotion toward goals
+
+38
+00:01:58,400 --> 00:02:01,550
+It divides into specialised subregions
+
+39
+00:02:01,600 --> 00:02:04,750
+Middle frontal gyrus, Brodmann areas 9 and 46
+
+40
+00:02:04,800 --> 00:02:07,950
+Working memory: holding and working with information
+
+41
+00:02:08,000 --> 00:02:11,150
+In delay tasks, its neurons keep firing through the wait
+
+42
+00:02:11,200 --> 00:02:14,350
+Cognitive control: making plans and switching rules
+
+43
+00:02:14,400 --> 00:02:17,550
+Inferior frontal gyrus, just above the lateral fissure
+
+44
+00:02:17,600 --> 00:02:20,750
+Right inferior frontal gyrus: stopping impulsive responses
+
+45
+00:02:20,800 --> 00:02:23,950
+Left areas 44/45 form Broca's area, for speech production
+
+46
+00:02:24,000 --> 00:02:27,150
+It also selects and retrieves what you need from memory
+
+47
+00:02:27,200 --> 00:02:30,350
+The very tip of the PFC, relatively enlarged in humans
+
+48
+00:02:30,400 --> 00:02:33,550
+It parks a main goal, handles a subtask, then returns
+
+49
+00:02:33,600 --> 00:02:36,750
+Metacognition: judging how sure you are
+
+50
+00:02:36,800 --> 00:02:39,950
+Weighing exploring the new against exploiting the known
+
+51
+00:02:40,000 --> 00:02:43,150
+On the frontal lobe's underside, right above the eye sockets
+
+52
+00:02:43,200 --> 00:02:46,350
+Computes reward value: what is this worth to me?
+
+53
+00:02:46,400 --> 00:02:49,550
+Rapidly updates when rules flip: reversal learning
+
+54
+00:02:49,600 --> 00:02:52,750
+Smell and taste converge here into the pleasure of flavour
+
+55
+00:02:52,800 --> 00:02:55,950
+Lower medial PFC, overlapping with the medial OFC
+
+56
+00:02:56,000 --> 00:02:59,150
+1848: an iron rod changed Phineas Gage's personality
+
+57
+00:02:59,200 --> 00:03:02,350
+Somatic marker hypothesis: emotional signals guide choices
+
+58
+00:03:02,400 --> 00:03:05,550
+It also helps regulate fear and calm negative emotion
+
+59
+00:03:05,600 --> 00:03:08,750
+Curves around the front of the corpus callosum
+
+60
+00:03:08,800 --> 00:03:11,950
+Conflict monitoring: noticing when impulse and goal collide
+
+61
+00:03:12,000 --> 00:03:15,150
+Slip up, and an error signal (the ERN) fires within ~100 ms
+
+62
+00:03:15,200 --> 00:03:18,350
+It also encodes how much pain hurts, not where it hurts
+
+63
+00:03:18,400 --> 00:03:21,550
+Six subregions, each with its own job
+
+64
+00:03:21,600 --> 00:03:24,750
+But none works alone: they form networks
+
+65
+00:03:24,800 --> 00:03:27,950
+And they are wired to the amygdala, hippocampus and thalamus
+
+66
+00:03:28,000 --> 00:03:31,150
+Know your brain, know yourself
+
+67
+00:03:31,200 --> 00:03:34,350
+Diagrams are simplified, not to anatomical scale
+
+68
+00:03:34,400 --> 00:03:37,550
+Thanks for watching
