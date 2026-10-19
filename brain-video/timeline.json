@@ -11,7 +11,7 @@
     "note": "1 bar = 1.6 s = 48 frames; 1 beat = 0.4 s = 12 frames. Every scene starts on a downbeat."
   },
   "music": [
-    { "bar": 0,   "len": 8,  "section": "intro",     "desc": "暗色铺底 + 心跳式低频鼓（每拍“咚-咚”）+ 每 2 小节一次低音冲击；第 4 小节起加入低弦 16 分音符固定音型" },
+    { "bar": 0,   "len": 8,  "section": "intro",     "desc": "暗色铺底 + 心跳低频（每两拍一次“咚-咚”）+ 每 2 小节一次低音冲击（对应每条数据砸入）；第 2 小节起踩镲计时，第 4 小节起加入低弦 16 分音符固定音型" },
     { "bar": 8,   "len": 4,  "section": "build1",    "desc": "四拍底鼓推进，军鼓滚奏由 8 分→16 分→32 分加速，白噪声上升音效；第 11 小节最后半拍全静音制造“空拍”" },
     { "bar": 12,  "len": 4,  "section": "drop1",     "desc": "第一次爆点：重低音冲击 + Braam 铜管长音 + 镲片；随后进入半速重鼓律动" },
     { "bar": 16,  "len": 44, "section": "grooveA",   "desc": "第一章主律动：半速鼓（1 拍底鼓、3 拍军鼓）、8 分音符贝斯、超锯齿和弦；每 4 小节一次镲片 + 冲击，场景末拍通鼓过门；每 8~16 小节增减声部" },
@@ -19,7 +19,7 @@
     { "bar": 64,  "len": 4,  "section": "build2",    "desc": "第二次蓄力：和弦每拍重击、军鼓滚奏加速、上升音效，最后半拍静音" },
     { "bar": 68,  "len": 8,  "section": "drop2",     "desc": "第二次爆点（全片最大）：冲击 + Braam + 全速四拍鼓 + 主旋律锯齿合成器" },
     { "bar": 76,  "len": 48, "section": "grooveB",   "desc": "第二章主律动：全速鼓（四拍底鼓、2/4 拍军鼓）、16 分音符踩镲；每 8 小节一个亚区乐句，前 4 小节铺陈、后 4 小节加入主旋律" },
-    { "bar": 124, "len": 8,  "section": "finale",    "desc": "高潮：全部声部 + 额外打击乐；第 130 小节终极重击 + 长和弦" },
+    { "bar": 124, "len": 8,  "section": "finale",    "desc": "高潮：全部声部 + 额外打击乐，第 124–125 小节每拍一记和弦重击（对应每拍快切）；第 129 小节军鼓滚奏 + 最后半拍空拍；第 130 小节终极重击 + 长和弦" },
     { "bar": 132, "len": 4,  "section": "outro",     "desc": "尾声：铺底与混响拖尾，逐渐淡出" }
   ],
   "scenes": [
@@ -282,7 +282,7 @@
     },
     {
       "id": "S28", "bar": 108, "len": 8, "kind": "subregion", "view": "medial", "region": "vmpfc", "index": 5,
-      "title": { "zh": "腹内侧前额叶", "en": "VMPFC", "full": "Ventromedial prefrontal cortex", "ba": "BA 10m · 14 · 25 · 32", "analogy_zh": "大脑的“直觉”顾问", "analogy_en": "The brain's gut-feeling advisor" },
+      "title": { "zh": "腹内侧前额叶", "en": "VMPFC", "full": "Ventromedial prefrontal cortex", "ba": "BA 10m · 14 · 25 · 32", "analogy_zh": "大脑的直觉顾问", "analogy_en": "The brain's gut-feeling advisor" },
       "widget": { "type": "gageRod" },
       "refs": [ "Harlow (1868)", "Damasio et al. (1994) Science", "Bechara et al. (1994) Cognition", "Phelps et al. (2004) Neuron" ],
       "subs": [
@@ -322,7 +322,7 @@
     {
       "id": "S32", "bar": 128, "len": 2, "kind": "finaleDeep", "view": "medial",
       "subs": [ { "bar": 128, "len": 2, "zh": "并与杏仁核、海马、丘脑紧密相连", "en": "And they are wired to the amygdala, hippocampus and thalamus" } ],
-      "visual": "内侧视图：前额叶向杏仁核、海马、丘脑射出光束，按拍点亮第一章的深部结构"
+      "visual": "内侧视图：前额叶向杏仁核、海马、丘脑射出光束，按拍点亮第一章的深部结构；第 129 小节军鼓滚奏推镜，最后半拍黑场"
     },
     {
       "id": "S33", "bar": 130, "len": 2, "kind": "finaleSlam", "view": "lateral",
@@ -346,8 +346,10 @@
     "O'Keefe J. & Dostrovsky J. (1971). The hippocampus as a spatial map. Brain Res 34:171–175.",
     "Gogtay N. et al. (2004). Dynamic mapping of human cortical development during childhood through early adulthood. PNAS 101:8174–8179.",
     "Miller E.K. & Cohen J.D. (2001). An integrative theory of prefrontal cortex function. Annu Rev Neurosci 24:167–202.",
+    "Baddeley A. (2003). Working memory: looking back and looking forward. Nat Rev Neurosci 4:829–839.",
     "Funahashi S., Bruce C.J. & Goldman-Rakic P.S. (1989). Mnemonic coding of visual space in the monkey's dorsolateral prefrontal cortex. J Neurophysiol 61:331–349.",
     "Aron A.R., Robbins T.W. & Poldrack R.A. (2004; 2014). Inhibition and the right inferior frontal cortex. Trends Cogn Sci 8:170–177; 18:177–185.",
+    "Broca P. (1861). Remarques sur le siège de la faculté du langage articulé. Bull Soc Anat Paris 36:330–357.",
     "Badre D. & Wagner A.D. (2007). Left ventrolateral prefrontal cortex and the cognitive control of memory. Neuropsychologia 45:2883–2901.",
     "Semendeferi K. et al. (2001). Prefrontal cortex in humans and apes: a comparative study of area 10. Am J Phys Anthropol 114:224–241.",
     "Koechlin E. et al. (1999). The role of the anterior prefrontal cortex in human cognition. Nature 399:148–151.",

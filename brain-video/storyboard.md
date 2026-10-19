@@ -20,14 +20,14 @@
 
 - **切镜只发生在小节强拍（第 1 拍）**，并伴随白闪、冲击波或横向故障切片；场景长度均为 2/4/8 小节，与音乐乐句对齐。
 - **场景内部的动作落在拍点上**：标签、关键词、记忆槽、柱状图等元素每拍弹出一个；军鼓拍有轻微闪光，底鼓拍画面轻微缩放脉动。
-- **两次“空拍”**：第 11、67 小节最后半拍全部静音、画面骤暗，下一强拍爆点（标题砸入）。
+- **三次“空拍”**：第 11、67、129 小节最后半拍全部静音、画面骤暗，下一强拍爆点（两个章节标题与结尾标语砸入）。
 - 配乐生成器同时导出 `build/beatmap.json`（每个底鼓、军鼓、冲击的精确时间），渲染器据此驱动闪光与震屏，保证声画同步。
 
 ## 音乐结构
 
 | 段落 | 小节 | 时间 | 内容 |
 |---|---|---|---|
-| intro | 0–7 | 0:00.0–0:12.8 | 暗色铺底 + 心跳式低频鼓（每拍“咚-咚”）+ 每 2 小节一次低音冲击；第 4 小节起加入低弦 16 分音符固定音型 |
+| intro | 0–7 | 0:00.0–0:12.8 | 暗色铺底 + 心跳低频（每两拍一次“咚-咚”）+ 每 2 小节一次低音冲击（对应每条数据砸入）；第 2 小节起踩镲计时，第 4 小节起加入低弦 16 分音符固定音型 |
 | build1 | 8–11 | 0:12.8–0:19.2 | 四拍底鼓推进，军鼓滚奏由 8 分→16 分→32 分加速，白噪声上升音效；第 11 小节最后半拍全静音制造“空拍” |
 | drop1 | 12–15 | 0:19.2–0:25.6 | 第一次爆点：重低音冲击 + Braam 铜管长音 + 镲片；随后进入半速重鼓律动 |
 | grooveA | 16–59 | 0:25.6–1:36.0 | 第一章主律动：半速鼓（1 拍底鼓、3 拍军鼓）、8 分音符贝斯、超锯齿和弦；每 4 小节一次镲片 + 冲击，场景末拍通鼓过门；每 8~16 小节增减声部 |
@@ -35,7 +35,7 @@
 | build2 | 64–67 | 1:42.4–1:48.8 | 第二次蓄力：和弦每拍重击、军鼓滚奏加速、上升音效，最后半拍静音 |
 | drop2 | 68–75 | 1:48.8–2:01.6 | 第二次爆点（全片最大）：冲击 + Braam + 全速四拍鼓 + 主旋律锯齿合成器 |
 | grooveB | 76–123 | 2:01.6–3:18.4 | 第二章主律动：全速鼓（四拍底鼓、2/4 拍军鼓）、16 分音符踩镲；每 8 小节一个亚区乐句，前 4 小节铺陈、后 4 小节加入主旋律 |
-| finale | 124–131 | 3:18.4–3:31.2 | 高潮：全部声部 + 额外打击乐；第 130 小节终极重击 + 长和弦 |
+| finale | 124–131 | 3:18.4–3:31.2 | 高潮：全部声部 + 额外打击乐，第 124–125 小节每拍一记和弦重击（对应每拍快切）；第 129 小节军鼓滚奏 + 最后半拍空拍；第 130 小节终极重击 + 长和弦 |
 | outro | 132–135 | 3:31.2–3:37.6 | 尾声：铺底与混响拖尾，逐渐淡出 |
 
 ## 分镜
@@ -86,7 +86,7 @@
 | S25 | 2:14.4–2:27.2 | 84–91 | 前额叶亚区 / 侧视图 | **腹外侧前额叶 VLPFC**（BA 44 · 45 · 47）<br>比喻：大脑的刹车 / The brain's brake<br>切镜到 VLPFC；第 86 小节停止信号任务：GO 箭头冲出 → STOP 信号亮起 → 反应被截停；第 88 小节布洛卡区（44/45）单独描边 | [84] 位于额下回，紧邻外侧裂<br>　 *Inferior frontal gyrus, just above the lateral fissure*<br>[86] 右侧额下回：叫停冲动，抑制反应<br>　 *Right inferior frontal gyrus: stopping impulsive responses*<br>[88] 左侧 44/45 区即布洛卡区，负责言语产生<br>　 *Left areas 44/45 form Broca's area, for speech production*<br>[90] 还帮助从记忆中挑选、提取所需信息<br>　 *It also selects and retrieves what you need from memory* |
 | S26 | 2:27.2–2:40.0 | 92–99 | 前额叶亚区 / 侧视图 | **额极 FRONTAL POLE**（BA 10）<br>比喻：给目标夹上书签 / A bookmark for your goals<br>切镜到额极；第 94 小节分支任务图：主目标挂起（书签）→ 子任务 → 返回；第 96 小节信心刻度条；最后一拍翻转到内侧视图 | [92] 前额叶的最前端，在人类中相对更大<br>　 *The very tip of the PFC, relatively enlarged in humans*<br>[94] 挂起主目标，先处理子任务，再切回来<br>　 *It parks a main goal, handles a subtask, then returns*<br>[96] 元认知：评估“我有多确定”<br>　 *Metacognition: judging how sure you are*<br>[98] 权衡探索新选项，还是利用旧经验<br>　 *Weighing exploring the new against exploiting the known* |
 | S27 | 2:40.0–2:52.8 | 100–107 | 前额叶亚区 / 内侧视图 | **眶额皮层 OFC**（BA 11 · 13 · 47/12）<br>比喻：大脑的估价师 / The brain's appraiser<br>翻转落地为内侧视图并推近额叶底面；眼眶位置以虚线弧标出；第 102 小节 A/B 两个选项价值条按拍升降；第 104 小节价值反转 | [100] 位于额叶底面，就在眼眶上方<br>　 *On the frontal lobe's underside, right above the eye sockets*<br>[102] 计算奖励价值：这对我值多少？<br>　 *Computes reward value: what is this worth to me?*<br>[104] 规则一变，迅速更新预期（逆转学习）<br>　 *Rapidly updates when rules flip: reversal learning*<br>[106] 嗅觉与味觉在此汇聚，形成“美味”的感受<br>　 *Smell and taste converge here into the pleasure of flavour* |
-| S28 | 2:52.8–3:05.6 | 108–115 | 前额叶亚区 / 内侧视图 | **腹内侧前额叶 VMPFC**（BA 10m · 14 · 25 · 32）<br>比喻：大脑的“直觉”顾问 / The brain's gut-feeling advisor<br>切镜到 VMPFC；第 110 小节“1848”大字 + 铁棍沿盖奇损伤轨迹贯穿额叶（重击帧）；第 112 小节身体信号曲线流向 VMPFC | [108] 位于前额叶内侧下部，与内侧 OFC 部分重叠<br>　 *Lower medial PFC, overlapping with the medial OFC*<br>[110] 1848 年，铁棍贯穿盖奇头颅，他从此性情大变<br>　 *1848: an iron rod changed Phineas Gage's personality*<br>[112] 躯体标记假说：情绪信号引导决策<br>　 *Somatic marker hypothesis: emotional signals guide choices*<br>[114] 还参与调节恐惧，平复负面情绪<br>　 *It also helps regulate fear and calm negative emotion* |
+| S28 | 2:52.8–3:05.6 | 108–115 | 前额叶亚区 / 内侧视图 | **腹内侧前额叶 VMPFC**（BA 10m · 14 · 25 · 32）<br>比喻：大脑的直觉顾问 / The brain's gut-feeling advisor<br>切镜到 VMPFC；第 110 小节“1848”大字 + 铁棍沿盖奇损伤轨迹贯穿额叶（重击帧）；第 112 小节身体信号曲线流向 VMPFC | [108] 位于前额叶内侧下部，与内侧 OFC 部分重叠<br>　 *Lower medial PFC, overlapping with the medial OFC*<br>[110] 1848 年，铁棍贯穿盖奇头颅，他从此性情大变<br>　 *1848: an iron rod changed Phineas Gage's personality*<br>[112] 躯体标记假说：情绪信号引导决策<br>　 *Somatic marker hypothesis: emotional signals guide choices*<br>[114] 还参与调节恐惧，平复负面情绪<br>　 *It also helps regulate fear and calm negative emotion* |
 | S29 | 3:05.6–3:18.4 | 116–123 | 前额叶亚区 / 内侧视图 | **前扣带皮层 ACC**（BA 24 · 32 · 33）<br>比喻：大脑的纠错雷达 / The brain's error radar<br>切镜到 ACC（胼胝体膝部周围）；第 118 小节侧翼任务箭头“← ← → ← ←”中间箭头冲突闪烁；第 120 小节脑电波形在错误后约 100 ms 出现负向波谷<br>【争议】严格说属扣带皮层，常被归入内侧前额叶网络 | [116] 环绕胼胝体前部，常被归入内侧前额叶<br>　 *Curves around the front of the corpus callosum*<br>[118] 冲突监测：察觉“冲动”与“目标”打架<br>　 *Conflict monitoring: noticing when impulse and goal collide*<br>[120] 一出错，脑电立刻出现“错误相关负波”<br>　 *Slip up, and an error signal (the ERN) fires within ~100 ms*<br>[122] 还编码疼痛有多“难受”，而不是痛在哪<br>　 *It also encodes how much pain hurts, not where it hurts* |
 
 ### 高潮与尾声
@@ -95,7 +95,7 @@
 |---|---|---|---|---|---|
 | S30 | 3:18.4–3:21.6 | 124–125 | 高潮快切 / 侧+内侧分屏 | 高潮快切：每一拍切到一个亚区 + 关键词（共 6 拍），第 7~8 拍六区同时亮起 | [124] 六个亚区，各司其职<br>　 *Six subregions, each with its own job* |
 | S31 | 3:21.6–3:24.8 | 126–127 | 高潮·网络 / 侧+内侧分屏 | 六个亚区之间按 8 分音符依次拉出光线，形成网络 | [126] 但它们并非单打独斗，而是组成网络<br>　 *But none works alone: they form networks* |
-| S32 | 3:24.8–3:28.0 | 128–129 | 高潮·深部连接 / 内侧视图 | 内侧视图：前额叶向杏仁核、海马、丘脑射出光束，按拍点亮第一章的深部结构 | [128] 并与杏仁核、海马、丘脑紧密相连<br>　 *And they are wired to the amygdala, hippocampus and thalamus* |
+| S32 | 3:24.8–3:28.0 | 128–129 | 高潮·深部连接 / 内侧视图 | 内侧视图：前额叶向杏仁核、海马、丘脑射出光束，按拍点亮第一章的深部结构；第 129 小节军鼓滚奏推镜，最后半拍黑场 | [128] 并与杏仁核、海马、丘脑紧密相连<br>　 *And they are wired to the amygdala, hippocampus and thalamus* |
 | S33 | 3:28.0–3:31.2 | 130–131 | 终极重击 / 侧视图 | **认识大脑，就是认识自己 KNOW YOUR BRAIN, KNOW YOURSELF**<br>终极重击：全脑所有区域同时爆亮 + 冲击波，标语砸入 | [130] 认识大脑，就是认识自己<br>　 *Know your brain, know yourself* |
 | S34 | 3:31.2–3:37.6 | 132–135 | 尾声 / — | 尾声：参考文献滚动列表 + 片名，画面随音乐淡出 | [132] 图示已简化，非精确解剖比例<br>　 *Diagrams are simplified, not to anatomical scale*<br>[134] 谢谢观看<br>　 *Thanks for watching* |
 
@@ -117,8 +117,10 @@
 - O'Keefe J. & Dostrovsky J. (1971). The hippocampus as a spatial map. Brain Res 34:171–175.
 - Gogtay N. et al. (2004). Dynamic mapping of human cortical development during childhood through early adulthood. PNAS 101:8174–8179.
 - Miller E.K. & Cohen J.D. (2001). An integrative theory of prefrontal cortex function. Annu Rev Neurosci 24:167–202.
+- Baddeley A. (2003). Working memory: looking back and looking forward. Nat Rev Neurosci 4:829–839.
 - Funahashi S., Bruce C.J. & Goldman-Rakic P.S. (1989). Mnemonic coding of visual space in the monkey's dorsolateral prefrontal cortex. J Neurophysiol 61:331–349.
 - Aron A.R., Robbins T.W. & Poldrack R.A. (2004; 2014). Inhibition and the right inferior frontal cortex. Trends Cogn Sci 8:170–177; 18:177–185.
+- Broca P. (1861). Remarques sur le siège de la faculté du langage articulé. Bull Soc Anat Paris 36:330–357.
 - Badre D. & Wagner A.D. (2007). Left ventrolateral prefrontal cortex and the cognitive control of memory. Neuropsychologia 45:2883–2901.
 - Semendeferi K. et al. (2001). Prefrontal cortex in humans and apes: a comparative study of area 10. Am J Phys Anthropol 114:224–241.
 - Koechlin E. et al. (1999). The role of the anterior prefrontal cortex in human cognition. Nature 399:148–151.
