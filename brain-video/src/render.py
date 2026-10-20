@@ -1223,7 +1223,7 @@ def main():
         return
     f0, f1 = (int(x) for x in a.frames.split(":"))
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", "%dx%d" % (W, H),
-           "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "17",
+           "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "slow", "-tune", "animation", "-crf", "20",
            "-pix_fmt", "yuv420p", "-g", "60", a.out]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     for fi in range(f0, f1):

@@ -64,7 +64,7 @@ def main():
     subprocess.check_call(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst,
                            "-ss", "%.4f" % (f0 / FPS), "-t", "%.4f" % ((f1 - f0) / FPS),
                            "-i", os.path.join(BUILD, "bgm.wav"),
-                           "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "256k",
+                           "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
                            "-movflags", "+faststart", out])
     write_srt(os.path.join(OUT, NAME + ".srt"))
     print("wrote", out)

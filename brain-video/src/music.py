@@ -840,7 +840,7 @@ def main():
     mix = np.tanh(mix * (0.9 / np.percentile(np.abs(mix), 99.95)))
     mix = mix * (1.35 / np.percentile(np.abs(mix), 99.9))
     mix, g = limiter(mix)
-    mix = mix * (0.95 / np.abs(mix).max())
+    mix = mix * (0.7 / np.abs(mix).max())   # ~3 dB headroom: AAC overshoots heavily limited peaks
     end = int(DURATION * SR)
     mix[:, end - int(1.5 * SR):end] *= np.linspace(1, 0, int(1.5 * SR))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
