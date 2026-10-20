@@ -1,0 +1,200 @@
+1
+00:00:00,000 --> 00:00:03,683
+约 860 亿个神经元
+Around 86 billion neurons
+
+2
+00:00:03,733 --> 00:00:07,417
+体重的 2%，能耗的 20%
+2% of body weight, 20% of its energy
+
+3
+00:00:07,467 --> 00:00:11,150
+人类大脑
+The Human Brain
+
+4
+00:00:11,200 --> 00:00:14,883
+第一部分 · 脑区巡礼
+PART 1 · A TOUR OF THE BRAIN REGIONS
+
+5
+00:00:14,933 --> 00:00:22,350
+额叶：大脑的“指挥中心”
+Frontal lobe: the brain's command center
+
+6
+00:00:22,400 --> 00:00:29,817
+顶叶：身体与空间的地图
+Parietal lobe: a map of body and space
+
+7
+00:00:29,867 --> 00:00:37,283
+颞叶：听见、理解、记住
+Temporal lobe: hearing, understanding, remembering
+
+8
+00:00:37,333 --> 00:00:44,750
+枕叶：视觉从这里开始
+Occipital lobe: where vision begins
+
+9
+00:00:44,800 --> 00:00:52,217
+岛叶：倾听身体内部的声音
+Insula: listening to the body from within
+
+10
+00:00:52,267 --> 00:00:59,683
+海马：把经历写进记忆
+Hippocampus: writing experience into memory
+
+11
+00:00:59,733 --> 00:01:07,150
+杏仁核：危险的第一警报
+Amygdala: the first alarm for danger
+
+12
+00:01:07,200 --> 00:01:14,617
+基底神经节：选择动作，养成习惯
+Basal ganglia: choosing actions, forming habits
+
+13
+00:01:14,667 --> 00:01:22,083
+丘脑：感觉信息的总中转站
+Thalamus: the grand relay station of the senses
+
+14
+00:01:22,133 --> 00:01:29,550
+下丘脑：身体稳态的“恒温器”
+Hypothalamus: the body's thermostat
+
+15
+00:01:29,600 --> 00:01:37,017
+小脑：精准运动的“校准器”
+Cerebellum: the calibrator of precise movement
+
+16
+00:01:37,067 --> 00:01:44,483
+脑干：生命中枢
+Brainstem: the center of vital functions
+
+17
+00:01:44,533 --> 00:01:48,217
+聚焦：前额叶皮层
+Zoom in: the prefrontal cortex
+
+18
+00:01:48,267 --> 00:01:51,950
+最晚成熟的脑区之一：发育持续到二十多岁
+Among the last regions to mature, developing into the mid-20s
+
+19
+00:01:52,000 --> 00:01:59,417
+第二部分 · 前额叶七大亚区
+PART 2 · SEVEN SUBREGIONS OF THE PFC
+
+20
+00:01:59,467 --> 00:02:06,883
+DLPFC：大脑的“工作台”
+DLPFC: the brain's workbench
+
+21
+00:02:06,933 --> 00:02:14,350
+受损后：计划困难，思维僵化
+When damaged: poor planning, rigid thinking
+
+22
+00:02:14,400 --> 00:02:21,817
+VLPFC：在冲动面前踩下刹车
+VLPFC: hitting the brakes on impulse
+
+23
+00:02:21,867 --> 00:02:29,283
+左侧受损：说不出想说的话
+Left-side damage: unable to say what you mean
+
+24
+00:02:29,333 --> 00:02:36,750
+额极：同时驾驭多个目标
+Frontal pole: juggling multiple goals
+
+25
+00:02:36,800 --> 00:02:44,217
+思考你自己的思考
+Thinking about your own thinking
+
+26
+00:02:44,267 --> 00:02:51,683
+OFC：为每个选项标价
+OFC: putting a price on every option
+
+27
+00:02:51,733 --> 00:02:59,150
+规则变了，它帮你及时转向
+When the rules change, it helps you adapt
+
+28
+00:02:59,200 --> 00:03:06,617
+vmPFC：把情绪变成决策信号
+vmPFC: turning emotion into decision signals
+
+29
+00:03:06,667 --> 00:03:14,083
+一根铁棍，改写了神经科学
+One iron rod rewrote neuroscience
+
+30
+00:03:14,133 --> 00:03:21,550
+ACC：冲突与错误的警报器
+ACC: the alarm for conflict and errors
+
+31
+00:03:21,600 --> 00:03:29,017
+它也决定了疼痛有多“难受”
+It also shapes how much pain hurts
+
+32
+00:03:29,067 --> 00:03:36,483
+dmPFC：读懂他人的心
+dmPFC: reading other minds
+
+33
+00:03:36,533 --> 00:03:43,950
+社会认知的核心枢纽
+A core hub of social cognition
+
+34
+00:03:44,000 --> 00:03:47,683
+中央执行网络：专注当下任务
+Central executive network: focusing on the task
+
+35
+00:03:47,733 --> 00:03:51,417
+默认模式网络：内省与想象
+Default mode network: introspection and imagination
+
+36
+00:03:51,467 --> 00:03:55,150
+突显网络：在两者之间切换
+Salience network: switching between the two
+
+37
+00:03:55,200 --> 00:03:58,883
+前额叶从不单独工作
+The prefrontal cortex never works alone
+
+38
+00:03:58,933 --> 00:04:02,617
+思考 · 抑制 · 选择 · 共情
+Think · Inhibit · Choose · Empathize
+
+39
+00:04:02,667 --> 00:04:06,350
+认识大脑，就是认识自己
+Know your brain, know yourself
+
+40
+00:04:06,400 --> 00:04:13,817
+感谢观看
+Thanks for watching
+
