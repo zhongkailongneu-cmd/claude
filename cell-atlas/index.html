@@ -1,0 +1,1693 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anthropic · Cell Atlas</title>
+<meta name="description" content="Interactive 3D cell atlas research dashboard: a procedural Three.js cell, a six-agent pipeline and live telemetry panels.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400&display=swap">
+<style>
+/* ================================================================
+   Palette: warm paper + Loyel gradient-blue ink.
+   Organelle hues (purple nucleus, red-brown mitochondria, green
+   lysosomes, gold pores...) are semantic and live in the JS data.
+   ================================================================ */
+:root{
+  --paper:#ECE7DE; --paper-hi:#F4F1EA; --panel:#F3EFE8; --panel-2:#EAE5DB;
+  --rule:#CDC5B6; --rule-2:#B5AC9B; --rule-3:#DDD6C9;
+  --ink:#263B54; --ink-2:#2B4868; --ink-3:#2E5076;
+  --muted:#7A7468; --muted-2:#A39B8C;
+  --a70:#376392; --a60:#497DAE; --a50:#6C9AC4; --a40:#9FBDDA; --a30:#CCDBEB; --a20:#E8EEF6; --a10:#F4F7FB;
+  --clay:#B0563A;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",monospace;
+  --serif:"Newsreader","Source Serif 4",Georgia,"Songti SC","STSong",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background-color:var(--paper);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .16 0 0 0 0 .14 0 0 0 0 .1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color:var(--ink); font-family:var(--mono); font-size:11px; letter-spacing:.02em;
+  -webkit-font-smoothing:antialiased; overflow:hidden;
+}
+button{font:inherit;color:inherit}
+.app{height:100vh;min-height:700px;display:grid;grid-template-rows:auto auto minmax(0,1fr) clamp(196px,27vh,276px);gap:6px;padding:8px}
+.box{border:1px solid var(--rule);background:var(--panel)}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;border-bottom:1px solid var(--rule);
+    font-size:9.5px;letter-spacing:.12em;color:var(--ink-2);background:var(--panel-2);white-space:nowrap;min-height:29px}
+.ph .r{display:flex;align-items:center;gap:8px;color:var(--muted);letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis}
+.ph b{font-weight:600;color:var(--ink)}
+.tag{font-size:9px;padding:1px 5px;border:1px solid var(--rule-2);color:var(--muted)}
+
+/* ---------- top bar ---------- */
+.top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;padding:9px 14px;position:relative}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-4px;border-bottom:1px solid var(--rule)}
+.brand{display:flex;gap:12px;align-items:center;min-width:0}
+.mark{width:38px;height:38px;flex:none}
+.brand h1{font-family:var(--serif);font-weight:500;font-size:26px;letter-spacing:-.005em;line-height:1;color:var(--ink);white-space:nowrap}
+.brand h1 em{font-style:normal;color:var(--a50);padding:0 .08em}
+.sub{margin-top:6px;font-size:9.5px;color:var(--muted);letter-spacing:.07em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub i{font-style:normal;color:var(--ink-3)}
+.right{display:flex;flex-direction:column;gap:6px;min-width:600px}
+.metrics{display:flex;justify-content:flex-end;border:1px solid var(--rule);background:var(--paper-hi)}
+.m{padding:4px 12px;border-left:1px solid var(--rule);display:flex;gap:8px;align-items:baseline;white-space:nowrap}
+.m:first-child{border-left:0}
+.m b{font-weight:500;color:var(--muted);letter-spacing:.12em;font-size:9px}
+.m span{font-weight:600;font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
+.m.live b::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--a60);margin-right:6px;vertical-align:1px;animation:blink 1.4s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
+.st{position:relative;border:1px solid var(--rule);padding:3px 7px 4px;font-size:9.5px;letter-spacing:.08em;color:var(--muted-2);background:var(--panel);overflow:hidden;white-space:nowrap;transition:background .3s,color .3s,border-color .3s}
+.st u{text-decoration:none;color:inherit;opacity:.65;margin-right:5px}
+.st s{text-decoration:none;float:right;opacity:.8}
+.st i{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--a40);transform-origin:left;transform:scaleX(0)}
+.st.done{color:var(--ink-2);border-color:var(--a40);background:var(--a10)}
+.st.done i{transform:scaleX(1);background:var(--a50)}
+.st.run{color:#fff;background:var(--a70);border-color:var(--a70)}
+.st.run i{background:var(--a30)}
+
+/* ---------- agents ---------- */
+.agents{display:grid;grid-template-columns:132px repeat(6,minmax(0,1fr));gap:6px}
+.ag-lab{border:1px solid var(--rule);background:var(--panel-2);padding:7px 9px;display:flex;flex-direction:column;justify-content:space-between;font-size:9.5px;letter-spacing:.1em;color:var(--ink-2)}
+.ag-lab small{display:block;color:var(--muted);letter-spacing:.04em;font-size:9px;margin-top:3px}
+.ag-lab b{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:.02em}
+.ag{position:relative;border:1px solid var(--rule);background:var(--panel);padding:7px 9px 8px;display:flex;flex-direction:column;gap:5px;transition:border-color .25s,background .25s,box-shadow .2s;min-width:0}
+.ag.run{border-color:var(--a70);background:var(--a10)}
+.ag.polled{box-shadow:inset 0 0 0 1px var(--a50)}
+.ag .pl{position:absolute;top:-1px;right:-1px;font-size:8.5px;letter-spacing:.1em;background:var(--a60);color:#fff;padding:1px 5px;opacity:0;transition:opacity .15s}
+.ag.polled .pl{opacity:1}
+.ag-h{display:flex;align-items:center;gap:7px;min-width:0}
+.ag-id{color:var(--muted);font-size:9px}
+.ag-n{font-weight:600;letter-spacing:.06em;font-size:11.5px}
+.ag-s{margin-left:auto;font-size:8.5px;letter-spacing:.1em;padding:1px 5px;border:1px solid currentColor;color:var(--muted-2);border-style:dashed;margin-right:30px}
+.ag.run .ag-s{color:#fff;background:var(--a70);border:1px solid var(--a70)}
+.ag.done .ag-s{color:var(--a70);border-style:solid}
+.ag-r{color:var(--muted);font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ag-bar{height:5px;background:var(--rule-3);position:relative;overflow:hidden}
+.ag-bar i{position:absolute;inset:0;transform-origin:left;transform:scaleX(0);background:var(--a50)}
+.ag.done .ag-bar i{background:var(--a60)}
+.ag.run .ag-bar i{background:repeating-linear-gradient(-45deg,var(--a70) 0 5px,var(--a60) 5px 10px);background-size:14px 14px;animation:stripes .7s linear infinite}
+@keyframes stripes{to{background-position:14px 0}}
+.ag-f{display:flex;gap:8px;font-size:9px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.ag-f .lg{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;color:var(--ink-3)}
+.ag-f .pc{width:30px;text-align:right;color:var(--ink);font-weight:500}
+
+/* ---------- main ---------- */
+.main{display:grid;grid-template-columns:236px minmax(0,1fr);gap:6px;min-height:0}
+.index{display:flex;flex-direction:column;min-height:0}
+.idx{flex:1;overflow:auto;min-height:0}
+.ir{display:grid;grid-template-columns:18px 10px minmax(0,1fr) 30px;grid-template-rows:auto auto;align-items:center;column-gap:7px;row-gap:3px;width:100%;
+    padding:4px 10px 4px 12px;border:0;border-bottom:1px dashed var(--rule-3);background:none;text-align:left;cursor:pointer;position:relative}
+.ir:hover{background:var(--a10)}
+.ir.on{background:var(--a20)}
+.ir.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--a70)}
+.ir .n{color:var(--muted);font-size:9.5px}
+.ir .sw{width:9px;height:9px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(38,59,84,.35)}
+.ir .nm{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ir .nm small{color:var(--muted);font-size:9.5px;margin-left:5px}
+.ir .cf{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.ir .cb{grid-column:3/5;height:2px;background:var(--rule-3);position:relative}
+.ir .cb i{position:absolute;left:0;top:0;bottom:0;background:var(--a50)}
+.ir.on .cb i{background:var(--a70)}
+.keys{border-top:1px solid var(--rule);padding:7px 10px;font-size:9px;color:var(--muted);line-height:1.75;background:var(--panel-2)}
+.keys kbd{font:inherit;color:var(--ink);border:1px solid var(--rule-2);padding:0 4px;background:var(--paper-hi)}
+
+.viewport{position:relative;overflow:hidden;min-height:0;
+  background:radial-gradient(120% 95% at 56% 44%,#F7F4EE 0%,#EDE7DC 52%,#DFD8CA 100%)}
+.viewport::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(var(--rule-3) 1px,transparent 1px),linear-gradient(90deg,var(--rule-3) 1px,transparent 1px);background-size:48px 48px;background-position:-1px -1px}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#gl.drag{cursor:grabbing}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+  background:repeating-linear-gradient(0deg,rgba(38,59,84,.035) 0 1px,transparent 1px 3px)}
+.corner{position:absolute;width:16px;height:16px;border:1.5px solid var(--ink);pointer-events:none}
+.corner.tl{top:8px;left:8px;border-right:0;border-bottom:0}.corner.tr{top:8px;right:8px;border-left:0;border-bottom:0}
+.corner.bl{bottom:8px;left:8px;border-right:0;border-top:0}.corner.br{bottom:8px;right:8px;border-left:0;border-top:0}
+.ov{position:absolute;pointer-events:none;font-size:9.5px;letter-spacing:.08em;color:var(--ink-2);line-height:1.6;text-shadow:0 0 6px rgba(244,241,234,.9)}
+.vp-tl{top:14px;left:30px}
+.vp-tl b{font-weight:600;color:var(--ink);letter-spacing:.12em}
+.vp-tl span{color:var(--muted)}
+.vp-bl{bottom:20px;left:30px;font-variant-numeric:tabular-nums}
+.vp-bl .mode{display:inline-block;background:var(--ink);color:#F4F1EA;padding:0 6px;margin-right:6px;letter-spacing:.12em;text-shadow:none}
+.vp-br{bottom:20px;right:30px;text-align:right;font-variant-numeric:tabular-nums}
+.scale{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:3px}
+.scale i{display:block;height:6px;border:1.5px solid var(--ink);border-top:0;width:80px}
+.ctrls{position:absolute;top:12px;right:30px;display:flex;gap:4px;z-index:3}
+.btn{border:1px solid var(--ink);background:rgba(244,241,234,.85);padding:5px 10px;font-size:10px;letter-spacing:.12em;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.btn:hover{background:var(--a20)}
+.btn.on{background:var(--ink);color:#F4F1EA}
+.btn.on:hover{background:var(--ink-3)}
+.btn .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:1px}
+.btn.on .dot{animation:blink 1s steps(2,start) infinite;background:#9FBDDA}
+.tourbar{position:absolute;left:30px;right:30px;bottom:12px;height:2px;background:var(--rule-3);pointer-events:none}
+.tourbar i{position:absolute;left:0;top:0;bottom:0;width:100%;transform-origin:left;transform:scaleX(0);background:var(--a70)}
+
+.xhair{position:absolute;left:50%;top:50%;width:132px;height:132px;margin:-66px 0 0 -66px;pointer-events:none;transition:opacity .3s}
+.xhair svg{width:100%;height:100%;overflow:visible}
+.xhair .ring{transform-origin:66px 66px;animation:spin 14s linear infinite}
+.xhair .br{transition:transform .5s cubic-bezier(.2,.8,.2,1);transform-origin:66px 66px;transform:scale(1.35)}
+.xhair.lock .br{transform:scale(1)}
+.xhair.ovw{opacity:.45}
+@keyframes spin{to{transform:rotate(360deg)}}
+svg.lead{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+
+.card{position:absolute;left:calc(50% + 86px);top:calc(50% - 178px);width:290px;pointer-events:none;
+  background:rgba(245,242,236,.93);border:1px solid var(--ink);box-shadow:4px 4px 0 rgba(38,59,84,.12);
+  padding:0 0 9px;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
+.card.show{opacity:1;transform:none}
+.card.show.acq{opacity:.78}
+.card.ovc{left:auto;right:30px;top:52px}
+.c-top{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:#F4F1EA;padding:3px 9px;font-size:9px;letter-spacing:.14em}
+.c-state{padding:0 5px;border:1px solid rgba(244,241,234,.55)}
+.c-state.acq{color:#9FBDDA;border-color:#9FBDDA;animation:blink .5s steps(2,start) infinite}
+.c-name{font-size:15px;font-weight:600;letter-spacing:.06em;padding:8px 10px 0;color:var(--ink);text-transform:uppercase}
+.c-zh{padding:1px 10px 0;color:var(--muted);font-size:10.5px;letter-spacing:.04em}
+.c-zh b{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:0}
+.c-conf{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;padding:8px 10px 2px;font-size:9px;letter-spacing:.12em;color:var(--muted)}
+.c-conf b{font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.c-bar{height:7px;position:relative;background:repeating-linear-gradient(90deg,var(--rule-3) 0 5px,transparent 5px 7px)}
+.c-bar i{position:absolute;left:0;top:0;bottom:0;background:repeating-linear-gradient(90deg,var(--a70) 0 5px,transparent 5px 7px);transition:width .6s}
+.c-grid{display:grid;grid-template-columns:repeat(3,1fr);margin:8px 10px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.c-grid div{padding:4px 0 5px;border-left:1px dashed var(--rule);padding-left:7px;min-width:0}
+.c-grid div:first-child{border-left:0;padding-left:0}
+.c-grid span{display:block;font-size:8.5px;letter-spacing:.12em;color:var(--muted)}
+.c-grid b{display:block;font-size:10.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-desc{padding:7px 10px 0;font-size:10.5px;line-height:1.6;color:var(--ink-2);letter-spacing:.01em}
+.c-xyz{padding:6px 10px 0;font-size:9px;color:var(--muted);letter-spacing:.08em;font-variant-numeric:tabular-nums}
+
+.hover{position:absolute;pointer-events:none;background:var(--ink);color:#F4F1EA;font-size:9.5px;letter-spacing:.1em;padding:2px 7px;transform:translate(12px,-26px);opacity:0;transition:opacity .12s;white-space:nowrap;z-index:4}
+.hover.show{opacity:1}
+.labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;left:0;top:0;font-size:9px;letter-spacing:.1em;color:var(--ink);white-space:nowrap;opacity:0;transition:opacity .4s;text-shadow:0 0 4px #F4F1EA,0 0 8px #F4F1EA}
+.lbl::before{content:"";position:absolute;left:-3px;top:-3px;width:5px;height:5px;border:1px solid var(--ink);background:#F4F1EA;border-radius:50%}
+.lbl span{position:absolute;left:5px;bottom:4px;padding-left:2px;border-left:1px solid var(--ink-2);padding-bottom:10px;line-height:1}
+.lbl.show{opacity:1}
+.flash{position:absolute;left:50%;top:22%;transform:translateX(-50%);font-size:11px;letter-spacing:.2em;color:#fff;background:var(--clay);padding:3px 10px;opacity:0;pointer-events:none;transition:opacity .3s}
+.flash.show{opacity:1}
+.fail{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:11px;line-height:1.8;color:var(--ink-2);background:rgba(236,231,222,.92);z-index:9}
+
+/* ---------- telemetry ---------- */
+.tele{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:6px;min-height:0}
+.panel{display:flex;flex-direction:column;min-height:0;min-width:0}
+.pc{position:relative;flex:1;min-height:0}
+.pc canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.atp{border:1px solid var(--clay);color:var(--clay);background:transparent;font-size:9.5px;letter-spacing:.12em;padding:2px 8px;cursor:pointer;transition:background .15s,color .15s}
+.atp:hover,.atp.fire{background:var(--clay);color:#fff}
+#c-con{cursor:crosshair}#c-obs{cursor:pointer}
+
+@media (max-width:1240px){
+  .main{grid-template-columns:1fr}.index{display:none}
+  .agents{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(168px,1fr);overflow-x:auto}
+  .ag-lab{display:none}
+  .right{min-width:0}
+}
+@media (max-width:900px){
+  body{overflow:auto}
+  .app{height:auto;min-height:0;grid-template-rows:auto auto 64vh auto}
+  .top{grid-template-columns:1fr}
+  .metrics{flex-wrap:wrap;justify-content:flex-start}
+  .m{flex:1 1 40%;border-left:0;border-top:1px solid var(--rule)}
+  .flow{grid-template-columns:repeat(3,1fr)}
+  .tele{grid-template-columns:1fr}
+  .panel{height:236px}
+  .card,.card.ovc{left:16px;right:16px;top:auto;bottom:58px;width:auto}
+  .vp-bl,.vp-br{display:none}
+  .ctrls{left:16px;right:16px;flex-wrap:wrap;justify-content:flex-end}
+  .vp-tl{top:auto;bottom:22px;left:16px}
+  .brand h1{font-size:21px}
+}
+</style>
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===================== TOP BAR ===================== -->
+  <header class="top box">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="18" fill="none" stroke="#263B54" stroke-width="1.4"/>
+        <path d="M20 2 A18 18 0 0 1 38 20 L20 20 Z" fill="#E8EEF6" stroke="#263B54" stroke-width="1"/>
+        <circle cx="16.5" cy="22" r="7" fill="#6E4F95" opacity=".85"/>
+        <circle cx="19" cy="20" r="2.4" fill="#3F2659"/>
+        <rect x="25" y="25" width="8" height="3.4" rx="1.7" fill="#A4523E" transform="rotate(-25 29 26.7)"/>
+        <circle cx="10" cy="11" r="2" fill="#5E9461"/>
+        <path d="M2 20h4M34 20h4M20 34v4" stroke="#263B54" stroke-width="1"/>
+      </svg>
+      <div style="min-width:0">
+        <h1>Anthropic <em>·</em> Cell Atlas</h1>
+        <div class="sub">VOL. 07 · Nº 14 — <i>Interactive 3D atlas of a HeLa cell</i> · specimen HeLa-07 · cryo-ET · 1.2 nm / voxel · Fig. 1 (live)</div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="metrics">
+        <div class="m"><b>ORGANELLES</b><span>14/14</span></div>
+        <div class="m"><b>CONFIDENCE</b><span>0.71</span></div>
+        <div class="m"><b>ERROR</b><span>0.340Å</span></div>
+        <div class="m live"><b id="clk-d">—</b><span id="clk">--:--:--</span></div>
+      </div>
+      <div class="flow" id="flow"></div>
+    </div>
+  </header>
+
+  <!-- ===================== AGENTS ===================== -->
+  <section class="agents" id="agents">
+    <div class="ag-lab">
+      <div>AGENT POOL<small>orchestrator · round-robin</small></div>
+      <div><b id="run-no">RUN #0042</b><small id="poll-l">poll 420ms · 6/6</small></div>
+    </div>
+  </section>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <aside class="index box">
+      <div class="ph"><span>§1 ORGANELLE INDEX</span><span class="r"><b>14</b> classes</span></div>
+      <div class="idx" id="idx"></div>
+      <div class="keys">
+        <kbd>DRAG</kbd> orbit · <kbd>WHEEL</kbd> zoom · <kbd>CLICK</kbd> lock<br>
+        <kbd>T</kbd> tour · <kbd>O</kbd> overview · <kbd>E</kbd> exploded<br>
+        <kbd>←</kbd><kbd>→</kbd> prev / next · <kbd>B</kbd> ATP burst
+      </div>
+    </aside>
+
+    <section class="viewport box" id="viewport">
+      <canvas id="gl"></canvas>
+      <div class="grain"></div>
+      <div class="labels" id="labels"></div>
+      <svg class="lead" id="lead"><polyline id="lead-l" points="" fill="none" stroke="#263B54" stroke-width="1" stroke-dasharray="3 3"/><circle id="lead-c" r="2.5" fill="#263B54"/></svg>
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+
+      <div class="ov vp-tl"><b>FIG. 1 · VIEWPORT 3D</b><br><span>HeLa-07 · octant cutaway · fov 38°</span></div>
+      <div class="ctrls">
+        <button class="btn on" id="b-tour"><span class="dot"></span>AUTO TOUR</button>
+        <button class="btn" id="b-over">◎ OVERVIEW</button>
+        <button class="btn" id="b-expl">+ EXPLODED</button>
+      </div>
+
+      <div class="xhair" id="xhair">
+        <svg viewBox="0 0 132 132">
+          <g class="ring"><circle cx="66" cy="66" r="44" fill="none" stroke="#263B54" stroke-width=".8" stroke-dasharray="2 5"/></g>
+          <circle cx="66" cy="66" r="30" fill="none" stroke="#376392" stroke-width=".8" opacity=".6"/>
+          <path d="M66 14v20M66 98v20M14 66h20M98 66h20" stroke="#263B54" stroke-width="1"/>
+          <path d="M62 66h8M66 62v8" stroke="#263B54" stroke-width="1.2"/>
+          <g class="br" fill="none" stroke="#263B54" stroke-width="1.6">
+            <path d="M40 50V40h10M82 40h10v10M92 82v10H82M50 92H40V82"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="card" id="card">
+        <div class="c-top"><span id="c-idx">01 / 14</span><span class="c-state" id="c-state">LOCKED</span></div>
+        <div class="c-name" id="c-name">—</div>
+        <div class="c-zh" id="c-zh">—</div>
+        <div class="c-conf"><span>CONFIDENCE</span><div class="c-bar"><i id="c-bar"></i></div><b id="c-conf">0.00</b></div>
+        <div class="c-grid">
+          <div><span>COPIES</span><b id="c-copies">—</b></div>
+          <div><span>SIZE</span><b id="c-size">—</b></div>
+          <div><span>MARKER</span><b id="c-prot">—</b></div>
+        </div>
+        <p class="c-desc" id="c-desc"></p>
+        <div class="c-xyz" id="c-xyz"></div>
+      </div>
+
+      <div class="ov vp-bl" id="vp-bl"></div>
+      <div class="ov vp-br"><div class="scale"><span id="s-lab">2 µm</span><i id="s-bar"></i></div><div id="stats"></div></div>
+      <div class="tourbar"><i id="tourbar"></i></div>
+      <div class="hover" id="hover"></div>
+      <div class="flash" id="flash">ATP BURST · ΔΨm ↑</div>
+      <div class="fail" id="fail">WebGL scene unavailable.<br>Three.js could not be loaded from cdn.jsdelivr.net, or WebGL is disabled in this browser.<br>The telemetry and agent panels need the scene module to run.</div>
+    </section>
+  </main>
+
+  <!-- ===================== TELEMETRY ===================== -->
+  <section class="tele">
+    <div class="panel box">
+      <div class="ph"><span>§2 · ACTIVITY PER ORGANELLE</span><span class="r"><span id="atp-r">ATP 1.00 mM</span><button class="atp" id="b-atp">+ ATP BURST</button></span></div>
+      <div class="pc"><canvas id="c-act"></canvas></div>
+    </div>
+    <div class="panel box">
+      <div class="ph"><span>§3 · CONTACT MAP</span><span class="r" id="con-r">—</span></div>
+      <div class="pc"><canvas id="c-con"></canvas></div>
+    </div>
+    <div class="panel box">
+      <div class="ph"><span>§4 · UNDER OBSERVATION</span><span class="r" id="obs-r">—</span></div>
+      <div class="pc"><canvas id="c-obs"></canvas></div>
+    </div>
+  </section>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* =================================================================
+   0 · helpers
+   ================================================================= */
+const $ = s => document.querySelector(s);
+const V3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const TAU = Math.PI * 2;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const rng = mulberry32(20261022);            // fixed seed: the cell is identical on every load
+const rr = (a, b) => a + (b - a) * rng();
+function randDir(r = rng) { const u = r() * 2 - 1, a = r() * TAU, s = Math.sqrt(1 - u * u); return V3(s * Math.cos(a), u, s * Math.sin(a)); }
+function randInBall(R, r = rng) { return randDir(r).multiplyScalar(R * Math.cbrt(r())); }
+const sph = (az, el) => V3(Math.cos(el) * Math.cos(az), Math.sin(el), Math.cos(el) * Math.sin(az));
+const inOct = (d, m = 0) => d.x > -m && d.y > -m && d.z > -m;   // the cut-away octant (+x +y +z)
+
+// value noise + fbm (deterministic, used for membrane / envelope relief and ER fenestrae)
+function hash3(x, y, z) {
+  let h = Math.imul(x, 0x27d4eb2d) ^ Math.imul(y, 0x165667b1) ^ Math.imul(z, 0x9e3779b1);
+  h = Math.imul(h ^ (h >>> 15), 0x85ebca6b); h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35); h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+function vnoise(x, y, z) {
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+  const xf = x - xi, yf = y - yi, zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf), w = zf * zf * (3 - 2 * zf);
+  const c = (i, j, k) => hash3(xi + i, yi + j, zi + k);
+  const x00 = lerp(c(0, 0, 0), c(1, 0, 0), u), x10 = lerp(c(0, 1, 0), c(1, 1, 0), u);
+  const x01 = lerp(c(0, 0, 1), c(1, 0, 1), u), x11 = lerp(c(0, 1, 1), c(1, 1, 1), u);
+  return lerp(lerp(x00, x10, v), lerp(x01, x11, v), w) * 2 - 1;
+}
+function fbm(x, y, z, oct = 4) { let s = 0, a = 0.5, f = 1; for (let i = 0; i < oct; i++) { s += a * vnoise(x * f, y * f, z * f); f *= 2.07; a *= 0.5; } return s; }
+
+// critically damped smoothing (ease-in-out flights without timers)
+function smoothDamp(cur, goal, vel, st, dt) {
+  st = Math.max(1e-4, st);
+  const o = 2 / st, x = o * dt, e = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+  const ch = cur - goal, tmp = (vel.v + o * ch) * dt;
+  vel.v = (vel.v - o * tmp) * e;
+  let out = goal + (ch + tmp) * e;
+  if ((goal - cur > 0) === (out > goal)) { out = goal; vel.v = 0; }
+  return out;
+}
+
+// average normals of coincident vertices (sphere seams / poles) after displacement
+function smoothSeams(geo) {
+  const p = geo.attributes.position, n = geo.attributes.normal, map = new Map();
+  for (let i = 0; i < p.count; i++) {
+    const k = Math.round(p.getX(i) * 1e4) + ',' + Math.round(p.getY(i) * 1e4) + ',' + Math.round(p.getZ(i) * 1e4);
+    let a = map.get(k); if (!a) map.set(k, a = []); a.push(i);
+  }
+  for (const a of map.values()) {
+    if (a.length < 2) continue;
+    let x = 0, y = 0, z = 0;
+    for (const i of a) { x += n.getX(i); y += n.getY(i); z += n.getZ(i); }
+    const l = Math.hypot(x, y, z) || 1;
+    for (const i of a) n.setXYZ(i, x / l, y / l, z / l);
+  }
+  n.needsUpdate = true;
+}
+function radialGeo(segW, segH, rFn) {
+  const g = new THREE.SphereGeometry(1, segW, segH), p = g.attributes.position, v = V3();
+  for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i).normalize(); const r = rFn(v); p.setXYZ(i, v.x * r, v.y * r, v.z * r); }
+  g.computeVertexNormals(); smoothSeams(g); return g;
+}
+// merge indexed / non-indexed geometries (position + normal) into one draw call
+function mergeGeos(geos) {
+  let nv = 0, ni = 0;
+  for (const g of geos) { nv += g.attributes.position.count; ni += g.index ? g.index.count : g.attributes.position.count; }
+  const pos = new Float32Array(nv * 3), nor = new Float32Array(nv * 3), idx = new Uint32Array(ni);
+  let vo = 0, io = 0;
+  for (const g of geos) {
+    const p = g.attributes.position, n = g.attributes.normal;
+    pos.set(p.array, vo * 3); nor.set(n.array, vo * 3);
+    if (g.index) { const a = g.index.array; for (let k = 0; k < a.length; k++) idx[io + k] = a[k] + vo; io += a.length; }
+    else { for (let k = 0; k < p.count; k++) idx[io + k] = vo + k; io += p.count; }
+    vo += p.count;
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  out.setIndex(new THREE.BufferAttribute(idx, 1));
+  return out;
+}
+function blobGeo(r) {   // 20-triangle icosahedron with sphere normals: round-looking, cheap to instance by the thousand
+  const g = new THREE.IcosahedronGeometry(r, 0), p = g.attributes.position, n = g.attributes.normal, v = V3();
+  for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i).normalize(); n.setXYZ(i, v.x, v.y, v.z); }
+  return g;
+}
+function dotTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.5, 'rgba(255,255,255,.85)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+
+/* =================================================================
+   1 · atlas data — 14 classes (mean confidence = 0.71)
+   ================================================================= */
+const ORGS = [
+  { key: 'membrane',  en: 'Plasma Membrane',     zh: '细胞膜',       short: 'MEMBRANE',   conf: .91, color: '#C9AE8C', copies: '1',        size: 'Ø 20 µm',     prot: 'ATP1A1',  desc: '磷脂双分子层（lipid bilayer）构成的选择性屏障，嵌有转运蛋白与受体，维持胞内稳态并介导跨膜信号转导。' },
+  { key: 'nucleus',   en: 'Nucleus',             zh: '细胞核',       short: 'NUCLEUS',    conf: .86, color: '#6E4F95', copies: '1',        size: 'Ø 6.8 µm',    prot: 'LMNA',    desc: '双层核膜包裹的遗传信息中心，容纳染色质（chromatin），调控基因转录与 DNA 复制。' },
+  { key: 'nucleolus', en: 'Nucleolus',           zh: '核仁',         short: 'NUCLEOLUS',  conf: .71, color: '#4A2F66', copies: '1',        size: 'Ø 2.1 µm',    prot: 'FBL',     desc: '核内无膜的相分离凝聚体，负责 rRNA 转录、加工与核糖体亚基组装。' },
+  { key: 'npc',       en: 'Nuclear Pore Complex',zh: '核孔复合体',   short: 'NPC',        conf: .66, color: '#C9A44A', copies: '~2,700',   size: 'Ø 120 nm',    prot: 'NUP98',   desc: '贯穿双层核膜、约 110 MDa 的蛋白通道，选择性介导 mRNA 出核与蛋白质入核转运。' },
+  { key: 'rer',       en: 'Rough ER',            zh: '粗面内质网',   short: 'RER',        conf: .67, color: '#BF8796', copies: '1 network',size: '4 sheets',    prot: 'SEC61A1', desc: '表面附着核糖体的扁平膜片层，负责分泌蛋白与膜蛋白的共翻译转运、折叠与质量控制。' },
+  { key: 'ribo',      en: 'Ribosomes',           zh: '核糖体',       short: 'RIBOSOME',   conf: .80, color: '#5A5266', copies: '~4,200',   size: 'Ø 25 nm',     prot: 'RPL4',    desc: '由 rRNA 与蛋白质组成的翻译机器，沿 mRNA 解码合成多肽链；成串排列者称多聚核糖体（polysome）。' },
+  { key: 'golgi',     en: 'Golgi Apparatus',     zh: '高尔基体',     short: 'GOLGI',      conf: .70, color: '#C98B4F', copies: '1 stack',  size: '6 cisternae', prot: 'GOLGA2',  desc: '由层叠的扁平囊（cisternae）构成，对蛋白质进行糖基化修饰、分选并包装进运输囊泡。' },
+  { key: 'vesicle',   en: 'Transport Vesicles',  zh: '运输囊泡',     short: 'VESICLE',    conf: .58, color: '#9FBDDA', copies: '~520',     size: 'Ø 60–100 nm', prot: 'CLTC',    desc: '在内膜系统之间穿梭的小囊泡，由马达蛋白牵引沿微管定向运输货物，完成胞吐与胞吞。' },
+  { key: 'mito',      en: 'Mitochondrion',       zh: '线粒体',       short: 'MITO',       conf: .79, color: '#A4523E', copies: '7',        size: '2.2 × 0.9 µm',prot: 'ATP5F1A', desc: '通过氧化磷酸化（OXPHOS）合成 ATP 的“细胞动力工厂”，内膜向内折叠成嵴（cristae）以扩大反应面积。' },
+  { key: 'lyso',      en: 'Lysosome',            zh: '溶酶体',       short: 'LYSOSOME',   conf: .74, color: '#5E9461', copies: '9',        size: 'Ø 0.5–1.2 µm',prot: 'LAMP1',   desc: '腔内 pH≈4.5、富含酸性水解酶的降解中心，参与自噬（autophagy）与营养感知（mTORC1 信号）。' },
+  { key: 'perox',     en: 'Peroxisome',          zh: '过氧化物酶体', short: 'PEROXISOME', conf: .61, color: '#B9A04A', copies: '6',        size: 'Ø 0.6 µm',    prot: 'PEX5',    desc: '含过氧化氢酶的单层膜小体，执行极长链脂肪酸 β-氧化并分解 H₂O₂，内部常见尿酸氧化酶晶核。' },
+  { key: 'ser',       en: 'Smooth ER',           zh: '光面内质网',   short: 'SER',        conf: .63, color: '#D3A39B', copies: '1 network',size: 'tubular',     prot: 'ATL1',    desc: '无核糖体附着的管状膜网络，参与脂质与类固醇合成、药物解毒及 Ca²⁺ 储存。' },
+  { key: 'centro',    en: 'Centrosome',          zh: '中心体',       short: 'CENTROSOME', conf: .64, color: '#3E7378', copies: '1 pair',   size: '0.5 µm',      prot: 'TUBG1',   desc: '由一对互相垂直的中心粒（9 组微管三联体）构成的微管组织中心（MTOC），主导纺锤体组装。' },
+  { key: 'cyto',      en: 'Cytoskeleton',        zh: '细胞骨架',     short: 'CYTOSKEL.',  conf: .64, color: '#497DAE', copies: '54 MT',    size: 'Ø 25 nm',     prot: 'TUBB',    desc: '由微管、肌动蛋白丝与中间丝构成的动态支架，维持细胞形态，并为囊泡运输提供“轨道”。' },
+];
+const KEY2I = Object.fromEntries(ORGS.map((o, i) => [o.key, i]));
+const pad2 = n => String(n).padStart(2, '0');
+
+/* =================================================================
+   2 · renderer / scene
+   ================================================================= */
+const vpEl = $('#viewport'), canvas = $('#gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+renderer.localClippingEnabled = true;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.02;
+renderer.setClearColor(0x000000, 0);
+window.__atlasReady = true;   // WebGL is up; the fallback notice stays hidden
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xE8E2D7, 46, 120);
+const camera = new THREE.PerspectiveCamera(38, 1, 0.05, 400);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0xFFF3E0, 0xB4AC9C, 0.85));
+const keyL = new THREE.DirectionalLight(0xFFF0DA, 1.5); keyL.position.set(12, 16, 10); scene.add(keyL);
+const fillL = new THREE.DirectionalLight(0x9FBDDA, 0.6); fillL.position.set(-14, -6, -10); scene.add(fillL);
+const DOT = dotTexture();
+
+const EXP = [];   // explode registry: {obj, home, dir, dist}
+function regExp(obj, dir, dist) { EXP.push({ obj, home: obj.position.clone(), dir: dir.clone().normalize(), dist }); }
+const PICK = [];
+function tag(obj, key) { obj.traverse(o => { if (o.isMesh) { o.userData.key = key; PICK.push(o); } }); }
+const occupied = [];  // placement spheres for rejection sampling
+
+/* =================================================================
+   3 · plasma membrane — octant cut-away bumpy shell
+   ================================================================= */
+const R = 10;
+const membR = d => R * (1 + 0.024 * fbm(d.x * 2.1 + 3.1, d.y * 2.1, d.z * 2.1, 4) + 0.007 * vnoise(d.x * 11, d.y * 11, d.z * 11));
+const cellPlanes = [new THREE.Plane(V3(-1, 0, 0), 0), new THREE.Plane(V3(0, -1, 0), 0), new THREE.Plane(V3(0, 0, -1), 0)];
+
+function cutRibbon(rFn, layers, cols) {
+  // a flat band in each of the three cut planes, showing the leaflets in cross-section
+  const pairs = [[V3(1, 0, 0), V3(0, 1, 0)], [V3(0, 1, 0), V3(0, 0, 1)], [V3(1, 0, 0), V3(0, 0, 1)]];
+  const N = 150, L = layers.length, pos = [], col = [], idx = [];
+  let base = 0;
+  for (const [e1, e2] of pairs) {
+    for (let i = 0; i <= N; i++) {
+      const a = i / N * Math.PI / 2;
+      const d = e1.clone().multiplyScalar(Math.cos(a)).addScaledVector(e2, Math.sin(a));
+      const r = rFn(d);
+      for (let j = 0; j < L; j++) { pos.push(d.x * r * layers[j], d.y * r * layers[j], d.z * r * layers[j]); col.push(cols[j].r, cols[j].g, cols[j].b); }
+    }
+    for (let i = 0; i < N; i++) for (let j = 0; j < L - 1; j++) { const a = base + i * L + j, b = a + L; idx.push(a, b, a + 1, b, b + 1, a + 1); }
+    base += (N + 1) * L;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.setIndex(idx); g.computeVertexNormals();
+  return new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, side: THREE.DoubleSide, roughness: .75 }));
+}
+
+const membrane = new THREE.Group(); scene.add(membrane);
+const membMat = new THREE.MeshPhysicalMaterial({
+  color: 0xDCC6A6, roughness: .48, clearcoat: .35, clearcoatRoughness: .5, transparent: true, opacity: .34,
+  side: THREE.DoubleSide, depthWrite: false, clippingPlanes: cellPlanes, clipIntersection: true, envMapIntensity: .7,
+});
+const membMesh = new THREE.Mesh(radialGeo(168, 112, membR), membMat);
+membMesh.renderOrder = 10;
+membrane.add(membMesh);
+{
+  const D = new THREE.Color(0x9A7A5A), Lc = new THREE.Color(0xEEDFC6);
+  const rib = cutRibbon(membR, [1, .994, .993, .972, .971, .962], [D, D, Lc, Lc, D, D]);
+  rib.userData.noPick = true; membrane.add(rib);
+}
+// lipid head groups as a fine stipple
+const lipidMat = new THREE.PointsMaterial({ color: 0x9C8264, size: .075, map: DOT, transparent: true, opacity: .55, depthWrite: false, alphaTest: .05 });
+{
+  const n = 15000, a = [];
+  for (let i = 0; i < n; i++) {
+    const y = 1 - 2 * (i + .5) / n, rad = Math.sqrt(1 - y * y), ph = i * 2.39996323;
+    const d = V3(Math.cos(ph) * rad, y, Math.sin(ph) * rad);
+    if (inOct(d)) continue;
+    const r = membR(d) * 1.003; a.push(d.x * r, d.y * r, d.z * r);
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(a, 3));
+  membrane.add(new THREE.Points(g, lipidMat));
+}
+// transmembrane proteins (warm) and receptors (blue)
+{
+  const n = 300, m = new THREE.InstancedMesh(new THREE.CylinderGeometry(.1, .13, .58, 7), new THREE.MeshStandardMaterial({ roughness: .5 }), n);
+  const q = new THREE.Quaternion(), M = new THREE.Matrix4(), c1 = new THREE.Color(0x8B6E57), c2 = new THREE.Color(0x497DAE);
+  let k = 0;
+  while (k < n) {
+    const d = randDir(); if (inOct(d, .06)) continue;
+    q.setFromUnitVectors(V3(0, 1, 0), d);
+    M.compose(d.clone().multiplyScalar(membR(d)), q, V3(1, rr(.7, 1.3), 1));
+    m.setMatrixAt(k, M); m.setColorAt(k, rng() < .22 ? c2 : c1); k++;
+  }
+  membrane.add(m);
+}
+const membAnchor = new THREE.Object3D();
+const dMemb = V3(-0.55, 0.5, 0.67).normalize();
+membAnchor.position.copy(dMemb).multiplyScalar(membR(dMemb));
+membrane.add(membAnchor);
+tag(membMesh, 'membrane');
+
+/* =================================================================
+   4 · nucleus — porous purple envelope, chromatin, nucleolus, gold pores
+   ================================================================= */
+const NC = V3(-1.4, -0.6, -1.2), RN = 3.4;
+const nucR = d => RN * (1 + 0.03 * fbm(d.x * 2.4 + 11, d.y * 2.4 + 5, d.z * 2.4, 4) + 0.012 * vnoise(d.x * 9 + 2, d.y * 9, d.z * 9)
+                    - 0.014 * Math.max(0, vnoise(d.x * 16, d.y * 16 + 4, d.z * 16)));
+const nucPlanes = [new THREE.Plane(V3(-1, 0, 0), 0), new THREE.Plane(V3(0, -1, 0), 0), new THREE.Plane(V3(0, 0, -1), 0)];
+const nucleus = new THREE.Group(); nucleus.position.copy(NC); scene.add(nucleus);
+occupied.push({ p: NC, r: RN + .3 });
+{
+  const outer = new THREE.Mesh(radialGeo(150, 110, nucR), new THREE.MeshPhysicalMaterial({
+    color: 0x6E4F95, roughness: .52, clearcoat: .3, clearcoatRoughness: .45, clippingPlanes: nucPlanes, clipIntersection: true,
+  }));
+  const inner = new THREE.Mesh(radialGeo(110, 80, d => nucR(d) * .962), new THREE.MeshStandardMaterial({
+    color: 0x9C86BC, roughness: .85, side: THREE.BackSide, clippingPlanes: nucPlanes, clipIntersection: true,
+  }));
+  inner.userData.noPick = true;
+  nucleus.add(outer, inner);
+  tag(outer, 'nucleus');
+  const D = new THREE.Color(0x553A78), Lc = new THREE.Color(0xC8B7DC);
+  nucleus.add(cutRibbon(nucR, [1, .988, .987, .975, .974, .962], [D, D, Lc, Lc, D, D]));
+}
+// chromatin fibres: bead chains, clipped with the envelope so the cut shows a cross-section
+{
+  const chains = 44, beads = 26, n = chains * beads;
+  const m = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1),
+    new THREE.MeshStandardMaterial({ roughness: .85, clippingPlanes: nucPlanes, clipIntersection: true }), n);
+  const M = new THREE.Matrix4(), q = new THREE.Quaternion(), ca = new THREE.Color(0x4E3470), cb = new THREE.Color(0x7A5BA0), c = new THREE.Color();
+  let k = 0;
+  for (let ch = 0; ch < chains; ch++) {
+    const p = randInBall(RN * .78); let dir = randDir();
+    for (let b = 0; b < beads; b++) {
+      dir.add(randDir().multiplyScalar(.7)).normalize();
+      p.addScaledVector(dir, .17);
+      if (p.length() > RN * .86) { p.multiplyScalar(.82); dir.negate(); }
+      const s = rr(.07, .13);
+      M.compose(p, q, V3(s, s, s)); m.setMatrixAt(k, M);
+      m.setColorAt(k, c.copy(ca).lerp(cb, rng() * .7)); k++;
+    }
+  }
+  nucleus.add(m);
+}
+// nuclear pore complexes: gold rings + central plugs (instanced), plus gold surface granules
+let npcAnchor;
+{
+  const n = 480, dirs = [];
+  for (let i = 0; i < n; i++) {
+    const y = 1 - 2 * (i + .5) / n, rad = Math.sqrt(1 - y * y), ph = i * 2.39996323;
+    const d = V3(Math.cos(ph) * rad, y, Math.sin(ph) * rad).add(randDir().multiplyScalar(.03)).normalize();
+    if (!inOct(d, .05)) dirs.push(d);
+  }
+  const gold = new THREE.MeshStandardMaterial({ color: 0xC9A44A, metalness: .65, roughness: .32, emissive: 0x2a1d04 });
+  const rings = new THREE.InstancedMesh(new THREE.TorusGeometry(.12, .04, 6, 14), gold, dirs.length);
+  const plugs = new THREE.InstancedMesh(new THREE.SphereGeometry(.05, 7, 5), gold, dirs.length);
+  const M = new THREE.Matrix4(), q = new THREE.Quaternion(), one = V3(1, 1, 1);
+  dirs.forEach((d, i) => {
+    q.setFromUnitVectors(V3(0, 0, 1), d);
+    const p = d.clone().multiplyScalar(nucR(d) * 1.004);
+    M.compose(p, q, one); rings.setMatrixAt(i, M);
+    M.compose(p, q, one); plugs.setMatrixAt(i, M);
+  });
+  nucleus.add(rings, plugs);
+  tag(rings, 'npc'); tag(plugs, 'npc');
+  // anchor on the pore nearest a well-lit upper-left direction
+  const want = V3(-0.3, 0.85, 0.45).normalize();
+  let best = dirs[0]; for (const d of dirs) if (d.dot(want) > best.dot(want)) best = d;
+  npcAnchor = new THREE.Object3D(); npcAnchor.position.copy(best).multiplyScalar(nucR(best));
+  npcAnchor.userData.dir = best.clone();
+  nucleus.add(npcAnchor);
+  const a = [];
+  for (let i = 0; i < 1900; i++) { const d = randDir(); if (inOct(d, .03)) continue; const r = nucR(d) * 1.006; a.push(d.x * r, d.y * r, d.z * r); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(a, 3));
+  nucleus.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xD9B65C, size: .05, map: DOT, transparent: true, depthWrite: false, alphaTest: .05 })));
+}
+// nucleolus — sits in the opened octant, pops out of the nucleus in exploded view
+const nucleolus = new THREE.Group();
+nucleolus.position.copy(NC).add(V3(0.8, 0.65, 0.8));
+scene.add(nucleolus);
+{
+  const body = new THREE.Mesh(radialGeo(64, 48, d => 1.05 * (1 + .12 * fbm(d.x * 3 + 1, d.y * 3, d.z * 3, 3))),
+    new THREE.MeshStandardMaterial({ color: 0x432A63, roughness: .9 }));
+  const fcs = [];
+  for (let i = 0; i < 10; i++) { const d = randDir(); const g = new THREE.SphereGeometry(rr(.15, .27), 16, 12); g.translate(d.x * .95, d.y * .95, d.z * .95); fcs.push(g); }
+  const fc = new THREE.Mesh(mergeGeos(fcs), new THREE.MeshStandardMaterial({ color: 0x9A7DC0, roughness: .6 }));
+  nucleolus.add(body, fc); tag(nucleolus, 'nucleolus');
+}
+
+/* =================================================================
+   5 · rough ER — fenestrated sheets wrapped around the far side of the nucleus
+   ================================================================= */
+const RER_SHEETS = [
+  { r: 4.0,  a0: .62 * Math.PI, a1: 1.86 * Math.PI, e0: -.70, e1: .78, k: 1 },
+  { r: 4.45, a0: .66 * Math.PI, a1: 1.80 * Math.PI, e0: -.78, e1: .70, k: 2 },
+  { r: 4.9,  a0: .60 * Math.PI, a1: 1.84 * Math.PI, e0: -.62, e1: .82, k: 3 },
+  { r: 5.35, a0: .70 * Math.PI, a1: 1.76 * Math.PI, e0: -.55, e1: .62, k: 4 },
+];
+const sheetR = (s, d) => s.r + .2 * fbm(d.x * 2.6 + s.k * 7, d.y * 2.6, d.z * 2.6 + s.k, 3) + .05 * Math.sin(Math.atan2(d.z, d.x) * 13 + s.k);
+const sheetHole = (s, d) => fbm(d.x * 4.2 + s.k * 13, d.y * 4.2 + 3, d.z * 4.2, 3) < -.2;
+function buildSheet(s) {
+  const nu = 120, nv = 52, pos = new Float32Array((nu + 1) * (nv + 1) * 3), idx = [];
+  const at = (u, v) => sph(lerp(s.a0, s.a1, u), lerp(s.e0, s.e1, v));
+  for (let j = 0; j <= nv; j++) for (let i = 0; i <= nu; i++) {
+    const d = at(i / nu, j / nv), r = sheetR(s, d), k = (j * (nu + 1) + i) * 3;
+    pos[k] = d.x * r; pos[k + 1] = d.y * r; pos[k + 2] = d.z * r;
+  }
+  for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) {
+    const u = (i + .5) / nu, v = (j + .5) / nv, d = at(u, v);
+    if (sheetHole(s, d)) continue;
+    const edge = Math.min(Math.min(u, 1 - u) * 2.2, Math.min(v, 1 - v) * 2) + .06 * vnoise(d.x * 7 + s.k, d.y * 7, d.z * 7);
+    if (edge < .03) continue;
+    const a = j * (nu + 1) + i, b = a + 1, c = a + nu + 1, e = c + 1;
+    idx.push(a, c, b, b, c, e);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+  return g;
+}
+const rer = new THREE.Group(); rer.position.copy(NC); scene.add(rer);
+const rerAnchor = new THREE.Object3D();
+{
+  const mat = new THREE.MeshStandardMaterial({ color: 0xC28A98, roughness: .62, side: THREE.DoubleSide });
+  for (const s of RER_SHEETS) rer.add(new THREE.Mesh(buildSheet(s), mat));
+  // membrane-bound ribosomes on both faces of every sheet
+  const per = 430, n = per * RER_SHEETS.length;
+  const m = new THREE.InstancedMesh(blobGeo(.048), new THREE.MeshStandardMaterial({ color: 0x4F475A, roughness: .55 }), n);
+  const M = new THREE.Matrix4();
+  let k = 0;
+  for (const s of RER_SHEETS) {
+    let c = 0;
+    while (c < per) {
+      const d = sph(lerp(s.a0, s.a1, rr(.04, .96)), lerp(s.e0, s.e1, rr(.05, .95)));
+      if (sheetHole(s, d)) continue;
+      const r = sheetR(s, d) + (rng() < .5 ? .065 : -.065);
+      M.makeTranslation(d.x * r, d.y * r, d.z * r); m.setMatrixAt(k++, M); c++;
+    }
+  }
+  rer.add(m);
+  const s = RER_SHEETS[3]; let d = sph(150 / 180 * Math.PI, .25);
+  for (let t = 0; t < 40 && sheetHole(s, d); t++) d = sph((150 + rr(-12, 12)) / 180 * Math.PI, .25 + rr(-.15, .15));
+  rerAnchor.position.copy(d).multiplyScalar(sheetR(s, d));
+  rer.add(rerAnchor);
+  tag(rer, 'rer');
+}
+
+/* =================================================================
+   6 · placement (hand-picked tour stops + seeded rejection sampling)
+   ================================================================= */
+const GC = V3(3.0, 2.6, -1.6);     // Golgi
+const SERC = V3(3.6, -5.0, -2.6);   // smooth ER
+const CC = V3(1.6, -0.9, 3.4);      // centrosome
+const R0 = V3(2.6, -4.0, 3.6);      // polysome cluster
+const VES0 = V3(5.0, 3.6, 3.4);     // vesicle traffic focus
+occupied.push({ p: GC, r: 1.8 }, { p: SERC, r: 2.1 }, { p: CC, r: .8 }, { p: R0, r: .6 });
+function blocked(p, r) {
+  if (p.length() + r > 8.7) return true;
+  const rel = p.clone().sub(NC), dN = rel.length();
+  if (dN < RN + .45 + r) return true;
+  if (dN < 5.95 + r) {           // inside the RER shell zone?
+    let az = Math.atan2(rel.z, rel.x); if (az < 0) az += TAU;
+    const el = Math.asin(clamp(rel.y / dN, -1, 1));
+    if (az > .56 * Math.PI && az < 1.9 * Math.PI && el > -.9 && el < .9) return true;
+  }
+  for (const o of occupied) if (p.distanceTo(o.p) < r + o.r + .25) return true;
+  return false;
+}
+function place(r) {
+  for (let t = 0; t < 4000; t++) { const p = randInBall(8.4); if (!blocked(p, r)) { occupied.push({ p, r }); return p; } }
+  const p = randInBall(7); occupied.push({ p, r }); return p;
+}
+
+/* =================================================================
+   7 · Golgi — six curved cisternae with dilated rims + budding vesicles
+   ================================================================= */
+const golgi = new THREE.Group(); golgi.position.copy(GC); scene.add(golgi);
+golgi.lookAt(NC);   // local +z faces the nucleus (cis face)
+{
+  const W = [1.25, 1.45, 1.6, 1.6, 1.45, 1.2], H = [.55, .62, .7, .7, .62, .52];
+  const cis = new THREE.Color(0xC27E5C), trans = new THREE.Color(0xE0B05E);
+  const buds = [];
+  for (let i = 0; i < 6; i++) {
+    const g = new THREE.SphereGeometry(1, 56, 18), p = g.attributes.position, w = W[i], h = H[i], z0 = .55 - i * .21;
+    for (let k = 0; k < p.count; k++) {
+      const ux = p.getX(k), uy = p.getY(k), uz = p.getZ(k);
+      const X = ux * w, Y = uy * h, th = .055 + .1 * Math.pow(Math.abs(ux), 6);
+      p.setXYZ(k, X, Y, z0 + uz * th + .2 * X * X / w + .08 * Y * Y);
+    }
+    g.computeVertexNormals(); smoothSeams(g);
+    golgi.add(new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: cis.clone().lerp(trans, i / 5), roughness: .45 })));
+    for (const sgn of [-1, 1]) {
+      const b = new THREE.SphereGeometry(rr(.07, .1), 12, 9);
+      b.translate(sgn * (w + .1), rr(-.25, .25), z0 + .2 * w + rr(-.05, .05)); buds.push(b);
+    }
+  }
+  for (let i = 0; i < 16; i++) {
+    const b = new THREE.SphereGeometry(rr(.06, .11), 12, 9);
+    b.translate(rr(-1.3, 1.3), rr(-.6, .6), -.75 + rr(-.35, .1)); buds.push(b);
+  }
+  golgi.add(new THREE.Mesh(mergeGeos(buds), new THREE.MeshStandardMaterial({ color: 0xE3BA6A, roughness: .4 })));
+  tag(golgi, 'golgi');
+}
+
+/* =================================================================
+   8 · mitochondria — translucent capsules with folded cristae
+   ================================================================= */
+const mitoOuterMat = new THREE.MeshPhysicalMaterial({ color: 0xA9533F, roughness: .3, clearcoat: .8, clearcoatRoughness: .25,
+  transparent: true, opacity: .36, depthWrite: false, emissive: 0x000000 });
+const mitoInnerMat = new THREE.MeshStandardMaterial({ color: 0xC97A62, roughness: .6, transparent: true, opacity: .42, side: THREE.BackSide, depthWrite: false });
+const cristaMat = new THREE.MeshStandardMaterial({ color: 0x7C2D20, roughness: .5, side: THREE.DoubleSide, emissive: 0xFF6A2A, emissiveIntensity: 0 });
+const cristaGeo = (() => {
+  const g = new THREE.PlaneGeometry(1, 1, 22, 8), p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const u = p.getX(i) + .5, v = p.getY(i) * 2, X = -.84 + u * 1.26;
+    let hh = .8 * Math.sqrt(Math.max(0, 1 - (X / .92) ** 2));
+    if (u > .78) hh *= Math.sqrt(Math.max(0, 1 - ((u - .78) / .22) ** 2));
+    p.setXYZ(i, X, .065 * Math.sin(u * 10.5 + v * 1.5) * (1 - .4 * v * v), v * hh);
+  }
+  g.computeVertexNormals(); return g;
+})();
+function makeMito(len, rad) {
+  const g = new THREE.Group();
+  const inner = new THREE.Mesh(new THREE.CapsuleGeometry(rad * .9, len, 10, 28), mitoInnerMat); inner.renderOrder = 1;
+  const outer = new THREE.Mesh(new THREE.CapsuleGeometry(rad, len, 12, 32), mitoOuterMat); outer.renderOrder = 2;
+  const n = Math.max(4, Math.round(len / .24)), parts = [], M = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
+  for (let i = 0; i < n; i++) {
+    e.set((rng() - .5) * .25, (i % 2 ? Math.PI : 0) + (rng() - .5) * .5, (rng() - .5) * .25);
+    M.compose(V3(0, -len / 2 + (i + .5) * len / n, 0), q.setFromEuler(e), V3(rad * .98, rad * .98, rad * .98));
+    parts.push(cristaGeo.clone().applyMatrix4(M));
+  }
+  g.add(new THREE.Mesh(mergeGeos(parts), cristaMat), inner, outer);
+  g.userData = { len, rad };
+  return g;
+}
+const mitos = [];
+{
+  const first = makeMito(2.2, .46); first.position.set(5.0, -2.2, 3.6);
+  first.quaternion.setFromUnitVectors(V3(0, 1, 0), V3(1, 0, .2).normalize());
+  occupied.push({ p: first.position.clone(), r: 1.6 }); mitos.push(first);
+  for (let i = 0; i < 6; i++) {
+    const len = rr(1.4, 2.6), rad = rr(.36, .5), m = makeMito(len, rad);
+    m.position.copy(place(len / 2 + rad)); m.quaternion.setFromUnitVectors(V3(0, 1, 0), randDir()); mitos.push(m);
+  }
+  for (const m of mitos) { scene.add(m); tag(m, 'mito'); }
+}
+
+/* =================================================================
+   9 · lysosomes (smooth green) · peroxisomes (crystalloid core)
+   ================================================================= */
+const lysos = [];
+{
+  const ca = new THREE.Color(0x5E9461), cb = new THREE.Color(0x86B077);
+  const spots = [{ p: V3(1.2, 3.2, 4.8), r: .55 }];
+  occupied.push({ p: spots[0].p, r: .55 });
+  for (let i = 0; i < 8; i++) { const r = rr(.28, .6); spots.push({ p: place(r), r }); }
+  spots.forEach(({ p, r }) => {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(r, 40, 28), new THREE.MeshPhysicalMaterial({
+      color: ca.clone().lerp(cb, rng() * .6), roughness: .2, clearcoat: 1, clearcoatRoughness: .12 }));
+    m.position.copy(p); m.userData.r = r; scene.add(m); lysos.push(m); tag(m, 'lyso');
+  });
+}
+const peroxs = [];
+{
+  const outerMat = new THREE.MeshPhysicalMaterial({ color: 0xC9B55E, roughness: .3, clearcoat: .6, transparent: true, opacity: .5, depthWrite: false });
+  const coreMat = new THREE.MeshStandardMaterial({ color: 0x8C7628, roughness: .4 });
+  const spots = [{ p: V3(5.2, 2.0, 1.4), r: .34 }];
+  occupied.push({ p: spots[0].p, r: .34 });
+  for (let i = 0; i < 5; i++) { const r = rr(.22, .34); spots.push({ p: place(r), r }); }
+  spots.forEach(({ p, r }) => {
+    const g = new THREE.Group(); g.position.copy(p);
+    const o = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 24), outerMat); o.renderOrder = 2;
+    const c = new THREE.Mesh(new THREE.BoxGeometry(r * .8, r * .8, r * .8), coreMat); c.rotation.set(rng() * 3, rng() * 3, rng() * 3);
+    g.add(c, o); g.userData.r = r; scene.add(g); peroxs.push(g); tag(g, 'perox');
+  });
+}
+
+/* =================================================================
+   10 · smooth ER — tubular network
+   ================================================================= */
+const ser = new THREE.Group(); ser.position.copy(SERC); scene.add(ser);
+const serNodes = [];
+{
+  for (let i = 0; i < 17; i++) serNodes.push(randInBall(1.9).multiply(V3(1, .75, 1)));
+  const edges = new Set(), geos = [];
+  serNodes.forEach((a, i) => {
+    serNodes.map((b, j) => [j, a.distanceTo(b)]).filter(([j]) => j !== i).sort((x, y) => x[1] - y[1]).slice(0, 2)
+      .forEach(([j]) => edges.add(i < j ? i + '-' + j : j + '-' + i));
+  });
+  for (const e of edges) {
+    const [i, j] = e.split('-').map(Number), a = serNodes[i], b = serNodes[j];
+    const mid = a.clone().lerp(b, .5).add(randDir().multiplyScalar(.28));
+    geos.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([a, mid, b]), 26, .075, 7, false));
+  }
+  for (const p of serNodes) { const s = new THREE.SphereGeometry(.12, 12, 9); s.translate(p.x, p.y, p.z); geos.push(s); }
+  ser.add(new THREE.Mesh(mergeGeos(geos), new THREE.MeshStandardMaterial({ color: 0xD6A79E, roughness: .45 })));
+  tag(ser, 'ser');
+}
+
+/* =================================================================
+   11 · centrosome (9×3 triplet centrioles) + cytoskeleton
+   ================================================================= */
+const centro = new THREE.Group(); centro.position.copy(CC); scene.add(centro);
+{
+  const m = new THREE.InstancedMesh(new THREE.CylinderGeometry(.028, .028, .62, 8), new THREE.MeshStandardMaterial({ color: 0x3E7378, roughness: .45 }), 54);
+  const M = new THREE.Matrix4(), q = new THREE.Quaternion(), one = V3(1, 1, 1);
+  const orient = [new THREE.Quaternion(), new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI / 2, 0, 0))];
+  const offs = [V3(0, 0, 0), V3(0, .2, .48)];
+  let k = 0;
+  for (let c = 0; c < 2; c++) for (let t = 0; t < 9; t++) {
+    const a = t / 9 * TAU, rad = V3(Math.cos(a), 0, Math.sin(a)), tan = V3(-Math.sin(a), 0, Math.cos(a));
+    const tilt = rad.clone().multiplyScalar(.55).addScaledVector(tan, .83).normalize();
+    for (let j = 0; j < 3; j++) {
+      const p = rad.clone().multiplyScalar(.19).addScaledVector(tilt, (j - 1) * .055).applyQuaternion(orient[c]).add(offs[c]);
+      M.compose(p, q.copy(orient[c]), one); m.setMatrixAt(k++, M);
+    }
+  }
+  const pcm = new THREE.Mesh(new THREE.SphereGeometry(.78, 32, 24), new THREE.MeshStandardMaterial({ color: 0x7FA5A8, transparent: true, opacity: .14, depthWrite: false }));
+  pcm.position.set(0, .1, .24);
+  centro.add(m, pcm); tag(centro, 'centro');
+}
+const cyto = new THREE.Group(); scene.add(cyto);
+{
+  const geos = [];
+  for (let i = 0; i < 54; i++) {
+    const end = randDir().multiplyScalar(rr(8.6, 9.2));
+    const mid = CC.clone().lerp(end, .5).add(randDir().multiplyScalar(1.2));
+    for (let it = 0; it < 3; it++) {           // bend around the nucleus
+      const curve = new THREE.QuadraticBezierCurve3(CC, mid, end);
+      let hit = false;
+      for (let s = 0; s <= 12; s++) if (curve.getPoint(s / 12).distanceTo(NC) < RN + .5) { hit = true; break; }
+      if (!hit) break;
+      mid.sub(NC).setLength(RN + 2.6).add(NC);
+    }
+    geos.push(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(CC, mid, end), 44, .021, 5, false));
+  }
+  const mt = new THREE.Mesh(mergeGeos(geos), new THREE.MeshStandardMaterial({ color: 0x497DAE, roughness: .5 }));
+  cyto.add(mt); tag(mt, 'cyto');
+  // actin cortex just under the membrane + intermediate filaments cage around the nucleus
+  const seg = [], seg2 = [];
+  for (let i = 0; i < 64; i++) {
+    const d = randDir(), t = randDir().cross(d).normalize(), b = d.clone().cross(t);
+    let prev = null;
+    for (let s = 0; s <= 16; s++) {
+      const a = (s / 16 - .5) * .7, w = .05 * Math.sin(s * 1.7 + i);
+      const p = d.clone().multiplyScalar(Math.cos(a)).addScaledVector(t, Math.sin(a)).addScaledVector(b, w).normalize().multiplyScalar(8.95);
+      if (prev) seg.push(prev.x, prev.y, prev.z, p.x, p.y, p.z); prev = p;
+    }
+  }
+  for (let i = 0; i < 22; i++) {
+    const ax = randDir(), t = randDir().cross(ax).normalize(), b = ax.clone().cross(t);
+    let prev = null;
+    for (let s = 0; s <= 48; s++) {
+      const a = s / 48 * TAU, rr2 = RN + .32 + .08 * Math.sin(a * 5 + i);
+      const p = t.clone().multiplyScalar(Math.cos(a) * rr2).addScaledVector(b, Math.sin(a) * rr2).add(NC);
+      if (prev) seg2.push(prev.x, prev.y, prev.z, p.x, p.y, p.z); prev = p;
+    }
+  }
+  const g1 = new THREE.BufferGeometry(); g1.setAttribute('position', new THREE.Float32BufferAttribute(seg, 3));
+  const g2 = new THREE.BufferGeometry(); g2.setAttribute('position', new THREE.Float32BufferAttribute(seg2, 3));
+  cyto.add(new THREE.LineSegments(g1, new THREE.LineBasicMaterial({ color: 0x6C9AC4, transparent: true, opacity: .45 })));
+  cyto.add(new THREE.LineSegments(g2, new THREE.LineBasicMaterial({ color: 0x9FBDDA, transparent: true, opacity: .55 })));
+}
+
+/* =================================================================
+   12 · free ribosomes · vesicle traffic · cytosol (InstancedMesh / Points)
+   ================================================================= */
+const free = new THREE.Group(); scene.add(free);   // scaled by explode; hosts anchors + cytosol stipple
+const FREE_N = 2400, POLY_N = 96, RIBO_N = FREE_N + POLY_N;
+const riboBase = new Float32Array(RIBO_N * 3), riboPh = new Float32Array(RIBO_N);
+const freeRibo = new THREE.InstancedMesh(blobGeo(.055), new THREE.MeshStandardMaterial({ color: 0x564E62, roughness: .55 }), RIBO_N);
+freeRibo.instanceMatrix.setUsage(THREE.DynamicDrawUsage); freeRibo.frustumCulled = false;
+{
+  const M = new THREE.Matrix4(), q = new THREE.Quaternion();
+  let k = 0;
+  while (k < FREE_N) {
+    const p = randInBall(9.0); if (p.distanceTo(NC) < RN + .25) continue;
+    const s = rr(.8, 1.3); M.compose(p, q, V3(s, s, s)); freeRibo.setMatrixAt(k, M);
+    riboBase.set([p.x, p.y, p.z], k * 3); riboPh[k] = rng() * 100; k++;
+  }
+  for (let sp = 0; sp < 4; sp++) {      // polysomes: helical strings on an mRNA
+    const c = R0.clone().add(randInBall(.55)), ax = randDir(), t = randDir().cross(ax).normalize(), b = ax.clone().cross(t);
+    for (let j = 0; j < POLY_N / 4; j++) {
+      const a = j * .62, p = c.clone().addScaledVector(t, Math.cos(a) * .17).addScaledVector(b, Math.sin(a) * .17).addScaledVector(ax, (j - 12) * .045);
+      M.compose(p, q, V3(1, 1, 1)); freeRibo.setMatrixAt(k, M);
+      riboBase.set([p.x, p.y, p.z], k * 3); riboPh[k] = rng() * 100; k++;
+    }
+  }
+  scene.add(freeRibo);
+  tag(freeRibo, 'ribo');
+  freeRibo.userData.noRay = true;
+}
+const VES_N = 520;
+const ves = { S: new Float32Array(VES_N * 3), C: new Float32Array(VES_N * 3), E: new Float32Array(VES_N * 3), t: new Float32Array(VES_N), sp: new Float32Array(VES_N), r: new Float32Array(VES_N), pos: new Float32Array(VES_N * 3) };
+const vesMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 10, 7), new THREE.MeshStandardMaterial({ roughness: .32 }), VES_N);
+vesMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); vesMesh.frustumCulled = false;
+{
+  const transDir = GC.clone().sub(NC).normalize();
+  const cExo = new THREE.Color(0x9FBDDA), cEr = new THREE.Color(0xD9B3BD), cEndo = new THREE.Color(0xA8C8A2);
+  for (let i = 0; i < VES_N; i++) {
+    const u = rng(); let S, E, col;
+    if (u < .5) { S = GC.clone().addScaledVector(transDir, .7).add(randInBall(.55)); E = GC.clone().add(randDir().multiplyScalar(7)).normalize().multiplyScalar(9.0); col = cExo; }
+    else if (u < .75) { S = NC.clone().addScaledVector(sph(rr(.62, 1.8) * Math.PI, rr(-.6, .7)), 4.7); E = GC.clone().addScaledVector(transDir, -.6).add(randInBall(.45)); col = cEr; }
+    else { S = randDir().multiplyScalar(9.0); E = lysos[Math.floor(rng() * lysos.length)].position.clone().add(randInBall(.3)); col = cEndo; }
+    const Cm = S.clone().add(E).multiplyScalar(.5).add(randDir().multiplyScalar(rr(.5, 1.6)));
+    if (Cm.distanceTo(NC) < RN + 1.2) Cm.sub(NC).setLength(RN + 1.8).add(NC);
+    if (Cm.length() > 8.8) Cm.setLength(8.8);
+    ves.S.set([S.x, S.y, S.z], i * 3); ves.C.set([Cm.x, Cm.y, Cm.z], i * 3); ves.E.set([E.x, E.y, E.z], i * 3);
+    ves.t[i] = rng(); ves.sp[i] = rr(.06, .16) / Math.max(1, S.distanceTo(E) / 6); ves.r[i] = rr(.07, .13);
+    vesMesh.setMatrixAt(i, new THREE.Matrix4()); vesMesh.setColorAt(i, col);
+  }
+  scene.add(vesMesh);
+}
+const riboAnchor = new THREE.Object3D(); riboAnchor.position.copy(R0); free.add(riboAnchor);
+const vesAnchor = new THREE.Object3D(); vesAnchor.position.copy(VES0); free.add(vesAnchor);
+{
+  const a = [];
+  for (let i = 0; i < 4200; i++) { const p = randInBall(9.2); if (p.distanceTo(NC) < RN + .1) continue; a.push(p.x, p.y, p.z); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(a, 3));
+  free.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0x8E8676, size: .045, map: DOT, transparent: true, opacity: .5, depthWrite: false, alphaTest: .05 })));
+}
+
+/* =================================================================
+   13 · exploded-view registry
+   ================================================================= */
+regExp(nucleus, NC, 2.4);
+regExp(nucleolus, V3(.75, .62, .75), 5.2);
+regExp(rer, V3(-.45, .8, -.4), 4.6);
+regExp(golgi, GC, GC.length() * .75);
+regExp(ser, SERC, SERC.length() * .75);
+regExp(centro, CC, CC.length() * .6);         // keeps the microtubule asters attached (cyto scales by 0.6)
+for (const m of mitos) regExp(m, m.position, m.position.length() * .75);
+for (const m of lysos) regExp(m, m.position, m.position.length() * .75);
+for (const m of peroxs) regExp(m, m.position, m.position.length() * .75);
+
+/* =================================================================
+   14 · tour anchors (what the camera locks onto)
+   ================================================================= */
+const ANCH = {
+  membrane:  { obj: membAnchor, dist: 8.5,  view: dMemb.clone(),        r2: 1.6 },
+  nucleus:   { obj: nucleus,    dist: 12,   view: V3(1, .72, 1),        r2: RN },
+  nucleolus: { obj: nucleolus,  dist: 4.4,  view: V3(1, .68, .86),      r2: 1.15 },
+  npc:       { obj: npcAnchor,  dist: 2.3,  view: npcAnchor.userData.dir.clone().add(V3(.4, .2, .4)), r2: .35 },
+  rer:       { obj: rerAnchor,  dist: 7.0,  view: V3(.55, .45, 1),      r2: 1.4 },
+  ribo:      { obj: riboAnchor, dist: 2.3,  view: V3(.6, .4, 1),        r2: .75 },
+  golgi:     { obj: golgi,      dist: 5.2,  view: V3(-.5, .8, .4),      r2: 1.75 },   // side-on to the stack axis
+  vesicle:   { obj: vesAnchor,  dist: 3.4,  view: V3(-.3, .3, 1),       r2: .9 },
+  mito:      { obj: mitos[0],   dist: 4.3,  view: V3(-.2, .6, 1),       r2: 1.6 },
+  lyso:      { obj: lysos[0],   dist: 3.0,  view: V3(.6, .5, 1),        r2: .7 },
+  perox:     { obj: peroxs[0],  dist: 2.0,  view: V3(1, .6, .5),        r2: .45 },
+  ser:       { obj: ser,        dist: 5.6,  view: V3(.25, -.1, 1),      r2: 2.1 },
+  centro:    { obj: centro,     dist: 2.6,  view: V3(.8, .6, 1),        r2: .7 },
+  cyto:      { obj: centro,     dist: 10,   view: V3(1, .9, .9),        r2: 3.2 },
+};
+for (const a of Object.values(ANCH)) { a.view.normalize(); a.az = Math.atan2(a.view.z, a.view.x); a.el = Math.asin(a.view.y); }
+
+/* =================================================================
+   15 · camera rig + interaction
+   ================================================================= */
+const rig = { target: V3(0, 0, 0), dist: 78, az: .95, el: .55 };
+const goal = { target: V3(0, 0, 0), dist: 31, az: .82, el: .42 };
+const vel = { x: { v: 0 }, y: { v: 0 }, z: { v: 0 }, d: { v: 0 }, a: { v: 0 }, e: { v: 0 }, ex: { v: 0 } };
+let mode = 'tour', focus = 0, exploded = false, explodeF = 0, tourT = 0, lastUser = -99, T = 0, burst = 0, locked = false, settle = 0;
+const TOUR_DWELL = 7.5;
+const tmpV = V3(), tmpV2 = V3();
+
+function focusPos(i, out) { return ANCH[ORGS[i].key].obj.getWorldPosition(out); }
+function setFocus(i, how) {
+  focus = (i + ORGS.length) % ORGS.length;
+  if (how) mode = how;
+  const a = ANCH[ORGS[focus].key];
+  goal.az = a.az; goal.el = a.el; goal.dist = a.dist;
+  tourT = 0; locked = false; settle = 0;
+  onFocusChange();
+  syncButtons();
+}
+function setOverview() {
+  mode = 'overview'; locked = false;
+  goal.dist = exploded ? 50 : 31; goal.el = .42;
+  syncButtons(); onFocusChange();
+}
+function toggleTour() { if (mode === 'tour') { mode = 'focus'; syncButtons(); } else setFocus(focus, 'tour'); }
+function toggleExplode() { exploded = !exploded; if (mode === 'overview') goal.dist = exploded ? 50 : 31; syncButtons(); }
+
+// pointer: drag to orbit, click to lock, wheel to zoom, hover to identify
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let drag = null, hoverTimer = 0, hoverEvt = null;
+canvas.addEventListener('pointerdown', e => {
+  drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: 0 };
+  canvas.setPointerCapture(e.pointerId); canvas.classList.add('drag');
+});
+canvas.addEventListener('pointermove', e => {
+  if (drag) {
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
+    drag.moved += Math.abs(dx) + Math.abs(dy);
+    if (drag.moved > 4) {
+      goal.az += dx * .006; goal.el = clamp(goal.el + dy * .005, -1.35, 1.35); lastUser = T;
+      if (mode === 'tour') { mode = 'focus'; syncButtons(); }
+    }
+  } else hoverEvt = e;
+});
+canvas.addEventListener('pointerup', e => {
+  canvas.classList.remove('drag');
+  if (drag && drag.moved <= 4) { const k = pickAt(e); if (k) setFocus(KEY2I[k], 'focus'); }
+  drag = null;
+});
+canvas.addEventListener('pointerleave', () => { hoverEvt = null; $('#hover').classList.remove('show'); });
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  goal.dist = clamp(goal.dist * (1 + clamp(e.deltaY, -120, 120) * .0012), 1.2, 95); lastUser = T;
+  if (mode === 'tour') { mode = 'focus'; syncButtons(); }
+}, { passive: false });
+
+function pickAt(e) {
+  const r = canvas.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hits = ray.intersectObjects(PICK.filter(o => !o.userData.noRay && !o.userData.noPick), false);
+  let shell = null;
+  for (const h of hits) {
+    const k = h.object.userData.key;
+    if (k === 'membrane') {
+      const p = h.point.clone().divideScalar(membrane.scale.x);
+      if (!inOct(p)) shell = shell || k;
+      continue;
+    }
+    if (k === 'nucleus' && inOct(h.point.clone().sub(nucleus.getWorldPosition(tmpV2)))) continue;
+    return k;
+  }
+  return shell;
+}
+
+/* =================================================================
+   16 · DOM: index, card, agents, workflow, clock
+   ================================================================= */
+const idxEl = $('#idx');
+ORGS.forEach((o, i) => {
+  const b = document.createElement('button');
+  b.className = 'ir';
+  b.innerHTML = `<span class="n">${pad2(i + 1)}</span><span class="sw" style="background:${o.color}"></span>` +
+    `<span class="nm">${o.en}<small>${o.zh}</small></span><span class="cf">${o.conf.toFixed(2)}</span>` +
+    `<span class="cb"><i style="width:${o.conf * 100}%"></i></span>`;
+  b.onclick = () => setFocus(i, 'focus');
+  idxEl.appendChild(b);
+});
+const labelsEl = $('#labels');
+const LBL = ORGS.map((o, i) => { const d = document.createElement('div'); d.className = 'lbl'; d.innerHTML = `<span>${pad2(i + 1)} ${o.short}</span>`; labelsEl.appendChild(d); return d; });
+
+const card = $('#card');
+let scr = null;
+function scramble(el, text) {
+  const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#/<>*';
+  const t0 = performance.now();
+  cancelAnimationFrame(scr);
+  const step = () => {
+    const k = Math.min(1, (performance.now() - t0) / 520), n = Math.floor(text.length * k);
+    let s = text.slice(0, n);
+    for (let i = n; i < text.length; i++) s += text[i] === ' ' ? ' ' : glyphs[Math.floor(Math.random() * glyphs.length)];
+    el.textContent = s;
+    if (k < 1) scr = requestAnimationFrame(step);
+  };
+  step();
+}
+function onFocusChange() {
+  [...idxEl.children].forEach((b, i) => b.classList.toggle('on', mode !== 'overview' && i === focus));
+  const o = ORGS[focus];
+  if (mode === 'overview') {
+    $('#c-idx').textContent = 'WHOLE CELL';
+    scramble($('#c-name'), 'HeLa-07 · OVERVIEW');
+    $('#c-zh').innerHTML = `<b style="background:#C9AE8C"></b>全细胞视图 · 14 类细胞器`;
+    $('#c-conf').textContent = '0.71'; $('#c-bar').style.width = '71%';
+    $('#c-copies').textContent = '14 classes'; $('#c-size').textContent = 'Ø 20 µm'; $('#c-prot').textContent = 'μ ± σ';
+    $('#c-desc').textContent = '八分体剖面（octant cut-away）展示胞内结构；拖拽旋转、滚轮缩放，点击任意细胞器可锁定观察。切换 + EXPLODED 可将细胞器径向拆解。';
+  } else {
+    $('#c-idx').textContent = `${pad2(focus + 1)} / 14 · ${o.short}`;
+    scramble($('#c-name'), o.en.toUpperCase());
+    $('#c-zh').innerHTML = `<b style="background:${o.color}"></b>${o.zh} · ${o.en}`;
+    $('#c-conf').textContent = o.conf.toFixed(2); $('#c-bar').style.width = (o.conf * 100) + '%';
+    $('#c-copies').textContent = o.copies; $('#c-size').textContent = o.size; $('#c-prot').textContent = o.prot;
+    $('#c-desc').textContent = o.desc;
+  }
+  conSetTarget(focus);
+}
+function syncButtons() {
+  $('#b-tour').classList.toggle('on', mode === 'tour');
+  $('#b-over').classList.toggle('on', mode === 'overview');
+  $('#b-expl').classList.toggle('on', exploded);
+  [...idxEl.children].forEach((b, i) => b.classList.toggle('on', mode !== 'overview' && i === focus));
+}
+$('#b-tour').onclick = toggleTour;
+$('#b-over').onclick = () => mode === 'overview' ? setFocus(focus, 'tour') : setOverview();
+$('#b-expl').onclick = toggleExplode;
+$('#b-atp').onclick = fireATP;
+addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('input,textarea')) return;
+  const k = e.key.toLowerCase();
+  if (k === 't') toggleTour();
+  else if (k === 'o') mode === 'overview' ? setFocus(focus, 'tour') : setOverview();
+  else if (k === 'e') toggleExplode();
+  else if (k === 'b') fireATP();
+  else if (e.key === 'ArrowRight') setFocus(focus + 1, mode === 'tour' ? 'tour' : 'focus');
+  else if (e.key === 'ArrowLeft') setFocus(focus - 1, mode === 'tour' ? 'tour' : 'focus');
+});
+function fireATP() {
+  burst = 1;
+  const b = $('#b-atp'); b.classList.add('fire'); setTimeout(() => b.classList.remove('fire'), 650);
+  const f = $('#flash'); f.classList.add('show'); clearTimeout(fireATP.t); fireATP.t = setTimeout(() => f.classList.remove('show'), 1400);
+}
+
+// ---- agents + 6-step workflow ----
+const AG = [
+  { n: 'Parser',    id: 'A-01', step: 'PARSE',   role: 'tilt series → tomogram tiles', logs: ['read tilt 41/61 · MRC2014', 'decode header · 4096²', 'tile 512³ voxels · bin 2', 'stream → shard 07/12', 'checksum ok · sha256'] },
+  { n: 'Aligner',   id: 'A-02', step: 'ALIGN',   role: 'fiducial alignment · CTF fit', logs: ['track 38 fiducials', 'residual 0.42 px', 'CTF defocus −3.1 µm', 'patch-track refine', 'tilt axis 84.7°'] },
+  { n: 'Folder',    id: 'A-03', step: 'FOLD',    role: 'structure inference · residues', logs: ['MSA depth 2,418', 'recycle 3/4', 'pLDDT μ 78.2', 'pair repr 128×128', 'relax · amber14'] },
+  { n: 'Inspector', id: 'A-04', step: 'INSPECT', role: 'segmentation QA · 14 classes', logs: ['mask 09 mito · IoU 0.83', 'membrane closure ok', 'NPC count 2,694', 'flag: perox low SNR', 'ER fenestrae 112'] },
+  { n: 'Scorer',    id: 'A-05', step: 'SCORE',   role: 'confidence calibration · ECE', logs: ['ECE 0.041', 'isotonic fit', 'σ(err) 0.340 Å', 'μ conf 0.71', 'bootstrap 1k'] },
+  { n: 'Curator',   id: 'A-06', step: 'CURATE',  role: 'atlas assembly · annotation', logs: ['merge 14 layers', 'GO:0005739 ✓', 'write atlas v7.14', 'cross-ref UniProt', 'publish → index'] },
+];
+const pipe = { active: 2, prog: [1, 1, .32, 0, 0, 0], dur: [4.2, 5.6, 7.4, 6.0, 4.8, 5.2], hold: 0, run: 42, poll: 0, pollT: 0, log: [4, 4, 1, 0, 0, 0], logT: 0, hb: [12, 9, 14, 11, 8, 10] };
+const flowEl = $('#flow'), agentsEl = $('#agents');
+const STEPS = AG.map((a, i) => {
+  const d = document.createElement('div'); d.className = 'st';
+  d.innerHTML = `<u>${pad2(i + 1)}</u>${a.step}<s></s><i></i>`; flowEl.appendChild(d); return d;
+});
+const CARDS = AG.map(a => {
+  const d = document.createElement('div'); d.className = 'ag';
+  d.innerHTML = `<span class="pl">POLL</span><div class="ag-h"><span class="ag-id">${a.id}</span><span class="ag-n">${a.n.toUpperCase()}</span><span class="ag-s">QUEUED</span></div>` +
+    `<div class="ag-r">${a.role}</div><div class="ag-bar"><i></i></div><div class="ag-f"><span class="lg"></span><span class="hb"></span><span class="pc">0%</span></div>`;
+  agentsEl.appendChild(d);
+  return { el: d, s: d.querySelector('.ag-s'), bar: d.querySelector('.ag-bar i'), lg: d.querySelector('.lg'), hb: d.querySelector('.hb'), pc: d.querySelector('.pc') };
+});
+function updatePipe(dt) {
+  if (pipe.active < 6) {
+    pipe.prog[pipe.active] += dt / pipe.dur[pipe.active] * (1 + burst * .8);
+    if (pipe.prog[pipe.active] >= 1) { pipe.prog[pipe.active] = 1; pipe.log[pipe.active] = AG[pipe.active].logs.length - 1; pipe.active++; }
+  } else if ((pipe.hold += dt) > 3.2) { pipe.hold = 0; pipe.active = 0; pipe.prog.fill(0); pipe.log.fill(0); pipe.run++; }
+  if ((pipe.pollT += dt) > .42) { pipe.pollT = 0; pipe.poll = (pipe.poll + 1) % 6; pipe.hb[pipe.poll] = Math.round(6 + Math.random() * 30); }
+  if ((pipe.logT += dt) > 1.15) { pipe.logT = 0; if (pipe.active < 6) pipe.log[pipe.active] = (pipe.log[pipe.active] + 1) % AG[pipe.active].logs.length; }
+}
+function renderPipe() {
+  AG.forEach((a, i) => {
+    const c = CARDS[i], st = i < pipe.active ? 'done' : i === pipe.active ? 'run' : 'wait', p = pipe.prog[i];
+    c.el.className = 'ag ' + st + (i === pipe.poll ? ' polled' : '');
+    c.s.textContent = st === 'done' ? 'DONE ✓' : st === 'run' ? 'RUNNING' : 'QUEUED';
+    c.bar.style.transform = `scaleX(${p})`;
+    c.pc.textContent = Math.floor(p * 100) + '%';
+    c.lg.textContent = st === 'wait' ? `waiting on ${AG[Math.max(0, i - 1)].id}` : (st === 'done' ? '✓ ' : '› ') + a.logs[pipe.log[i]];
+    c.hb.textContent = `hb ${pipe.hb[i]}ms`;
+    STEPS[i].className = 'st ' + st;
+    STEPS[i].querySelector('i').style.transform = `scaleX(${st === 'wait' ? 0 : p})`;
+    STEPS[i].querySelector('s').textContent = st === 'done' ? '✓' : st === 'run' ? Math.floor(p * 100) + '%' : '';
+  });
+  $('#run-no').textContent = 'RUN #' + String(pipe.run).padStart(4, '0');
+  $('#poll-l').textContent = `poll 420ms · ${AG[pipe.poll].id} · 6/6`;
+}
+function tick() {
+  const d = new Date(), off = -d.getTimezoneOffset();
+  $('#clk').textContent = d.toLocaleTimeString('en-GB', { hour12: false });
+  $('#clk-d').textContent = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} UTC${off >= 0 ? '+' : '−'}${pad2(Math.floor(Math.abs(off) / 60))}`;
+}
+tick(); setInterval(tick, 250);
+
+/* =================================================================
+   17 · telemetry canvases
+   ================================================================= */
+const LOYEL = ['#F4F7FB', '#E8EEF6', '#CCDBEB', '#9FBDDA', '#6C9AC4', '#497DAE', '#376392', '#2E5076', '#2B4868', '#263B54'];
+const LOYEL_RGB = LOYEL.map(h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)));
+function ramp(v) {
+  v = clamp(v, 0, 1) * (LOYEL.length - 1);
+  const i = Math.min(LOYEL.length - 2, Math.floor(v)), f = v - i, a = LOYEL_RGB[i], b = LOYEL_RGB[i + 1];
+  return `rgb(${Math.round(lerp(a[0], b[0], f))},${Math.round(lerp(a[1], b[1], f))},${Math.round(lerp(a[2], b[2], f))})`;
+}
+function makeCanvas(sel) {
+  const c = $(sel), o = { c, ctx: c.getContext('2d'), w: 1, h: 1 };
+  const fit = () => {
+    const r = c.getBoundingClientRect(), d = Math.min(devicePixelRatio, 2);
+    o.w = Math.max(1, r.width); o.h = Math.max(1, r.height);
+    c.width = Math.round(o.w * d); c.height = Math.round(o.h * d); o.ctx.setTransform(d, 0, 0, d, 0, 0);
+  };
+  new ResizeObserver(fit).observe(c.parentElement); fit();
+  return o;
+}
+const FONT = '500 9px "IBM Plex Mono", ui-monospace, monospace';
+
+// ---- §2 activity: multi-channel scrolling ECG / sine / noise traces ----
+const act = makeCanvas('#c-act');
+const CH = [
+  { key: 'nucleus', label: 'NUC',   unit: 'mV' },
+  { key: 'mito',    label: 'MITO',  unit: 'ΔΨ' },
+  { key: 'lyso',    label: 'LYSO',  unit: 'pH' },
+  { key: 'golgi',   label: 'GOLGI', unit: 'Hz' },
+  { key: 'rer',     label: 'ER',    unit: 'Ca' },
+  { key: 'vesicle', label: 'VES',   unit: 'ev' },
+];
+const CH_OF = { membrane: 5, nucleus: 0, nucleolus: 0, npc: 0, rer: 4, ribo: 4, golgi: 3, vesicle: 5, mito: 1, lyso: 2, perox: 2, ser: 4, centro: 0, cyto: 5 };
+const SERIES = ['#376392', '#2B4868', '#497DAE', '#6C9AC4', '#2E5076', '#497DAE'];
+const BUF = 1024, actBuf = CH.map(() => new Float32Array(BUF));
+let actHead = 0, actAcc = 0, simT = 0, ecgPh = 0, vesEv = [];
+const gauss = (x, m, s) => Math.exp(-((x - m) * (x - m)) / (2 * s * s));
+function sampleAll(t, step) {
+  const b = burst, amp = 1 + 1.25 * b;
+  ecgPh = (ecgPh + step / (1.05 - .5 * b)) % 1;
+  const ph = ecgPh;
+  const ecg = .14 * gauss(ph, .14, .03) - .17 * gauss(ph, .285, .012) + 1.0 * gauss(ph, .31, .014) - .3 * gauss(ph, .338, .013) + .28 * gauss(ph, .58, .055);
+  if (Math.random() < step * 1.4 * (1 + 3 * b)) vesEv.push({ t0: t, a: .5 + Math.random() * .5 });
+  vesEv = vesEv.filter(e => t - e.t0 < .8);
+  let vs = 0; for (const e of vesEv) vs += e.a * Math.exp(-(t - e.t0) / .07);
+  return [
+    (.3 * Math.sin(TAU * .35 * t) + .18 * Math.sin(TAU * 1.1 * t + 1) + .16 * vnoise(t * 2.2, 1.3, 0)) * (1 + .6 * b),
+    (ecg * .95 - .22) * (1 + 1.9 * b) + .04 * vnoise(t * 14, 2, 0),
+    (.42 * Math.sin(TAU * .22 * t) + .1 * Math.sin(TAU * 1.7 * t) + .12 * vnoise(t * 5, 7.7, 0)) * amp,
+    (.38 * Math.tanh(3.5 * Math.sin(TAU * .45 * t)) + .08 * vnoise(t * 8, 4.4, 0)) * amp,
+    (.45 * vnoise(t * 3.2, 3.3, 0) + .2 * vnoise(t * 9, 9.1, 0)) * amp,
+    (vs * .9 - .3 + .04 * vnoise(t * 20, 5, 0)) * amp,
+  ];
+}
+function updateActivity(dt) {
+  actAcc += dt; const step = 1 / 50;
+  while (actAcc >= step) {
+    actAcc -= step; simT += step;
+    const s = sampleAll(simT, step);
+    for (let i = 0; i < CH.length; i++) actBuf[i][actHead] = s[i];
+    actHead = (actHead + 1) % BUF;
+  }
+}
+for (let i = 0; i < BUF; i++) updateActivity(1 / 50);   // pre-roll ~20 s of history
+function drawActivity() {
+  const { ctx, w, h } = act; ctx.clearRect(0, 0, w, h);
+  const L = 70, Rr = 58, top = 6, bot = 16, lanes = CH.length, lh = (h - top - bot) / lanes, pw = w - L - Rr;
+  const hi = CH_OF[ORGS[focus].key];
+  // scrolling time grid
+  ctx.strokeStyle = '#E2DCD0'; ctx.lineWidth = 1; ctx.beginPath();
+  const off = (simT * 100) % 50;
+  for (let x = L + pw - off; x > L; x -= 50) { ctx.moveTo(Math.round(x) + .5, top); ctx.lineTo(Math.round(x) + .5, h - bot); }
+  ctx.stroke();
+  ctx.font = FONT; ctx.textBaseline = 'middle';
+  for (let i = 0; i < lanes; i++) {
+    const y0 = top + lh * (i + .5), isHi = mode !== 'overview' && i === hi;
+    if (isHi) { ctx.fillStyle = 'rgba(232,238,246,.85)'; ctx.fillRect(L, top + lh * i + 1, pw, lh - 2); }
+    ctx.strokeStyle = '#D5CEC0'; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(L, y0 + .5); ctx.lineTo(L + pw, y0 + .5); ctx.stroke(); ctx.setLineDash([]);
+    const org = ORGS[KEY2I[CH[i].key]];
+    ctx.fillStyle = org.color; ctx.beginPath(); ctx.arc(12, y0, 3.5, 0, TAU); ctx.fill();
+    ctx.fillStyle = isHi ? '#263B54' : '#7A7468'; ctx.textAlign = 'left';
+    ctx.fillText(`${pad2(i + 1)} ${CH[i].label}`, 20, y0);
+    const amp = lh * .4, n = Math.min(BUF - 1, Math.floor(pw / 2));
+    ctx.beginPath();
+    for (let k = 0; k <= n; k++) {
+      const v = actBuf[i][(actHead - 1 - k + BUF * 2) % BUF];
+      const x = L + pw - k * 2, y = y0 - clamp(v, -1.2, 1.2) * amp;
+      k ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.strokeStyle = (i === 1 && burst > .05) ? `rgba(176,86,58,${.45 + .55 * burst})` : SERIES[i];
+    ctx.lineWidth = isHi ? 1.8 : 1.15; ctx.lineJoin = 'round'; ctx.stroke();
+    const cur = actBuf[i][(actHead - 1 + BUF) % BUF], yc = y0 - clamp(cur, -1.2, 1.2) * amp;
+    ctx.fillStyle = '#263B54'; ctx.beginPath(); ctx.arc(L + pw, yc, 2.2, 0, TAU); ctx.fill();
+    ctx.textAlign = 'right'; ctx.fillStyle = isHi ? '#263B54' : '#7A7468';
+    ctx.fillText(`${cur >= 0 ? '+' : '−'}${Math.abs(cur).toFixed(2)} ${CH[i].unit}`, w - 6, y0);
+  }
+  ctx.textAlign = 'left'; ctx.fillStyle = '#A39B8C';
+  ctx.fillText('t − 0', L + pw - 30, h - 7);
+  ctx.fillText(`t − ${(pw / 100).toFixed(1)} s`, L + 2, h - 7);
+  ctx.fillText(burst > .05 ? `BURST ×${(1 + 1.9 * burst).toFixed(2)}` : '50 Hz · 100 px/s', L + pw * .42, h - 7);
+}
+
+// ---- §3 contact map: 8×8 residue contact heatmap (Loyel sequential ramp) ----
+const con = makeCanvas('#c-con');
+const CON = { cur: new Float32Array(64), tgt: new Float32Array(64), ph: new Float32Array(64), om: new Float32Array(64), labels: [], hover: -1 };
+for (let k = 0; k < 64; k++) { CON.ph[k] = Math.random() * TAU; CON.om[k] = .6 + Math.random() * 1.6; }
+const CON_BASE = ORGS.map((o, oi) => {
+  const r = mulberry32(1000 + oi * 77), m = new Float32Array(64);
+  for (let i = 0; i < 8; i++) for (let j = 0; j <= i; j++) {
+    const d = i - j; let v = i === j ? 1 : d === 1 ? .82 + .14 * r() : .9 * Math.exp(-(d - 1) / 1.3) * (.6 + .4 * r());
+    m[i * 8 + j] = m[j * 8 + i] = v;
+  }
+  for (let c = 0; c < 3; c++) {
+    const a = Math.floor(r() * 8), b = Math.floor(r() * 8);
+    if (Math.abs(a - b) > 2) { const v = .62 + .34 * r(); m[a * 8 + b] = m[b * 8 + a] = v; }
+  }
+  const AA = 'KERDLFYWHMSTNQGAVIPC'; let pos = 4 + Math.floor(r() * 18);
+  const labels = [];
+  for (let i = 0; i < 8; i++) { labels.push(AA[Math.floor(r() * AA.length)] + pos); pos += 9 + Math.floor(r() * 34); }
+  return { m, labels };
+});
+CON.cur.set(CON_BASE[0].m);
+function conSetTarget(i) {
+  CON.tgt.set(CON_BASE[i].m); CON.labels = CON_BASE[i].labels;
+  $('#con-r').innerHTML = `<b>${ORGS[i].prot}</b> · ${ORGS[i].short} · 8×8 · cut-off 8 Å`;
+}
+con.c.addEventListener('mousemove', e => {
+  const r = con.c.getBoundingClientRect(), g = CON.geo; if (!g) return;
+  const i = Math.floor((e.clientY - r.top - g.y) / g.s), j = Math.floor((e.clientX - r.left - g.x) / g.s);
+  CON.hover = (i >= 0 && i < 8 && j >= 0 && j < 8) ? i * 8 + j : -1;
+});
+con.c.addEventListener('mouseleave', () => CON.hover = -1);
+function drawContact(dt) {
+  const { ctx, w, h } = con; ctx.clearRect(0, 0, w, h);
+  const k = 1 - Math.exp(-dt * 3);
+  const val = new Float32Array(64);
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
+    const q = i * 8 + j, a = Math.min(i, j) * 8 + Math.max(i, j);
+    CON.cur[q] += (CON.tgt[q] - CON.cur[q]) * k;
+    val[q] = i === j ? 1 : clamp(CON.cur[q] + .09 * Math.sin(T * CON.om[a] + CON.ph[a]) + burst * .18 * (1 - CON.cur[q]), 0, 1);
+  }
+  const left = 34, topM = 28, right = 40, botM = 18;
+  const s = Math.max(4, Math.floor(Math.min((w - left - right) / 8, (h - topM - botM) / 8)));
+  const x0 = Math.round((w - right - left - s * 8) / 2 + left), y0 = Math.round(topM + (h - topM - botM - s * 8) / 2);
+  CON.geo = { x: x0, y: y0, s };
+  ctx.font = FONT; ctx.textBaseline = 'middle';
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
+    const v = val[i * 8 + j];
+    ctx.fillStyle = ramp(v); ctx.fillRect(x0 + j * s, y0 + i * s, s - 1, s - 1);
+    if (s >= 19) { ctx.fillStyle = v > .55 ? '#F4F7FB' : '#2B4868'; ctx.textAlign = 'center'; ctx.font = s >= 24 ? FONT : '500 8px "IBM Plex Mono", ui-monospace, monospace'; ctx.fillText(v > .995 ? '1.0' : v.toFixed(2).slice(1), x0 + j * s + s / 2, y0 + i * s + s / 2); }
+    else if (v > .8 && i !== j) { ctx.fillStyle = '#F4F7FB'; ctx.fillRect(x0 + j * s + s / 2 - 1.5, y0 + i * s + s / 2 - 1.5, 3, 3); }
+  }
+  ctx.strokeStyle = '#263B54'; ctx.lineWidth = 1; ctx.strokeRect(x0 - .5, y0 - .5, s * 8, s * 8);
+  ctx.font = FONT; ctx.fillStyle = '#7A7468';
+  for (let i = 0; i < 8; i++) {
+    ctx.textAlign = 'right'; ctx.fillText(CON.labels[i] || '', x0 - 4, y0 + i * s + s / 2);
+    ctx.save(); ctx.translate(x0 + i * s + s / 2 - 2, y0 - 5); ctx.rotate(-Math.PI / 4); ctx.textAlign = 'left'; ctx.fillText(CON.labels[i] || '', 0, 0); ctx.restore();
+  }
+  // colour bar
+  const bx = x0 + s * 8 + 10, bh = s * 8;
+  for (let y = 0; y < bh; y++) { ctx.fillStyle = ramp(1 - y / bh); ctx.fillRect(bx, y0 + y, 7, 1); }
+  ctx.strokeStyle = '#CDC5B6'; ctx.strokeRect(bx - .5, y0 - .5, 8, bh + 1);
+  ctx.fillStyle = '#7A7468'; ctx.textAlign = 'left';
+  ctx.fillText('1.0', bx + 11, y0 + 3); ctx.fillText('0.5', bx + 11, y0 + bh / 2); ctx.fillText('0', bx + 11, y0 + bh - 3);
+  // hover / strongest long-range contact readout
+  let q = CON.hover, tagTxt = 'HOVER';
+  if (q < 0) { let best = -1; for (let i = 0; i < 8; i++) for (let j = i + 2; j < 8; j++) if (val[i * 8 + j] > best) { best = val[i * 8 + j]; q = i * 8 + j; } tagTxt = 'MAX'; }
+  const qi = Math.floor(q / 8), qj = q % 8;
+  ctx.strokeStyle = '#B0563A'; ctx.lineWidth = 1.5; ctx.strokeRect(x0 + qj * s - .5, y0 + qi * s - .5, s, s);
+  ctx.fillStyle = '#263B54'; ctx.textAlign = 'left';
+  ctx.fillText(`${tagTxt} ${CON.labels[qi]}↔${CON.labels[qj]}  p=${val[q].toFixed(2)}  d≈${(3.8 + (1 - val[q]) * 8).toFixed(1)}Å`, x0, y0 + s * 8 + 11);
+}
+
+// ---- §4 under observation: 2-D section (top view) synced to the 3-D lock ----
+const obs = makeCanvas('#c-obs');
+let obsGeo = null;
+obs.c.addEventListener('click', e => {
+  if (!obsGeo) return;
+  const r = obs.c.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+  let best = -1, bd = 1e9;
+  ORGS.forEach((o, i) => { focusPos(i, tmpV); const dx = obsGeo.X(tmpV.x) - mx, dy = obsGeo.Y(tmpV.z) - my, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = i; } });
+  if (best >= 0) setFocus(best, 'focus');
+});
+function drawObserve() {
+  const { ctx, w, h } = obs; ctx.clearRect(0, 0, w, h);
+  const ms = membrane.scale.x, Rm = R * ms;
+  const cx = w * .5, cy = h * .5 + 3, s = (Math.min(w, h) * .5 - 14) / Rm;
+  const X = x => cx + x * s, Y = z => cy + z * s;
+  obsGeo = { X, Y };
+  // graph paper
+  ctx.lineWidth = 1; ctx.strokeStyle = '#E4DED2'; ctx.beginPath();
+  const step = s * (s > 8 ? 1 : 2);
+  for (let x = cx % step; x < w; x += step) { ctx.moveTo(Math.round(x) + .5, 0); ctx.lineTo(Math.round(x) + .5, h); }
+  for (let y = cy % step; y < h; y += step) { ctx.moveTo(0, Math.round(y) + .5); ctx.lineTo(w, Math.round(y) + .5); }
+  ctx.stroke();
+  // octant cut-away (x>0, z>0 quadrant, upper half removed) — hatched
+  ctx.save(); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, Rm * s, 0, Math.PI / 2); ctx.closePath(); ctx.clip();
+  ctx.strokeStyle = 'rgba(73,125,174,.22)'; ctx.beginPath();
+  for (let k = -h; k < w + h; k += 6) { ctx.moveTo(k, 0); ctx.lineTo(k - h, h); }
+  ctx.stroke(); ctx.restore();
+  // membrane (double line)
+  ctx.strokeStyle = '#263B54'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.arc(cx, cy, Rm * s, 0, TAU); ctx.stroke();
+  ctx.strokeStyle = '#C9AE8C'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(cx, cy, Rm * s * .965, 0, TAU); ctx.stroke();
+  // free ribosomes + vesicles (live)
+  const ex = 1 + .5 * explodeF;
+  ctx.fillStyle = 'rgba(86,78,98,.45)';
+  for (let i = 0; i < RIBO_N; i += 9) ctx.fillRect(X(riboBase[i * 3] * ex) - .5, Y(riboBase[i * 3 + 2] * ex) - .5, 1.2, 1.2);
+  ctx.fillStyle = 'rgba(73,125,174,.75)';
+  for (let i = 0; i < VES_N; i += 3) ctx.fillRect(X(ves.pos[i * 3]) - 1, Y(ves.pos[i * 3 + 2]) - 1, 2, 2);
+  // RER arcs around the nucleus
+  const nw = nucleus.getWorldPosition(tmpV), rw = rer.getWorldPosition(tmpV2);
+  ctx.strokeStyle = 'rgba(191,135,150,.85)'; ctx.lineWidth = 1.6; ctx.setLineDash([5, 3]);
+  for (const sh of RER_SHEETS) { ctx.beginPath(); ctx.arc(X(rw.x), Y(rw.z), sh.r * s, sh.a0, sh.a1); ctx.stroke(); }
+  ctx.setLineDash([]);
+  // nucleus + pores + nucleolus
+  ctx.fillStyle = 'rgba(110,79,149,.22)'; ctx.strokeStyle = '#6E4F95'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(X(nw.x), Y(nw.z), RN * s, 0, TAU); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#C9A44A';
+  for (let a = 0; a < TAU; a += TAU / 36) ctx.fillRect(X(nw.x + Math.cos(a) * RN) - 1.2, Y(nw.z + Math.sin(a) * RN) - 1.2, 2.4, 2.4);
+  const nl = nucleolus.getWorldPosition(tmpV2);
+  ctx.fillStyle = 'rgba(67,42,99,.75)'; ctx.beginPath(); ctx.arc(X(nl.x), Y(nl.z), 1.05 * s, 0, TAU); ctx.fill();
+  // golgi (stacked arcs)
+  const gw = golgi.getWorldPosition(tmpV2), gdir = Math.atan2(nw.z - gw.z, nw.x - gw.x);
+  ctx.strokeStyle = '#C98B4F'; ctx.lineWidth = 2;
+  for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.arc(X(gw.x) - Math.cos(gdir) * (i * .2 - 1) * s, Y(gw.z) - Math.sin(gdir) * (i * .2 - 1) * s, (1.4 - i * .06) * s, gdir - .75, gdir + .75); ctx.stroke(); }
+  // SER network
+  const sw = ser.getWorldPosition(tmpV2);
+  ctx.strokeStyle = 'rgba(211,163,155,.95)'; ctx.lineWidth = 1.3; ctx.beginPath();
+  serNodes.forEach((p, i) => { const q = serNodes[(i * 7 + 3) % serNodes.length]; ctx.moveTo(X(sw.x + p.x), Y(sw.z + p.z)); ctx.lineTo(X(sw.x + q.x), Y(sw.z + q.z)); });
+  ctx.stroke();
+  // mitochondria (projected capsules)
+  const up = V3();
+  for (const m of mitos) {
+    const { len, rad } = m.userData; up.set(0, 1, 0).applyQuaternion(m.quaternion);
+    const hl = len / 2 * Math.hypot(up.x, up.z), ang = Math.atan2(up.z, up.x), dx = Math.cos(ang) * hl, dz = Math.sin(ang) * hl;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#7C2D20'; ctx.lineWidth = rad * 2 * s + 2; ctx.beginPath(); ctx.moveTo(X(m.position.x - dx), Y(m.position.z - dz)); ctx.lineTo(X(m.position.x + dx), Y(m.position.z + dz)); ctx.stroke();
+    ctx.strokeStyle = '#C7826D'; ctx.lineWidth = rad * 2 * s; ctx.stroke();
+    ctx.lineCap = 'butt';
+  }
+  const disc = (p, r, f, st) => { ctx.fillStyle = f; ctx.strokeStyle = st; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(X(p.x), Y(p.z), Math.max(1.5, r * s), 0, TAU); ctx.fill(); ctx.stroke(); };
+  for (const l of lysos) disc(l.position, l.userData.r, '#86B077', '#5E9461');
+  for (const p of peroxs) disc(p.position, p.userData.r, '#D8C77A', '#9C8634');
+  const cw = centro.getWorldPosition(tmpV2);
+  ctx.strokeStyle = '#3E7378'; ctx.lineWidth = 1.6; ctx.beginPath();
+  ctx.moveTo(X(cw.x) - 5, Y(cw.z)); ctx.lineTo(X(cw.x) + 5, Y(cw.z)); ctx.moveTo(X(cw.x), Y(cw.z) - 5); ctx.lineTo(X(cw.x), Y(cw.z) + 5); ctx.stroke();
+  // camera + view wedge
+  const cam = camera.position, tg = rig.target;
+  let px = X(cam.x), py = Y(cam.z); const fa = Math.atan2(tg.z - cam.z, tg.x - cam.x);
+  const outside = px < 6 || px > w - 6 || py < 6 || py > h - 6;
+  px = clamp(px, 6, w - 6); py = clamp(py, 6, h - 6);
+  const hf = Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect), wl = Math.hypot(X(tg.x) - px, Y(tg.z) - py) * 1.25 + 20;
+  ctx.fillStyle = 'rgba(108,154,196,.14)'; ctx.strokeStyle = 'rgba(73,125,174,.75)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + Math.cos(fa - hf) * wl, py + Math.sin(fa - hf) * wl);
+  ctx.lineTo(px + Math.cos(fa + hf) * wl, py + Math.sin(fa + hf) * wl); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+  ctx.save(); ctx.translate(px, py); ctx.rotate(fa); ctx.fillStyle = outside ? '#B0563A' : '#263B54';
+  ctx.beginPath(); ctx.moveTo(7, 0); ctx.lineTo(-5, -5); ctx.lineTo(-3, 0); ctx.lineTo(-5, 5); ctx.closePath(); ctx.fill(); ctx.restore();
+  // lock reticle
+  ctx.font = FONT; ctx.textBaseline = 'middle';
+  if (mode !== 'overview') {
+    const fp = focusPos(focus, tmpV2), fx = X(fp.x), fy = Y(fp.z), a = ANCH[ORGS[focus].key];
+    const rb = Math.max(9, a.r2 * s + 5) * (1 + .06 * Math.sin(T * 5));
+    ctx.strokeStyle = 'rgba(55,99,146,.5)'; ctx.setLineDash([2, 4]); ctx.beginPath();
+    ctx.moveTo(0, Math.round(fy) + .5); ctx.lineTo(w, Math.round(fy) + .5); ctx.moveTo(Math.round(fx) + .5, 0); ctx.lineTo(Math.round(fx) + .5, h); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle = '#263B54'; ctx.lineWidth = 1.6; ctx.beginPath();
+    const c = rb * .45;
+    for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { ctx.moveTo(fx + sx * rb, fy + sy * (rb - c)); ctx.lineTo(fx + sx * rb, fy + sy * rb); ctx.lineTo(fx + sx * (rb - c), fy + sy * rb); }
+    ctx.stroke();
+    const tx = fx + rb + 8 > w - 120 ? fx - rb - 8 : fx + rb + 8;
+    ctx.textAlign = tx < fx ? 'right' : 'left';
+    const t1 = `${pad2(focus + 1)} ${ORGS[focus].short}`, t2 = `x ${fp.x.toFixed(1)} z ${fp.z.toFixed(1)} µm`;
+    const tw = Math.max(ctx.measureText(t1).width, ctx.measureText(t2).width) + 8;
+    ctx.fillStyle = 'rgba(243,239,232,.88)'; ctx.fillRect(tx < fx ? tx - tw + 4 : tx - 4, fy - 13, tw, 26);
+    ctx.fillStyle = '#263B54'; ctx.fillText(t1, tx, fy - 6);
+    ctx.fillStyle = '#7A7468'; ctx.fillText(t2, tx, fy + 6);
+  }
+  ctx.textAlign = 'left'; ctx.fillStyle = '#A39B8C';
+  ctx.fillText('SECTION y=0 · TOP', 8, 10);
+  ctx.textAlign = 'right'; ctx.fillText('+X →', w - 8, h - 9);
+  ctx.textAlign = 'left'; ctx.fillText('↓ +Z', 8, h - 9);
+}
+
+/* =================================================================
+   18 · per-frame updates
+   ================================================================= */
+function updateExplode(dt) {
+  explodeF = smoothDamp(explodeF, exploded ? 1 : 0, vel.ex, .55, dt);
+  const E = explodeF;
+  for (const x of EXP) x.obj.position.copy(x.home).addScaledVector(x.dir, x.dist * E);
+  membrane.scale.setScalar(1 + .6 * E);
+  cyto.scale.setScalar(1 + .6 * E);
+  free.scale.setScalar(1 + .5 * E);
+  membMat.opacity = .34 * (1 - .5 * E);
+  lipidMat.opacity = .55 * (1 - .45 * E);
+  nucleus.getWorldPosition(tmpV);
+  for (const p of nucPlanes) p.constant = -p.normal.dot(tmpV);
+}
+function updateInstances(dt) {
+  const ex = 1 + .5 * explodeF;
+  let a = freeRibo.instanceMatrix.array;
+  for (let i = 0; i < RIBO_N; i++) {
+    const b = i * 3, o = i * 16, ph = riboPh[i];
+    a[o + 12] = riboBase[b] * ex + .035 * Math.sin(T * 1.3 + ph);
+    a[o + 13] = riboBase[b + 1] * ex + .035 * Math.sin(T * 1.1 + ph * 1.7);
+    a[o + 14] = riboBase[b + 2] * ex + .035 * Math.cos(T * 1.2 + ph * 2.3);
+  }
+  freeRibo.instanceMatrix.needsUpdate = true;
+  a = vesMesh.instanceMatrix.array;
+  const spd = 1 + 1.6 * burst;
+  for (let i = 0; i < VES_N; i++) {
+    let t = ves.t[i] + dt * ves.sp[i] * spd; if (t >= 1) t -= 1; ves.t[i] = t;
+    const u = 1 - t, c0 = u * u, c1 = 2 * u * t, c2 = t * t, k = i * 3, o = i * 16;
+    const x = (c0 * ves.S[k] + c1 * ves.C[k] + c2 * ves.E[k]) * ex;
+    const y = (c0 * ves.S[k + 1] + c1 * ves.C[k + 1] + c2 * ves.E[k + 1]) * ex;
+    const z = (c0 * ves.S[k + 2] + c1 * ves.C[k + 2] + c2 * ves.E[k + 2]) * ex;
+    const sc = ves.r[i] * Math.min(1, Math.sin(Math.PI * t) * 4);
+    a[o] = a[o + 5] = a[o + 10] = sc; a[o + 12] = x; a[o + 13] = y; a[o + 14] = z;
+    ves.pos[k] = x; ves.pos[k + 1] = y; ves.pos[k + 2] = z;
+  }
+  vesMesh.instanceMatrix.needsUpdate = true;
+  burst = Math.max(0, burst - dt / 2.6);
+  cristaMat.emissiveIntensity = burst * 1.6;
+  mitoOuterMat.emissive.setRGB(burst * .35, burst * .1, 0);
+  for (const m of mitos) m.scale.setScalar(1 + .04 * burst * Math.sin(T * 18));
+}
+function updateCamera(dt) {
+  if (mode === 'tour' && (tourT += dt) > TOUR_DWELL) setFocus(focus + 1, 'tour');
+  let baseDist = goal.dist;
+  if (mode === 'overview') {
+    goal.target.set(0, 0, 0);
+    if (T - lastUser > 4) goal.az += dt * .07;
+  } else {
+    focusPos(focus, goal.target);
+    if (T - lastUser > 4 || mode === 'tour') goal.az += dt * .05;
+  }
+  const remain = rig.target.distanceTo(goal.target);
+  if (mode !== 'overview') baseDist = goal.dist + Math.min(10, remain * .55);   // pull out mid-flight, then dolly in
+  while (goal.az - rig.az > Math.PI) goal.az -= TAU;
+  while (goal.az - rig.az < -Math.PI) goal.az += TAU;
+  const st = 1.0;
+  rig.target.x = smoothDamp(rig.target.x, goal.target.x, vel.x, st, dt);
+  rig.target.y = smoothDamp(rig.target.y, goal.target.y, vel.y, st, dt);
+  rig.target.z = smoothDamp(rig.target.z, goal.target.z, vel.z, st, dt);
+  rig.dist = smoothDamp(rig.dist, baseDist, vel.d, st * 1.1, dt);
+  rig.az = smoothDamp(rig.az, goal.az, vel.a, st * .9, dt);
+  rig.el = smoothDamp(rig.el, goal.el, vel.e, st * .9, dt);
+  camera.position.copy(sph(rig.az, rig.el)).multiplyScalar(rig.dist).add(rig.target);
+  camera.lookAt(rig.target);
+  const nowLocked = remain < .3 && Math.abs(rig.dist - goal.dist) < .8;
+  settle = nowLocked ? settle + dt : 0;
+  locked = settle > .25;
+}
+
+let ovT = 0, frames = 0, fpsT0 = performance.now(), fps = 60;
+const xhair = $('#xhair'), leadL = $('#lead-l'), leadC = $('#lead-c');
+function updateOverlay(dt) {
+  const show = mode === 'overview' || locked || T > 1.2;
+  card.classList.toggle('show', show);
+  card.classList.toggle('acq', mode !== 'overview' && !locked);
+  card.classList.toggle('ovc', mode === 'overview');
+  xhair.classList.toggle('lock', locked && mode !== 'overview');
+  xhair.classList.toggle('ovw', mode === 'overview');
+  const stEl = $('#c-state');
+  stEl.textContent = mode === 'overview' ? 'OVERVIEW' : locked ? 'LOCKED' : 'ACQUIRING';
+  stEl.classList.toggle('acq', mode !== 'overview' && !locked);
+  $('#tourbar').style.transform = `scaleX(${mode === 'tour' ? clamp(tourT / TOUR_DWELL, 0, 1) : 0})`;
+  // leader line from crosshair to card
+  const vr = vpEl.getBoundingClientRect(), cr = card.getBoundingClientRect();
+  if (show && cr.width && mode !== 'overview') {
+    const cx = vr.width / 2, cy = vr.height / 2, kx = cr.left - vr.left, ky = cr.bottom - vr.top - 14;
+    leadL.setAttribute('points', `${cx + 30},${cy - 30} ${kx - 16},${ky} ${kx},${ky}`);
+    leadC.setAttribute('cx', cx + 30); leadC.setAttribute('cy', cy - 30);
+    leadL.style.opacity = leadC.style.opacity = 1;
+  } else leadL.style.opacity = leadC.style.opacity = 0;
+  // overview labels
+  const showL = mode === 'overview' && remainOverview() < 2;
+  ORGS.forEach((o, i) => {
+    const el = LBL[i];
+    if (!showL || o.key === 'cyto') { el.classList.remove('show'); return; }
+    focusPos(i, tmpV).project(camera);
+    if (tmpV.z > 1) { el.classList.remove('show'); return; }
+    el.style.transform = `translate(${(tmpV.x * .5 + .5) * vr.width}px,${(-tmpV.y * .5 + .5) * vr.height}px)`;
+    el.classList.add('show');
+  });
+  // hover identify (throttled raycast)
+  if ((hoverTimer += dt) > .08 && hoverEvt && !drag) {
+    hoverTimer = 0;
+    const k = pickAt(hoverEvt), hv = $('#hover');
+    if (k) {
+      const i = KEY2I[k];
+      hv.textContent = `${pad2(i + 1)} · ${ORGS[i].en.toUpperCase()} · ${ORGS[i].conf.toFixed(2)}`;
+      hv.style.left = (hoverEvt.clientX - vr.left) + 'px'; hv.style.top = (hoverEvt.clientY - vr.top) + 'px';
+      hv.classList.add('show');
+    } else hv.classList.remove('show');
+    hoverEvt = null;
+  }
+  frames++; const nowP = performance.now(); if (nowP - fpsT0 > 500) { fps = frames * 1000 / (nowP - fpsT0); frames = 0; fpsT0 = nowP; }
+  if ((ovT += dt) < .1) return;
+  ovT = 0;
+  const fp = mode === 'overview' ? rig.target : focusPos(focus, tmpV2);
+  $('#c-xyz').textContent = `x ${fp.x.toFixed(2)}  y ${fp.y.toFixed(2)}  z ${fp.z.toFixed(2)} µm · r ${rig.dist.toFixed(1)}`;
+  const deg = v => (THREE.MathUtils.radToDeg(v) % 360 + 360) % 360;
+  const modeTxt = mode === 'tour' ? `AUTO TOUR ${pad2(focus + 1)}/14` : mode === 'focus' ? `MANUAL LOCK ${pad2(focus + 1)}/14` : 'OVERVIEW';
+  $('#vp-bl').innerHTML = `<span class="mode">${modeTxt}</span>${exploded ? 'EXPLODED ×' + (1 + .75 * explodeF).toFixed(2) : 'ASSEMBLED'}<br>` +
+    `CAM r ${rig.dist.toFixed(2)} · az ${deg(rig.az).toFixed(1)}° · el ${THREE.MathUtils.radToDeg(rig.el).toFixed(1)}°<br>` +
+    `TGT ${rig.target.x.toFixed(2)} ${rig.target.y.toFixed(2)} ${rig.target.z.toFixed(2)}`;
+  // scale bar at target depth
+  const pxPerUnit = vr.height / (2 * rig.dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+  const nice = [.05, .1, .2, .5, 1, 2, 5, 10]; let len = nice[0];
+  for (const n of nice) if (n * pxPerUnit <= 120) len = n;
+  $('#s-bar').style.width = Math.max(8, len * pxPerUnit) + 'px';
+  $('#s-lab').textContent = len < 1 ? `${Math.round(len * 1000)} nm` : `${len} µm`;
+  const info = renderer.info.render;
+  $('#stats').textContent = `${fps.toFixed(0)} FPS · ${info.calls} DRAW · ${(info.triangles / 1000).toFixed(0)}k TRI · ${(RIBO_N + VES_N + 1720).toLocaleString('en-US')} INST`;
+  $('#atp-r').textContent = `ATP ${(1 + 2.4 * burst).toFixed(2)} mM`;
+  $('#obs-r').innerHTML = mode === 'overview' ? '<b>OVERVIEW</b> · whole cell' : `LOCK <b>${pad2(focus + 1)} ${ORGS[focus].short}</b> · ${locked ? 'tracking' : 'acquiring'}`;
+  renderPipe();
+}
+function remainOverview() { return rig.target.length() + Math.abs(rig.dist - goal.dist) * .2; }
+
+function resize() {
+  const r = vpEl.getBoundingClientRect();
+  renderer.setSize(Math.max(1, r.width), Math.max(1, r.height), false);
+  camera.aspect = Math.max(1, r.width) / Math.max(1, r.height); camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(vpEl); resize();
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(.1, (now - last) / 1000); last = now; T += dt;
+  updateExplode(dt);
+  updateInstances(dt);
+  updateCamera(dt);
+  updatePipe(dt);
+  updateActivity(dt);
+  renderer.render(scene, camera);
+  updateOverlay(dt);
+  drawActivity(); drawContact(dt); drawObserve();
+  requestAnimationFrame(frame);
+}
+window.__atlas = {
+  focus: (i, how = 'focus') => setFocus(i, how), overview: setOverview, explode: toggleExplode, atp: fireATP,
+  snap() { focusPos(focus, goal.target); if (mode === 'overview') goal.target.set(0, 0, 0); rig.target.copy(goal.target); rig.dist = goal.dist; rig.az = goal.az; rig.el = goal.el; explodeF = exploded ? 1 : 0; for (const v of Object.values(vel)) v.v = 0; settle = 1; },
+};
+setFocus(0, 'tour');
+resize();
+renderer.compile(scene, camera);   // compile every material up front: no hitch the first time a stop comes into view
+requestAnimationFrame(frame);
+</script>
+<script>
+// If the scene module never starts (CDN blocked / no WebGL), say so instead of showing an empty frame.
+setTimeout(function () { if (!window.__atlasReady) { var f = document.getElementById('fail'); if (f) f.style.display = 'flex'; } }, 8000);
+</script>
+</body>
+</html>

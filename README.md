@@ -72,6 +72,10 @@ scripts/build.mjs  bundles everything into dist/index.html
 dist/index.html    the built, self-contained page
 ```
 
+## Cell Atlas (`cell-atlas/index.html`)
+
+A separate single-file page: an interactive 3D cell-atlas research dashboard (procedural Three.js cell with octant cut-away, auto tour, overview and exploded views; six-agent pipeline; activity traces, 8×8 contact map and a 2D section synced to the camera). Open the file in a browser; it loads three.js r160 from jsDelivr through an import map, so it needs network access. Keys: `T` tour, `O` overview, `E` exploded, `B` ATP burst, `←/→` previous / next organelle.
+
 ## Develop
 
 ```bash
