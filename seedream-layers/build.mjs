@@ -651,20 +651,28 @@ const sections = `
 
 // Loyel blue tokens for both themes, plus page chrome.
 const STYLE = `
-.iso{--anatomy-page:#263B54;--anatomy-card:#2B4868;--anatomy-text:#CCDBEB;--anatomy-strong:#F4F7FB;--anatomy-muted:#9FBDDA;
---anatomy-paper:#2B4868;--anatomy-face:#2E5076;--anatomy-top:#2E5076;
---anatomy-shade-0:#263B54;--anatomy-shade-1:#2B4868;--anatomy-shade-2:#2B4868;--anatomy-shade-3:#2E5076;
---anatomy-lit-top:#376392;--anatomy-lit-shade:#2E5076;
---anatomy-hi:#E8EEF6;--anatomy-mid:#9FBDDA;--anatomy-lo:#6C9AC4;--anatomy-faint:#497DAE;--anatomy-lit:#FFFFFF;
---anatomy-halo:#263B54;--anatomy-halo-opacity:.85;--anatomy-dot:#E8EEF6;
---sl-glass:#CCDBEB;--sl-glass-o:.08;--sl-screen:#263B54;--sl-lens:#9FBDDA}
-.iso[data-theme="light"]{--anatomy-page:#E8EEF6;--anatomy-card:#F4F7FB;--anatomy-text:#2B4868;--anatomy-strong:#263B54;--anatomy-muted:#497DAE;
+/* Loyel blue: light on bare :root, dark for a dark system setting or an explicit dark choice */
+:root{--anatomy-weight:.6px;--anatomy-ease:cubic-bezier(.32,.72,0,1);--anatomy-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--anatomy-page:#E8EEF6;--anatomy-card:#F4F7FB;--anatomy-text:#2B4868;--anatomy-strong:#263B54;--anatomy-muted:#497DAE;
 --anatomy-paper:#F4F7FB;--anatomy-face:#FFFFFF;--anatomy-top:#FFFFFF;
 --anatomy-shade-0:#CCDBEB;--anatomy-shade-1:#E8EEF6;--anatomy-shade-2:#E8EEF6;--anatomy-shade-3:#F4F7FB;
 --anatomy-lit-top:#FFFFFF;--anatomy-lit-shade:#E8EEF6;
 --anatomy-hi:#2E5076;--anatomy-mid:#6C9AC4;--anatomy-lo:#9FBDDA;--anatomy-faint:#CCDBEB;--anatomy-lit:#263B54;
 --anatomy-halo:#6C9AC4;--anatomy-halo-opacity:.3;--anatomy-dot:#2B4868;
---sl-glass:#9FBDDA;--sl-glass-o:.16;--sl-screen:#263B54;--sl-lens:#CCDBEB}
+--sl-glass:#9FBDDA;--sl-glass-o:.16;--sl-screen:#263B54;--sl-lens:#CCDBEB;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--anatomy-page:#263B54;--anatomy-card:#2B4868;--anatomy-text:#CCDBEB;--anatomy-strong:#F4F7FB;--anatomy-muted:#9FBDDA;
+--anatomy-paper:#2B4868;--anatomy-face:#2E5076;--anatomy-top:#2E5076;
+--anatomy-shade-0:#263B54;--anatomy-shade-1:#2B4868;--anatomy-shade-2:#2B4868;--anatomy-shade-3:#2E5076;
+--anatomy-lit-top:#376392;--anatomy-lit-shade:#2E5076;
+--anatomy-hi:#E8EEF6;--anatomy-mid:#9FBDDA;--anatomy-lo:#6C9AC4;--anatomy-faint:#497DAE;--anatomy-lit:#FFFFFF;
+--anatomy-halo:#263B54;--anatomy-halo-opacity:.85;--anatomy-dot:#E8EEF6;
+--sl-glass:#CCDBEB;--sl-glass-o:.08;--sl-screen:#263B54;--sl-lens:#9FBDDA;color-scheme:dark}}
+:root[data-theme="dark"]{--anatomy-page:#263B54;--anatomy-card:#2B4868;--anatomy-text:#CCDBEB;--anatomy-strong:#F4F7FB;--anatomy-muted:#9FBDDA;
+--anatomy-paper:#2B4868;--anatomy-face:#2E5076;--anatomy-top:#2E5076;
+--anatomy-shade-0:#263B54;--anatomy-shade-1:#2B4868;--anatomy-shade-2:#2B4868;--anatomy-shade-3:#2E5076;
+--anatomy-lit-top:#376392;--anatomy-lit-shade:#2E5076;
+--anatomy-hi:#E8EEF6;--anatomy-mid:#9FBDDA;--anatomy-lo:#6C9AC4;--anatomy-faint:#497DAE;--anatomy-lit:#FFFFFF;
+--anatomy-halo:#263B54;--anatomy-halo-opacity:.85;--anatomy-dot:#E8EEF6;
+--sl-glass:#CCDBEB;--sl-glass-o:.08;--sl-screen:#263B54;--sl-lens:#9FBDDA;color-scheme:dark}
 .iso-svg{--sl-sky0:${PALETTES.sunset.sky0};--sl-sky1:${PALETTES.sunset.sky1};--sl-sky2:${PALETTES.sunset.sky2};--sl-sun:${PALETTES.sunset.sun};--sl-far:${PALETTES.sunset.far};--sl-mid:${PALETTES.sunset.mid};--sl-near:${PALETTES.sunset.near};--sl-ground:${PALETTES.sunset.ground}}
 .sl-art path,.sl-art circle,.sl-art ellipse,.sl-art rect{vector-effect:none}
 .sl-glass{fill:var(--sl-glass);fill-opacity:var(--sl-glass-o);stroke:none}
@@ -680,7 +688,9 @@ const STYLE = `
 .sl-theme{position:absolute;top:-6px;right:0;width:34px;height:34px;border-radius:50%;border:1px solid var(--anatomy-mid);background:var(--anatomy-card);color:var(--anatomy-strong);display:grid;place-items:center;cursor:pointer;padding:0}
 .sl-theme svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round}
 .sl-theme .sl-moon{fill:currentColor;stroke:none}
-.iso[data-theme="dark"] .sl-moon,.iso:not([data-theme="dark"]) .sl-sun{display:none}
+.sl-sun{display:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sl-sun{display:inline}:root:not([data-theme="light"]) .sl-moon{display:none}}
+:root[data-theme="dark"] .sl-sun{display:inline}:root[data-theme="dark"] .sl-moon{display:none}
 .sl-scenes{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .sl-scene{font:12px/1 var(--anatomy-mono);color:var(--anatomy-text);background:transparent;border:1px solid var(--anatomy-lo);border-radius:999px;padding:8px 12px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;min-height:34px}
 .sl-scene:hover{border-color:var(--anatomy-mid)}
@@ -698,20 +708,32 @@ const STYLE = `
 @media (max-width:560px){.sl-en{display:none}.sl-head h1{font-size:20px}.iso-plate-corner[data-corner="title"]{display:none}.iso-stage{overflow:hidden;margin:0 -12px}.iso-stage .iso-svg{width:118%;margin-left:-9%}}
 `;
 
-const themeBoot = `<script>(function(){var t=null;try{t=localStorage.getItem("sl-theme")}catch(e){}if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.body.setAttribute("data-theme",t)})();</script>`;
+const PAGE = `
+*{box-sizing:border-box}
+body{margin:0;background:var(--anatomy-page);color:var(--anatomy-text);font:14px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI","PingFang SC","Noto Sans CJK SC",sans-serif;-webkit-font-smoothing:antialiased;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.iso-page{width:min(760px,100%);margin:0 auto;padding-block:56px 88px}
+.sl-head h1{text-wrap:balance;word-break:keep-all}
+`;
+// The toggle sets data-theme on the root, the same switch a viewer's own theme setting uses.
 const themeLive = `
+const root = document.documentElement;
 const toggle = document.querySelector("[data-theme-toggle]");
+const dark = () => root.getAttribute("data-theme") === "dark" || (root.getAttribute("data-theme") !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+if (!root.hasAttribute("data-theme")) { try { const saved = localStorage.getItem("sl-theme"); if (saved === "light" || saved === "dark") root.setAttribute("data-theme", saved); } catch (e) {} }
 toggle.addEventListener("click", () => {
-  const next = document.body.getAttribute("data-theme") === "dark" ? "light" : "dark";
-  document.body.setAttribute("data-theme", next);
+  const next = dark() ? "light" : "dark";
+  root.setAttribute("data-theme", next);
   try { localStorage.setItem("sl-theme", next); } catch (e) {}
 });
 `;
 
 const forced = process.argv.includes("--light") ? "light" : process.argv.includes("--dark") ? "dark" : null;
-let html = k.pageHtml({ title: "Seedream 图层光具座", theme: forced || "light", body: intro + figure + sections, script: kitScript() + live + themeLive, width: 760 });
-html = html.replace("</style>", `${STYLE}</style>`).replace('<html lang="en">', '<html lang="zh-CN">');
-if (!forced) html = html.replace('<main class="iso-page">', `${themeBoot}<main class="iso-page">`);
+const head = `<title>Seedream 图层光具座</title><meta name="claude:viewport-fit-sides" content="cover"><style>${k.ISO_CSS}${PAGE}${STYLE}</style>`;
+const content = `<main class="iso-page">${intro}${figure}${sections}</main><script type="module">${(kitScript() + live + themeLive).replace(/<\/(script)/gi, "<\\/$1")}</script>`;
+const html = `<!doctype html><html lang="zh-CN"${forced ? ` data-theme="${forced}"` : ""}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">${head}</head><body>${content}</body></html>`;
 const out = forced ? `seedream-layers-${forced}.html` : "seedream-layers.html";
 writeFileSync(join(HERE, out), html);
 console.log("wrote", out, (html.length / 1024).toFixed(0) + " KB");
+// Artifact build: the viewer wraps the page in its own document skeleton.
+const artifactAt = process.env.ARTIFACT_OUT;
+if (artifactAt && !forced) { writeFileSync(artifactAt, head + content); console.log("wrote", artifactAt); }
