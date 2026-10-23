@@ -84,6 +84,20 @@ An interactive 3D cell-atlas research dashboard: a procedural Three.js cell with
 
 On GitHub, or in a file viewer, an `.html` file shows as source code. Download it and open it in a browser to see the page.
 
+## BEYONEZKL Neuron Atlas (`neuron-atlas/`)
+
+A neuron-specific follow-up to Cell Atlas, in the Loyel gradient-blue palette. It models a layer-5 pyramidal neuron: a soma with a quadrant cut-away (pale euchromatic nucleus with a dark nucleolus, Nissl bodies absent from the axon hillock, perinuclear Golgi, mitochondria, lipofuscin, primary cilium), an apical dendrite with obliques and tuft, five basal dendrites with ~1,800 spines, an axon initial segment with periodic rings, six myelinated internodes (one cut open to show the lamellae and axoplasm), nodes of Ranvier, an oligodendrocyte, a collateral and a terminal arbor with a cut-away synaptic bouton.
+
+- Action potentials start at the distal AIS, jump node to node, and trigger vesicle fusion and glutamate release at the bouton. Back-propagating spikes and EPSP flashes run in the dendrites. Display time is slowed so the spikes are visible.
+- Panels: six-site membrane potential traces in sync with the 3D spike, with `+ STIMULUS` (key `S`); an 8 channel × 8 compartment ion-channel map (illustrative relative densities); and a front-view morphology with Sholl rings and a Sholl profile.
+- Keys: `T` tour, `O` overview, `E` exploded, `S` stimulus, `←/→` previous / next structure.
+
+| File | Use |
+|------|-----|
+| `neuron-atlas/neuron-atlas-offline.html` | **Download and double-click.** three.js r160 built in, no network needed. |
+| `neuron-atlas/index.html` | The source. three.js r160 from jsDelivr, then unpkg. |
+| `neuron-atlas/build.mjs` | Rebuilds the offline copy and `.artifact/neuron-atlas.html`: `node neuron-atlas/build.mjs package/build/three.min.js` (from `npm pack three@0.160.0`). |
+
 ## Develop
 
 ```bash
