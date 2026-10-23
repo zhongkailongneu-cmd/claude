@@ -33,7 +33,10 @@ body{
   -webkit-font-smoothing:antialiased; overflow:hidden;
 }
 button{font:inherit;color:inherit}
-.app{height:100vh;min-height:700px;display:grid;grid-template-rows:auto auto minmax(0,1fr) clamp(196px,27vh,276px);gap:6px;padding:8px}
+.app{height:100%;min-height:700px;display:grid;grid-template-rows:auto auto minmax(0,1fr) clamp(196px,27vh,276px);gap:6px;
+  padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.btn:focus-visible,.ir:focus-visible,.atp:focus-visible{outline:2px solid var(--a60);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 .box{border:1px solid var(--rule);background:var(--panel)}
 .ph{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;border-bottom:1px solid var(--rule);
     font-size:9.5px;letter-spacing:.12em;color:var(--ink-2);background:var(--panel-2);white-space:nowrap;min-height:29px}
@@ -186,7 +189,10 @@ svg.lead{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;ov
 .lbl.show{opacity:1}
 .flash{position:absolute;left:50%;top:22%;transform:translateX(-50%);font-size:11px;letter-spacing:.2em;color:#fff;background:var(--clay);padding:3px 10px;opacity:0;pointer-events:none;transition:opacity .3s}
 .flash.show{opacity:1}
-.fail{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:11px;line-height:1.8;color:var(--ink-2);background:rgba(236,231,222,.92);z-index:9}
+.fail{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:11px;line-height:1.9;color:var(--ink-2);background:rgba(236,231,222,.94);z-index:9}
+.fail b{letter-spacing:.14em;color:var(--ink)}
+.fail code{font:inherit;color:var(--ink);border-bottom:1px solid var(--a50)}
+.boot{left:50%;top:50%;transform:translate(-50%,-50%);letter-spacing:.16em;color:var(--ink-3);animation:blink 1s steps(2,start) infinite}
 
 /* ---------- telemetry ---------- */
 .tele{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:6px;min-height:0}
@@ -219,12 +225,6 @@ svg.lead{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;ov
   .brand h1{font-size:21px}
 }
 </style>
-<script type="importmap">
-{ "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-} }
-</script>
 </head>
 <body>
 <div class="app">
@@ -322,7 +322,8 @@ svg.lead{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;ov
       <div class="tourbar"><i id="tourbar"></i></div>
       <div class="hover" id="hover"></div>
       <div class="flash" id="flash">ATP BURST · ΔΨm ↑</div>
-      <div class="fail" id="fail">WebGL scene unavailable.<br>Three.js could not be loaded from cdn.jsdelivr.net, or WebGL is disabled in this browser.<br>The telemetry and agent panels need the scene module to run.</div>
+      <div class="ov boot" id="boot">LOADING three.js r160 …</div>
+      <div class="fail" id="fail"><div><b>3D SCENE UNAVAILABLE · 三维场景未能加载</b><br><span class="why"></span><br><span class="hint">Open <code>cell-atlas-offline.html</code> instead: it has three.js built in and works without a network.<br>请改用同目录下的 cell-atlas-offline.html（已内置 three.js，无需联网，双击即可打开）。</span></div></div>
     </section>
   </main>
 
@@ -344,8 +345,34 @@ svg.lead{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;ov
 </div>
 
 <script type="module">
-import * as THREE from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+/* =================================================================
+   three.js r160 — the offline build embeds it (window.THREE); otherwise it
+   loads from jsDelivr, then unpkg if jsDelivr is slow or unreachable.
+   ================================================================= */
+window.__atlasBoot = true;
+const bootEl = document.getElementById('boot');
+const THREE_SOURCES = [
+  ['jsDelivr', 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js'],
+  ['unpkg', 'https://unpkg.com/three@0.160.0/build/three.module.min.js'],
+];
+function fail(why) {
+  bootEl.style.display = 'none';
+  const f = document.getElementById('fail');
+  f.querySelector('.why').textContent = why;
+  f.style.display = 'flex';
+}
+async function loadThree() {
+  if (window.THREE && window.THREE.REVISION) return window.THREE;
+  for (const [name, url] of THREE_SOURCES) {
+    bootEl.textContent = `LOADING three.js r160 · ${name} …`;
+    try {
+      return await Promise.race([import(url), new Promise((_, no) => setTimeout(() => no(new Error('timed out after 10 s')), 10000))]);
+    } catch (e) { console.warn(`three.js from ${name} failed:`, e); }
+  }
+  throw new Error('three.js could not be loaded from jsDelivr or unpkg.');
+}
+let THREE;
+try { THREE = await loadThree(); } catch (e) { fail(e.message); throw e; }
 
 /* =================================================================
    0 · helpers
@@ -445,6 +472,25 @@ function blobGeo(r) {   // 20-triangle icosahedron with sphere normals: round-lo
   for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i).normalize(); n.setXYZ(i, v.x, v.y, v.z); }
   return g;
 }
+// soft studio reflections for the clear-coated organelles (layout ported from three's RoomEnvironment, MIT)
+function studioEnv() {
+  const s = new THREE.Scene(), box = new THREE.BoxGeometry(), std = new THREE.MeshStandardMaterial();
+  const room = new THREE.Mesh(box, new THREE.MeshStandardMaterial({ side: THREE.BackSide }));
+  room.position.set(-.757, 13.219, .717); room.scale.set(31.713, 28.305, 28.591); s.add(room);
+  const bulb = new THREE.PointLight(0xffffff, 900, 28, 2); bulb.position.set(.418, 16.199, .3); s.add(bulb);
+  for (const [p, ry, k] of [[[-10.906, 2.009, 1.846], -.195, [2.328, 7.905, 4.651]], [[-5.607, -.754, -.758], .994, [1.97, 1.534, 3.955]],
+    [[6.167, .857, 7.803], .561, [3.927, 6.285, 3.687]], [[-2.017, .018, 6.124], .333, [2.002, 4.566, 2.064]],
+    [[2.291, -.756, -2.621], -.286, [1.546, 1.552, 1.496]], [[-2.193, -.369, -5.547], .516, [3.875, 3.487, 2.986]]]) {
+    const m = new THREE.Mesh(box, std); m.position.set(...p); m.rotation.y = ry; m.scale.set(...k); s.add(m);
+  }
+  for (const [i, p, k] of [[50, [-16.116, 14.37, 8.208], [.1, 2.428, 2.739]], [50, [-16.109, 18.021, -8.207], [.1, 2.425, 2.751]],
+    [17, [14.904, 12.198, -1.832], [.15, 4.265, 6.331]], [43, [-.462, 8.89, 14.52], [4.38, 5.441, .088]],
+    [20, [3.235, 11.486, -12.541], [2.5, 2, .1]], [100, [0, 20, 0], [1, .1, 1]]]) {
+    const mat = new THREE.MeshBasicMaterial(); mat.color.setScalar(i);
+    const m = new THREE.Mesh(box, mat); m.position.set(...p); m.scale.set(...k); s.add(m);
+  }
+  return s;
+}
 function dotTexture() {
   const c = document.createElement('canvas'); c.width = c.height = 64;
   const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
@@ -479,19 +525,20 @@ const pad2 = n => String(n).padStart(2, '0');
    2 · renderer / scene
    ================================================================= */
 const vpEl = $('#viewport'), canvas = $('#gl');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
+catch (e) { fail('WebGL is disabled or unavailable in this browser.'); throw e; }
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
 renderer.localClippingEnabled = true;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.02;
 renderer.setClearColor(0x000000, 0);
-window.__atlasReady = true;   // WebGL is up; the fallback notice stays hidden
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0xE8E2D7, 46, 120);
 const camera = new THREE.PerspectiveCamera(38, 1, 0.05, 400);
 const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+scene.environment = pmrem.fromScene(studioEnv(), 0.04).texture;
 scene.add(new THREE.HemisphereLight(0xFFF3E0, 0xB4AC9C, 0.85));
 const keyL = new THREE.DirectionalLight(0xFFF0DA, 1.5); keyL.position.set(12, 16, 10); scene.add(keyL);
 const fillL = new THREE.DirectionalLight(0x9FBDDA, 0.6); fillL.position.set(-14, -6, -10); scene.add(fillL);
@@ -1672,6 +1719,7 @@ function frame(now) {
   updatePipe(dt);
   updateActivity(dt);
   renderer.render(scene, camera);
+  if (bootEl.style.display !== 'none') bootEl.style.display = 'none';
   updateOverlay(dt);
   drawActivity(); drawContact(dt); drawObserve();
   requestAnimationFrame(frame);
@@ -1686,8 +1734,13 @@ renderer.compile(scene, camera);   // compile every material up front: no hitch 
 requestAnimationFrame(frame);
 </script>
 <script>
-// If the scene module never starts (CDN blocked / no WebGL), say so instead of showing an empty frame.
-setTimeout(function () { if (!window.__atlasReady) { var f = document.getElementById('fail'); if (f) f.style.display = 'flex'; } }, 8000);
+// Browsers too old for module scripts never start the scene; say so instead of leaving an empty frame.
+setTimeout(function () {
+  if (window.__atlasBoot) return;
+  var f = document.getElementById('fail'), b = document.getElementById('boot');
+  if (b) b.style.display = 'none';
+  if (f) { f.querySelector('.why').textContent = 'This browser cannot run the page script (ES modules are required).'; f.style.display = 'flex'; }
+}, 4000);
 </script>
 </body>
 </html>

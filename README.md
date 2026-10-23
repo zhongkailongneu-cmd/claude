@@ -72,9 +72,17 @@ scripts/build.mjs  bundles everything into dist/index.html
 dist/index.html    the built, self-contained page
 ```
 
-## Cell Atlas (`cell-atlas/index.html`)
+## Cell Atlas (`cell-atlas/`)
 
-A separate single-file page: an interactive 3D cell-atlas research dashboard (procedural Three.js cell with octant cut-away, auto tour, overview and exploded views; six-agent pipeline; activity traces, 8×8 contact map and a 2D section synced to the camera). Open the file in a browser; it loads three.js r160 from jsDelivr through an import map, so it needs network access. Keys: `T` tour, `O` overview, `E` exploded, `B` ATP burst, `←/→` previous / next organelle.
+An interactive 3D cell-atlas research dashboard: a procedural Three.js cell with an octant cut-away, auto tour, overview and exploded views; a six-agent pipeline; activity traces, an 8×8 contact map and a 2D section synced to the camera. Keys: `T` tour, `O` overview, `E` exploded, `B` ATP burst, `←/→` previous / next organelle.
+
+| File | Use |
+|------|-----|
+| `cell-atlas/cell-atlas-offline.html` | **Download and double-click.** three.js r160 is built in, so it works with no network. |
+| `cell-atlas/index.html` | The source. Loads three.js r160 from jsDelivr, then unpkg if jsDelivr is unreachable, and shows a message if both fail. |
+| `cell-atlas/build.mjs` | Rebuilds the offline copy (and `.artifact/cell-atlas.html`, the claude.ai preview) from `index.html`: `npm pack three@0.160.0 && tar xzf three-0.160.0.tgz && node cell-atlas/build.mjs package/build/three.min.js` |
+
+On GitHub, or in a file viewer, an `.html` file shows as source code. Download it and open it in a browser to see the page.
 
 ## Develop
 
