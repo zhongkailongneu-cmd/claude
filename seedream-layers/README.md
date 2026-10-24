@@ -52,6 +52,19 @@ node build.mjs --black         # 固定黑色，验证用
 ANATOMY=/path/to/anatomy node build.mjs   # skill 不在 ~/.claude/skills/anatomy 时
 ```
 
+## 录制竖屏短视频
+
+`record.mjs` 把页面的自动巡游录成 1080×1920、30fps 的 MP4。它用虚拟时钟逐帧推进，每帧精确间隔 1/30 秒，不会因为截图慢而掉帧。视频版只保留标题、插图和场景按钮。
+
+```sh
+node build.mjs --light && node build.mjs --dark && node build.mjs --black
+node record.mjs --surface light            # 浅蓝，输出 seedream-layers-light.mp4
+node record.mjs --surface dark             # 深蓝
+node record.mjs --surface black --seconds 32 --fps 30 --out /path/to/black.mp4
+```
+
+32 秒正好是 5 个场景巡游一轮。需要 Playwright、Chromium 和带 libx264 的 ffmpeg。
+
 ## 验证
 
 - `scripts/lines.mjs`（线条端点检查）：浅蓝、深蓝、黑色和展开状态都是 `line ends: 0`
