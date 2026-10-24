@@ -2,7 +2,7 @@
 
 A 3:16 film, 1920×1080 at 30 fps. It tours 13 major brain regions, then zooms into 7 subregions of the prefrontal cortex. Every element is drawn in blue fluorescent particles. Subtitles are bilingual (Chinese and English). There is no narration. The soundtrack is a 140 BPM epic electronic piece, and every visual hit lands on its beat grid.
 
-- 成片：`output/brain_journey.mp4`（字幕已烧录）
+- 成片：`output/brain_journey.mp4`（字幕已烧录，H.264 CRF 26，约 64 MB）。另有一个高画质版 `output/brain_journey_HQ.mp4`（CRF 20，约 224 MB），超过 GitHub 单文件 100 MB 的上限，所以不进 git，需要时重新渲染即可得到
 - 软字幕：`output/brain_journey.srt`（中英双语，可在播放器里单独开关）
 
 ## 分镜与时间轴

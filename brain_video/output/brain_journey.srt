@@ -1,0 +1,255 @@
+1
+00:00:00,857 --> 00:00:06,429
+约 860 亿个神经元 · 逾百万亿个突触
+~86 billion neurons · 100+ trillion synapses
+
+2
+00:00:06,857 --> 00:00:13,286
+一场穿越大脑的旅程
+A journey through the brain
+
+3
+00:00:06,857 --> 00:00:13,286
+人类大脑
+THE HUMAN BRAIN
+
+4
+00:00:13,714 --> 00:00:17,143
+计划、决策与自主运动的指挥部
+Command center for planning, decisions & voluntary movement
+
+5
+00:00:17,143 --> 00:00:20,571
+约占大脑皮层的三分之一
+About one-third of the cerebral cortex
+
+6
+00:00:20,571 --> 00:00:24,000
+整合触觉、痛觉与身体位置感
+Integrates touch, pain & body position
+
+7
+00:00:24,000 --> 00:00:27,429
+构建空间地图，引导注意与动作
+Builds spatial maps that guide attention & action
+
+8
+00:00:27,429 --> 00:00:30,857
+听觉与语言理解（韦尼克区）
+Hearing & language comprehension (Wernicke's area)
+
+9
+00:00:30,857 --> 00:00:34,286
+识别面孔与物体，参与记忆
+Recognizes faces & objects, supports memory
+
+10
+00:00:34,286 --> 00:00:37,714
+视觉皮层：解析形状、颜色与运动
+Visual cortex: decodes shape, color & motion
+
+11
+00:00:37,714 --> 00:00:41,143
+视觉由此分为“是什么”与“在哪里”两条通路
+Vision splits into 'what' & 'where' streams
+
+12
+00:00:41,143 --> 00:00:44,571
+藏于外侧沟深处的“第五脑叶”
+The hidden 'fifth lobe' deep in the lateral sulcus
+
+13
+00:00:44,571 --> 00:00:48,000
+感知心跳与饥饿等内感受，塑造主观感受
+Senses heartbeat & hunger — interoception that shapes feelings
+
+14
+00:00:48,000 --> 00:00:51,429
+约 2 亿根神经纤维
+~200 million nerve fibers
+
+15
+00:00:51,429 --> 00:00:54,857
+连接左右大脑半球的信息高速公路
+The information highway between the two hemispheres
+
+16
+00:00:54,857 --> 00:00:58,286
+感觉信息的中继枢纽（嗅觉除外）
+Relay hub for the senses (except smell)
+
+17
+00:00:58,286 --> 00:01:01,714
+调控觉醒、注意与意识状态
+Gates arousal, attention & consciousness
+
+18
+00:01:01,714 --> 00:01:05,143
+仅约 4 克，掌控体温、饥渴与睡眠
+Only ~4 g, yet governs temperature, hunger, thirst & sleep
+
+19
+00:01:05,143 --> 00:01:08,571
+经垂体指挥全身内分泌系统
+Commands the endocrine system via the pituitary
+
+20
+00:01:08,571 --> 00:01:12,000
+动作选择：“启动”还是“刹车”
+Action selection: 'go' or 'stop'
+
+21
+00:01:12,000 --> 00:01:15,429
+习惯与奖赏学习；帕金森病的核心受累环路
+Habits & reward learning; the circuit hit by Parkinson's disease
+
+22
+00:01:15,429 --> 00:01:18,857
+把经历转化为长期记忆
+Turns experiences into lasting memories
+
+23
+00:01:18,857 --> 00:01:22,286
+位置细胞绘制大脑的“内置 GPS”
+Place cells build the brain's inner GPS
+
+24
+00:01:22,286 --> 00:01:25,714
+威胁探测器：快速评估情绪意义
+Threat detector: rapidly tags emotional significance
+
+25
+00:01:25,714 --> 00:01:29,143
+驱动恐惧学习，强化情绪记忆
+Drives fear learning & strengthens emotional memories
+
+26
+00:01:29,143 --> 00:01:32,571
+协调运动、平衡与动作学习
+Coordinates movement, balance & motor learning
+
+27
+00:01:32,571 --> 00:01:36,000
+约占脑重 10%，却拥有约 80% 的神经元
+~10% of brain mass, yet ~80% of its neurons
+
+28
+00:01:36,000 --> 00:01:39,429
+呼吸、心跳、血压——生命中枢
+Breathing, heartbeat, blood pressure — the core of life
+
+29
+00:01:39,429 --> 00:01:42,857
+12 对脑神经中有 10 对由此发出
+Origin of 10 of the 12 pairs of cranial nerves
+
+30
+00:01:42,857 --> 00:01:46,286
+而在所有脑区之中……
+And among all of them…
+
+31
+00:01:46,286 --> 00:01:49,714
+有一处，承载着人类最高阶的智慧
+one region holds our highest cognition
+
+32
+00:01:51,429 --> 00:01:55,929
+前额叶皮层
+PREFRONTAL CORTEX
+
+33
+00:01:56,571 --> 00:02:00,000
+大脑的“首席执行官”：执行控制中枢
+The brain's CEO: the hub of executive control
+
+34
+00:02:00,000 --> 00:02:03,429
+发育成熟最晚的脑区之一，持续至成年早期
+One of the last regions to mature — into early adulthood
+
+35
+00:02:03,429 --> 00:02:06,857
+工作记忆：在脑中保持并操作信息
+Working memory: holding & manipulating information
+
+36
+00:02:06,857 --> 00:02:10,286
+制定计划、切换策略、抽象推理
+Planning, strategy switching & abstract reasoning
+
+37
+00:02:10,286 --> 00:02:13,714
+反应抑制：行为的“刹车”（以右侧为主）
+Response inhibition: the brain's brake (right-lateralized)
+
+38
+00:02:13,714 --> 00:02:17,143
+左侧含布洛卡区：语言产出与语义提取
+Left side hosts Broca's area: speech & semantic retrieval
+
+39
+00:02:17,143 --> 00:02:20,571
+计算奖赏价值：“这值得吗？”
+Computes reward value: 'Is it worth it?'
+
+40
+00:02:20,571 --> 00:02:24,000
+结果改变时迅速更新预期
+Rapidly updates expectations when outcomes change
+
+41
+00:02:24,000 --> 00:02:27,429
+整合情绪与价值，做出个人与社会决策
+Integrates emotion & value for personal and social decisions
+
+42
+00:02:27,429 --> 00:02:30,857
+盖奇（1848）：损伤后人格骤变
+Phineas Gage (1848): personality transformed after injury
+
+43
+00:02:30,857 --> 00:02:34,286
+冲突监测与错误觉察：“出错了！”
+Conflict monitoring & error detection: 'Something's wrong!'
+
+44
+00:02:34,286 --> 00:02:37,714
+权衡努力与回报，驱动动机
+Weighs effort against reward to drive motivation
+
+45
+00:02:37,714 --> 00:02:41,143
+心理理论：推测他人的想法与意图
+Theory of mind: inferring others' thoughts & intentions
+
+46
+00:02:41,143 --> 00:02:44,571
+自我反思：思考“我是谁”
+Self-reflection: thinking about who I am
+
+47
+00:02:44,571 --> 00:02:48,000
+大脑最前端：同时驾驭多个目标
+The frontmost cortex: juggling multiple goals at once
+
+48
+00:02:48,000 --> 00:02:51,429
+元认知：反思自己的思考
+Metacognition: thinking about your own thinking
+
+49
+00:02:51,429 --> 00:02:54,857
+前额叶从不孤军奋战
+The prefrontal cortex never works alone
+
+50
+00:02:54,857 --> 00:02:58,286
+它通过网络调度整个大脑
+It orchestrates the whole brain through networks
+
+51
+00:02:58,286 --> 00:03:04,929
+认识大脑，就是认识你自己
+To know the brain is to know yourself
+
