@@ -27,7 +27,7 @@ const SCALE = 3;                             // → 1080 × 1920
 
 // For a short video: keep the kicker, headline, card and scene buttons; drop the long text below.
 const VIDEO_CSS = `
-.sl-head p:not(.sl-kicker),.sl-section,.iso-legend,.sl-surfaces{display:none!important}
+.sl-head p:not(.sl-kicker),.sl-section,.iso-legend,.as-picker{display:none!important}
 .iso-page{padding-block:0!important;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
 .sl-head h1{margin-bottom:0!important}
 .iso-figure{margin:18px 0 0!important}

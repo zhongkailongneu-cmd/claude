@@ -6,6 +6,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { homedir } from "node:os";
 import { POSTER, PALETTES, NAMES, layers } from "./art.mjs";
+import { pageDocument, pickerHtml } from "../anatomy-surfaces/surfaces.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ANATOMY = process.env.ANATOMY || join(homedir(), ".claude/skills/anatomy");
@@ -482,10 +483,12 @@ function say() {
     const ratio = (C.XL - X[0]) / (C.XL - X[C.N - 1]);
     text = "相机 " + fmt(s.dy) + " · 前景层位移是底图的 " + ratio.toFixed(1) + "×";
   } else if (s.scene === 2) {
-    const toToucan = s.swapTo > 0.5;
+    // Before the scene fires its change, name the change it is about to make.
+    const toToucan = s.fired ? s.swapTo > 0.5 : s.swapTo < 0.5;
     text = "z 3 · " + (toToucan ? "鹦鹉 → 巨嘴鸟 · " + grid(BBOX.toucan) : "巨嘴鸟 → 鹦鹉 · " + grid(BBOX.parrot));
   } else if (s.scene === 3) {
-    text = "z 0 · " + (s.nightTo > 0.5 ? "日落 → 月夜" : "月夜 → 日落") + " · 其余 5 层不动";
+    const toNight = s.fired ? s.nightTo > 0.5 : s.nightTo < 0.5;
+    text = "z 0 · " + (toNight ? "日落 → 月夜" : "月夜 → 日落") + " · 其余 5 层不动";
   } else {
     const cx = TITLE_AT[0] + C.TITLE_MOVE[0] * s.title, cy = TITLE_AT[1] + C.TITLE_MOVE[1] * s.title;
     text = "z 4 · 标题中心 " + Math.round((cx / C.POSTER.w) * 1000) + " " + Math.round((cy / C.POSTER.h) * 1000);
@@ -624,7 +627,7 @@ const intro = `
   <p class="sl-kicker">Seedream 5.0 Pro · 图层分离（Layer separation）</p>
   <h1>一张平面图进去，一叠可编辑图层出来</h1>
   <p>字节跳动的 Seedream 5.0 Pro（2026 年 7 月 8 日发布）有一个图层分离模式：给它一张做好的图，它返回一张底图，外加若干张透明 PNG 图层，每个元素一层，并且已经按从前到后的顺序排好（Atlas Cloud 的 API 页写的上限是 16 层，各平台不完全一致）。下面这台光具座把这件事做成了实物：每片玻璃装一层。</p>
-  <div class="sl-surfaces" role="group" aria-label="底色">${[["light", "浅蓝"], ["navy", "深蓝"], ["black", "黑色"]].map(([key, name]) => `<button type="button" class="sl-surface" data-pick="${key}" aria-pressed="false" aria-label="${name}底色" title="${name}"></button>`).join("")}</div>
+  ${pickerHtml({ corner: true })}
 </header>`;
 
 const sections = `
@@ -649,63 +652,20 @@ const sections = `
   <p class="sl-note">资料：<a href="https://www.atlascloud.ai/models/seedream-5.0-pro">Atlas Cloud · Seedream 5.0 Pro</a> · <a href="https://creatorsecrets.co/p/seedream-5-0-splits-a-finished-image-into-editable-layers-plus-hi3d-and-gpt-5-6">Creator Secrets：Layerize 模式</a>。图中的海报和六个图层是为了说明手工画的，不是模型的真实输出。插图由 <a href="https://github.com/wheresryan22/anatomy">Anatomy</a> skill 生成。</p>
 </section>`;
 
-// Loyel blue tokens for both themes, plus page chrome.
+// Figure and page styles; the surface tokens come from ../anatomy-surfaces.
 const STYLE = `
-/* Loyel blue: light on bare :root, dark for a dark system setting or an explicit dark choice */
-:root{--anatomy-weight:.6px;--anatomy-ease:cubic-bezier(.32,.72,0,1);--anatomy-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--anatomy-page:#E8EEF6;--anatomy-card:#F4F7FB;--anatomy-text:#2B4868;--anatomy-strong:#263B54;--anatomy-muted:#497DAE;
---anatomy-paper:#F4F7FB;--anatomy-face:#FFFFFF;--anatomy-top:#FFFFFF;
---anatomy-shade-0:#CCDBEB;--anatomy-shade-1:#E8EEF6;--anatomy-shade-2:#E8EEF6;--anatomy-shade-3:#F4F7FB;
---anatomy-lit-top:#FFFFFF;--anatomy-lit-shade:#E8EEF6;
---anatomy-hi:#2E5076;--anatomy-mid:#6C9AC4;--anatomy-lo:#9FBDDA;--anatomy-faint:#CCDBEB;--anatomy-lit:#263B54;
---anatomy-halo:#6C9AC4;--anatomy-halo-opacity:.3;--anatomy-dot:#2B4868;
---sl-glass:#9FBDDA;--sl-glass-o:.16;--sl-screen:#263B54;--sl-lens:#CCDBEB;color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--anatomy-page:#263B54;--anatomy-card:#2B4868;--anatomy-text:#CCDBEB;--anatomy-strong:#F4F7FB;--anatomy-muted:#9FBDDA;
---anatomy-paper:#2B4868;--anatomy-face:#2E5076;--anatomy-top:#2E5076;
---anatomy-shade-0:#263B54;--anatomy-shade-1:#2B4868;--anatomy-shade-2:#2B4868;--anatomy-shade-3:#2E5076;
---anatomy-lit-top:#376392;--anatomy-lit-shade:#2E5076;
---anatomy-hi:#E8EEF6;--anatomy-mid:#9FBDDA;--anatomy-lo:#6C9AC4;--anatomy-faint:#497DAE;--anatomy-lit:#FFFFFF;
---anatomy-halo:#263B54;--anatomy-halo-opacity:.85;--anatomy-dot:#E8EEF6;
---sl-glass:#CCDBEB;--sl-glass-o:.08;--sl-screen:#263B54;--sl-lens:#9FBDDA;color-scheme:dark}}
-:root[data-theme="dark"]{--anatomy-page:#263B54;--anatomy-card:#2B4868;--anatomy-text:#CCDBEB;--anatomy-strong:#F4F7FB;--anatomy-muted:#9FBDDA;
---anatomy-paper:#2B4868;--anatomy-face:#2E5076;--anatomy-top:#2E5076;
---anatomy-shade-0:#263B54;--anatomy-shade-1:#2B4868;--anatomy-shade-2:#2B4868;--anatomy-shade-3:#2E5076;
---anatomy-lit-top:#376392;--anatomy-lit-shade:#2E5076;
---anatomy-hi:#E8EEF6;--anatomy-mid:#9FBDDA;--anatomy-lo:#6C9AC4;--anatomy-faint:#497DAE;--anatomy-lit:#FFFFFF;
---anatomy-halo:#263B54;--anatomy-halo-opacity:.85;--anatomy-dot:#E8EEF6;
---sl-glass:#CCDBEB;--sl-glass-o:.08;--sl-screen:#263B54;--sl-lens:#9FBDDA;color-scheme:dark}
-/* An explicit choice on the page wins over the system: light blue, navy (Loyel) or the original black */
-:root[data-surface="light"]{--anatomy-page:#E8EEF6;--anatomy-card:#F4F7FB;--anatomy-text:#2B4868;--anatomy-strong:#263B54;--anatomy-muted:#497DAE;
---anatomy-paper:#F4F7FB;--anatomy-face:#FFFFFF;--anatomy-top:#FFFFFF;
---anatomy-shade-0:#CCDBEB;--anatomy-shade-1:#E8EEF6;--anatomy-shade-2:#E8EEF6;--anatomy-shade-3:#F4F7FB;
---anatomy-lit-top:#FFFFFF;--anatomy-lit-shade:#E8EEF6;
---anatomy-hi:#2E5076;--anatomy-mid:#6C9AC4;--anatomy-lo:#9FBDDA;--anatomy-faint:#CCDBEB;--anatomy-lit:#263B54;
---anatomy-halo:#6C9AC4;--anatomy-halo-opacity:.3;--anatomy-dot:#2B4868;
---sl-glass:#9FBDDA;--sl-glass-o:.16;--sl-screen:#263B54;--sl-lens:#CCDBEB;color-scheme:light}
-:root[data-surface="navy"]{--anatomy-page:#263B54;--anatomy-card:#2B4868;--anatomy-text:#CCDBEB;--anatomy-strong:#F4F7FB;--anatomy-muted:#9FBDDA;
---anatomy-paper:#2B4868;--anatomy-face:#2E5076;--anatomy-top:#2E5076;
---anatomy-shade-0:#263B54;--anatomy-shade-1:#2B4868;--anatomy-shade-2:#2B4868;--anatomy-shade-3:#2E5076;
---anatomy-lit-top:#376392;--anatomy-lit-shade:#2E5076;
---anatomy-hi:#E8EEF6;--anatomy-mid:#9FBDDA;--anatomy-lo:#6C9AC4;--anatomy-faint:#497DAE;--anatomy-lit:#FFFFFF;
---anatomy-halo:#263B54;--anatomy-halo-opacity:.85;--anatomy-dot:#E8EEF6;
---sl-glass:#CCDBEB;--sl-glass-o:.08;--sl-screen:#263B54;--sl-lens:#9FBDDA;color-scheme:dark}
-:root[data-surface="black"]{--anatomy-page:#0b0b0b;--anatomy-card:#131313;--anatomy-text:#a3a3a3;--anatomy-strong:#e6e6e6;--anatomy-muted:#6e6e6e;--anatomy-paper:#131313;--anatomy-face:#1b1b1b;--anatomy-top:#1c1c1c;--anatomy-shade-0:#0f0f0f;--anatomy-shade-1:#121212;--anatomy-shade-2:#151515;--anatomy-shade-3:#181818;--anatomy-lit-top:#262626;--anatomy-lit-shade:#1d1d1d;--anatomy-hi:#d4d4d4;--anatomy-mid:#6a6a6a;--anatomy-lo:#3e3e3e;--anatomy-faint:#2a2a2a;--anatomy-lit:#ffffff;--anatomy-halo:#050505;--anatomy-halo-opacity:.9;--anatomy-dot:#e6e6e6;--sl-glass:#e6e6e6;--sl-glass-o:.05;--sl-screen:#0b0b0b;--sl-lens:#6a6a6a;color-scheme:dark}
 .iso-svg{--sl-sky0:${PALETTES.sunset.sky0};--sl-sky1:${PALETTES.sunset.sky1};--sl-sky2:${PALETTES.sunset.sky2};--sl-sun:${PALETTES.sunset.sun};--sl-far:${PALETTES.sunset.far};--sl-mid:${PALETTES.sunset.mid};--sl-near:${PALETTES.sunset.near};--sl-ground:${PALETTES.sunset.ground}}
 .sl-art path,.sl-art circle,.sl-art ellipse,.sl-art rect{vector-effect:none}
-.sl-glass{fill:var(--sl-glass);fill-opacity:var(--sl-glass-o);stroke:none}
-.sl-screen{fill:var(--sl-screen)}
-.sl-lens{fill:var(--sl-lens);fill-opacity:.35}
+.sl-glass{fill:var(--fig-glass);fill-opacity:var(--fig-glass-o);stroke:none}
+.sl-screen{fill:var(--fig-screen)}
+.sl-lens{fill:var(--fig-lens);fill-opacity:.35}
 .iso-stage{touch-action:pan-y;cursor:ew-resize;outline:none}
 .iso-stage .iso-svg{overflow:hidden}
 .iso-stage:focus-visible{outline:1px solid var(--anatomy-muted);outline-offset:6px}
 .sl-head{position:relative;margin-bottom:8px}
 .sl-head p{margin:0 0 12px;max-width:62ch}
 .sl-kicker{padding-right:104px;font-family:var(--anatomy-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--anatomy-muted)}
-.sl-head h1{margin:0 0 12px;color:var(--anatomy-strong);font-size:24px;line-height:1.3;font-weight:650;letter-spacing:-.01em;padding-right:44px}
-.sl-surfaces{position:absolute;top:-4px;right:0;display:flex;gap:8px}
-.sl-surface{width:24px;height:24px;border-radius:50%;padding:0;cursor:pointer;border:1px solid var(--anatomy-mid)}
-.sl-surface[data-pick="light"]{background:#F4F7FB}.sl-surface[data-pick="navy"]{background:#2B4868}.sl-surface[data-pick="black"]{background:#131313}
-.sl-surface[aria-pressed="true"]{box-shadow:0 0 0 2px var(--anatomy-page),0 0 0 3.5px var(--anatomy-strong)}
-.sl-surface:focus-visible{outline:1px solid var(--anatomy-muted);outline-offset:5px}
+.sl-head h1{margin:0 0 12px;color:var(--anatomy-strong);font-size:24px;line-height:1.3;font-weight:650;letter-spacing:-.01em;padding-right:44px;text-wrap:balance;word-break:keep-all}
 .sl-scenes{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .sl-scene{font:12px/1 var(--anatomy-mono);color:var(--anatomy-text);background:transparent;border:1px solid var(--anatomy-lo);border-radius:999px;padding:8px 12px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;min-height:34px}
 .sl-scene:hover{border-color:var(--anatomy-mid)}
@@ -723,38 +683,19 @@ const STYLE = `
 @media (max-width:560px){.sl-en{display:none}.sl-head h1{font-size:20px}.iso-plate-corner[data-corner="title"]{display:none}.iso-stage{overflow:hidden;margin:0 -12px}.iso-stage .iso-svg{width:118%;margin-left:-9%}}
 `;
 
-const PAGE = `
-*{box-sizing:border-box}
-body{margin:0;background:var(--anatomy-page);color:var(--anatomy-text);font:14px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI","PingFang SC","Noto Sans CJK SC",sans-serif;-webkit-font-smoothing:antialiased;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.iso-page{width:min(760px,100%);margin:0 auto;padding-block:56px 88px}
-.sl-head h1{text-wrap:balance;word-break:keep-all}
-`;
-// Three surfaces. With no choice the page follows the viewer's theme (light → light blue, dark → navy);
-// a pick is written as data-surface on the root and remembered in this browser.
-const themeLive = `
-const root = document.documentElement;
-const picks = [...document.querySelectorAll(".sl-surface")];
-const SURFACES = ["light", "navy", "black"];
-const system = () => (root.getAttribute("data-theme") === "dark" || (root.getAttribute("data-theme") !== "light" && matchMedia("(prefers-color-scheme: dark)").matches) ? "navy" : "light");
-const mark = () => { const now = root.getAttribute("data-surface") || system(); picks.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.pick === now))); };
-if (!root.hasAttribute("data-surface")) { try { const saved = localStorage.getItem("sl-surface"); if (SURFACES.includes(saved)) root.setAttribute("data-surface", saved); } catch (e) {} }
-picks.forEach((b) => b.addEventListener("click", () => {
-  root.setAttribute("data-surface", b.dataset.pick);
-  try { localStorage.setItem("sl-surface", b.dataset.pick); } catch (e) {}
-  mark();
-}));
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change", mark);
-new MutationObserver(mark).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
-mark();
-`;
-
 const forced = ["light", "dark", "black"].find((name) => process.argv.includes("--" + name)) || null;
-const head = `<title>Seedream 图层光具座</title><meta name="claude:viewport-fit-sides" content="cover"><style>${k.ISO_CSS}${PAGE}${STYLE}</style>`;
-const content = `<main class="iso-page">${intro}${figure}${sections}</main><script type="module">${(kitScript() + live + themeLive).replace(/<\/(script)/gi, "<\\/$1")}</script>`;
-const html = `<!doctype html><html lang="zh-CN"${forced === "black" ? ` data-surface="black"` : forced ? ` data-theme="${forced}"` : ""}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">${head}</head><body>${content}</body></html>`;
+const { html, fragment } = pageDocument({
+  isoCss: k.ISO_CSS,
+  title: "Seedream 图层光具座",
+  body: intro + figure + sections,
+  script: kitScript() + live,
+  css: STYLE,
+  force: forced === "dark" ? "navy" : forced,
+  key: "sl-surface",
+});
 const out = forced ? `seedream-layers-${forced}.html` : "seedream-layers.html";
 writeFileSync(join(HERE, out), html);
 console.log("wrote", out, (html.length / 1024).toFixed(0) + " KB");
 // Artifact build: the viewer wraps the page in its own document skeleton.
 const artifactAt = process.env.ARTIFACT_OUT;
-if (artifactAt && !forced) { writeFileSync(artifactAt, head + content); console.log("wrote", artifactAt); }
+if (artifactAt && !forced) { writeFileSync(artifactAt, fragment); console.log("wrote", artifactAt); }
