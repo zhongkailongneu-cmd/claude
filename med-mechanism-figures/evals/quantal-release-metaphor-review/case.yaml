@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: quantal-release-metaphor-review
+expected_outcome: |
+  一份设计评审（不画图）：指出「每次都发射」把随机过程画成了确定过程；给出映射审计表；按量子释放模型（m = n·p，del Castillo & Katz 1954）提出改进的机器；列出页面要写的比喻边界和出处。
