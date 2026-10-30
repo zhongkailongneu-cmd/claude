@@ -1,5 +1,6 @@
 // Builds pegasus/dist/index.html: one self-contained file (three.js, CSS and the Inter Tight
-// font all inlined), so it works offline and straight from disk.
+// font all inlined), so it works offline and straight from disk. Also writes
+// .artifact/pegasus.html (git-ignored), the same page as a fragment for the claude.ai preview.
 //   node build.mjs            one-off build
 //   node build.mjs --watch    rebuild on change and serve dist/ on http://localhost:8001
 
@@ -46,8 +47,16 @@ ${body}
 </body>
 </html>
 `;
+  // Page fragment for the claude.ai Artifact preview (it wraps title/style/body/script itself).
+  const artifact = `<title>Pegasus Flow</title>
+<style>${css}</style>
+${body}
+<script>${safeScript(js.outputFiles[0].text)}</script>
+`;
   await fs.mkdir(r('dist'), { recursive: true });
+  await fs.mkdir(r('.artifact'), { recursive: true });
   await fs.writeFile(r('dist/index.html'), html);
+  await fs.writeFile(r('.artifact/pegasus.html'), artifact);
   console.log(`built in ${Date.now() - t0} ms · dist/index.html ${(Buffer.byteLength(html) / 1024).toFixed(0)} KB`);
 }
 
