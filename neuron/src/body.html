@@ -1,0 +1,163 @@
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="shade" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="Synapse">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 9.2V3.5M9.6 13.4 4.4 16.4M14.4 13.4l5.2 3M12 3.5l-2.4-1.6M12 3.5l2.4-1.6M4.4 16.4l-.4 2.7M4.4 16.4l-2.6-.6M19.6 16.4l.4 2.7M19.6 16.4l2.6-.6"/></g><circle cx="12" cy="11.6" r="3" fill="currentColor"/></svg>
+    <span>Synapse</span>
+  </a>
+  <nav class="links" aria-label="Primary">
+    <a href="#">Neurons</a>
+    <a href="#">Circuits <i class="plus">+</i></a>
+    <a href="#">Atlas</a>
+    <a href="#">About</a>
+  </nav>
+  <a class="pill pill--nav" href="#">Explore</a>
+</header>
+
+<main id="story">
+  <section class="txt txt--hero" data-k="0" aria-labelledby="h0">
+    <p class="eyebrow"><i class="ring"></i><span>神经元 · Neuron</span></p>
+    <h1 id="h0" class="h" data-lines="One Cell.|Infinite Reach."></h1>
+    <p class="lead"><span>一个神经元，从胞体伸出树突，放出一条通向远方的轴突。</span> <span>世界上最复杂的网络，从这里开始生长。</span></p>
+    <div class="cta">
+      <a class="btn btn--solid" href="#"><span>Watch it grow</span><i class="knob"><svg viewBox="0 0 12 12" width="9" height="9"><path d="M2 6h8M6.5 2.5 10 6l-3.5 3.5" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></i></a>
+      <a class="btn btn--ghost" href="#"><span>How it works</span></a>
+    </div>
+  </section>
+
+  <section class="txt txt--extend" data-k="1" aria-labelledby="h1">
+    <p class="eyebrow"><i class="ring"></i><span>01 · 延伸 Extend</span></p>
+    <h2 id="h1" class="h" data-lines="It Reaches Out,|One Growth Cone at a Time."></h2>
+    <p class="lead"><span>轴突的尖端是生长锥：它像探路者，沿着化学线索一路向前，伸向远处的目标细胞。</span></p>
+  </section>
+
+  <section class="txt txt--expand" data-k="2" aria-labelledby="h2">
+    <p class="eyebrow"><i class="ring"></i><span>02 · 扩展 Expand</span></p>
+    <h2 id="h2" class="h" data-lines="Branch by Branch,|the Forest Grows."></h2>
+    <p class="lead"><span>树突不断分叉、向外扩展，邻近的神经元也相继萌发，感受范围成倍增加。</span></p>
+  </section>
+
+  <section class="txt txt--connect" data-k="3" aria-labelledby="h3">
+    <p class="eyebrow"><i class="ring"></i><span>03 · 连接 Connect</span></p>
+    <h2 id="h3" class="h" data-lines="Where Two Cells Meet,|a Synapse Is Born."></h2>
+    <p class="lead"><span>轴突末梢与树突接触的一刻，突触形成，神经递质第一次跨过缝隙，把信号传给下一个细胞。</span></p>
+  </section>
+
+  <section class="txt txt--network" data-k="4" aria-labelledby="h4">
+    <p class="eyebrow"><i class="ring"></i><span>04 · 网络 Network</span></p>
+    <h2 id="h4" class="h" data-lines="Connections Become|a Network."></h2>
+    <p class="lead"><span>千万次连接织成网络，信号在其中接力、汇聚、放大。</span></p>
+  </section>
+
+  <section class="txt txt--ignite" data-k="5" aria-labelledby="h5">
+    <p class="eyebrow"><i class="ring"></i><span>05 · 点燃 Ignite</span></p>
+    <h2 id="h5" class="h" data-lines="Then It Ignites."></h2>
+    <p class="lead"><span>当同步放电席卷整个网络，思考、记忆与行动就此被点燃。</span></p>
+  </section>
+</main>
+
+<div class="dash-wrap" id="dashWrap" aria-hidden="false">
+  <div class="dash" id="dash">
+    <aside class="side">
+      <div class="side-brand">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 9.2V3.5M9.6 13.4 4.4 16.4M14.4 13.4l5.2 3"/></g><circle cx="12" cy="11.6" r="3" fill="currentColor"/></svg>
+        <span>Synapse</span>
+      </div>
+      <ul>
+        <li class="on"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Overview</li>
+        <li><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="1.8"/><circle cx="12" cy="5" r="1.8"/><circle cx="8" cy="12" r="1.8"/><path d="M5.5 4.4l5 .5M5 5.6l2.2 5M10.8 6.5 8.9 10.6"/></svg>Network</li>
+        <li><svg viewBox="0 0 16 16"><path d="M8 2a4 4 0 0 0-4 4c-1.5.5-2 2-1.2 3.2C2.3 10.8 3.4 12 5 12h1v2h4v-2h1c1.600 0 2.700-1.200 2.200-2.800.8-1.200.3-2.700-1.200-3.200A4 4 0 0 0 8 2z"/></svg>Regions</li>
+        <li><svg viewBox="0 0 16 16"><path d="M2 12c2-6 4-6 6-2s4 4 6-6"/></svg>Plasticity</li>
+        <li><svg viewBox="0 0 16 16"><path d="M3 3v10M6 6v7M9 2v11M12 8v5"/></svg>Spikes</li>
+      </ul>
+    </aside>
+
+    <div class="main">
+      <div class="top">
+        <span class="crumb">Overview · sample data</span>
+        <div class="top-r">
+          <span class="chip"><i class="dot"></i>Live <svg viewBox="0 0 8 8" width="7" height="7"><path d="m1 2.5 3 3 3-3" stroke="currentColor" fill="none" stroke-width="1.2"/></svg></span>
+          <svg class="bell" viewBox="0 0 16 16" width="13" height="13"><path d="M4 11V7a4 4 0 0 1 8 0v4l1 1.5H3zM6.5 14a1.6 1.6 0 0 0 3 0" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+          <span class="user"><i class="avatar"></i>Lab-07 <svg viewBox="0 0 8 8" width="7" height="7"><path d="m1 2.5 3 3 3-3" stroke="currentColor" fill="none" stroke-width="1.2"/></svg></span>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><small>Neurons</small><b data-count="86420" data-dec="0">86,420</b></div>
+        <div class="stat"><small>Synapses</small><b data-count="1.27" data-suf=" M" data-dec="2">1.27 M</b></div>
+        <div class="stat"><small>Mean Rate</small><b data-count="12.4" data-suf=" Hz" data-dec="1">12.4 Hz</b></div>
+        <div class="stat"><small>Synchrony</small><b><span data-count="0.82" data-dec="2">0.82</span><em class="ok">+0.06 / h</em></b></div>
+        <div class="stat stat--r"><small>Latency</small><span class="mini">4.2 ms</span></div>
+        <div class="stat stat--r"><small>Bursts / min</small><span class="mini acc">24</span></div>
+      </div>
+
+      <h3 class="sec">Live Activity</h3>
+      <div class="payout">
+        <span class="p-ic"><svg viewBox="0 0 14 14" width="11" height="11"><path d="M1 8h2.500l1.500-5 2.500 9 1.500-4H13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="p-tx">The network is in<br>a burst state</span>
+        <b class="p-amt" data-count="1240" data-suf=" spikes/s" data-dec="0">1,240 spikes/s</b>
+        <span class="p-glow"><i></i></span>
+        <span class="p-btn"><svg viewBox="0 0 12 12" width="10" height="10"><circle cx="6" cy="6" r="3.600" fill="currentColor" stroke="none"/></svg>Record session</span>
+      </div>
+
+      <div class="grid2">
+        <div class="card chart">
+          <div class="card-h"><div><small>Overview</small><h4>Firing Rate by Layer</h4></div><i class="arrow">↗</i></div>
+          <div class="chart-body">
+            <ul class="yax"><li>20</li><li>15</li><li>10</li><li>5</li><li>0</li></ul>
+            <div class="bars" id="bars"></div>
+          </div>
+        </div>
+        <div class="card news">
+          <div class="card-h"><div><small>Explore</small><h4>Recent Events</h4></div><i class="arrow">↗</i></div>
+          <article><div class="n-t"><em class="tag tag--a">Burst</em><time>3 s ago</time></div><h5>Synchronous burst in Layer 5</h5><p>Detected across 3,412 neurons within 180 ms. Spread followed the axon map.</p></article>
+          <article><div class="n-t"><em class="tag tag--b">LTP</em><time>2 min ago</time></div><h5>Potentiation at 214 synapses</h5><p>Repeated co-activation strengthened connections in CA1.</p></article>
+        </div>
+      </div>
+
+      <div class="earn-h">
+        <h3>Brain Regions</h3>
+        <div class="filters">
+          <span class="search">Search...</span>
+          <span>Type <b>All</b></span><span>Rate <b>All</b></span><span>Layer <b>All</b></span>
+          <span class="viewall">View All</span>
+        </div>
+      </div>
+      <div class="opps" id="opps"></div>
+    </div>
+  </div>
+</div>
+
+<section class="outro" id="outro" aria-label="Get started">
+  <p class="eyebrow"><i class="ring"></i><span>Keep it firing</span></p>
+  <h2>Every thought is a network.<br>Start growing yours.</h2>
+  <div class="cta">
+    <a class="btn btn--solid" href="#"><span>Get started</span><i class="knob"><svg viewBox="0 0 12 12" width="9" height="9"><path d="M2 6h8M6.5 2.5 10 6l-3.5 3.5" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></i></a>
+    <a class="btn btn--ghost" href="#top" id="toTop"><span>Back to top</span></a>
+  </div>
+</section>
+
+<div class="scroll-cue" id="cue" aria-hidden="true"><i></i><span>Scroll</span></div>
+
+<div class="ctl" id="ctl">
+  <div class="ctl-group" role="radiogroup" aria-label="Colour theme" id="themes"></div>
+  <span class="ctl-sep"></span>
+  <button class="snd" id="snd" type="button" aria-pressed="false" aria-label="Toggle background music">
+    <span class="eq"><i></i><i></i><i></i><i></i></span><span class="snd-t">Sound</span>
+  </button>
+</div>
+
+<div class="loader" id="loader">
+  <div class="ld-brand">
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 9.2V3.5M9.6 13.4 4.4 16.4M14.4 13.4l5.2 3"/></g><circle cx="12" cy="11.6" r="3" fill="currentColor"/></svg>
+    <span>Synapse</span>
+  </div>
+  <div class="ld-line"><i id="ldBar"></i></div>
+  <div class="ld-actions" id="ldActions">
+    <button class="btn btn--solid" id="enterSound" type="button"><span>Enter with sound</span><i class="knob"><svg viewBox="0 0 12 12" width="9" height="9"><path d="M2 6h8M6.5 2.5 10 6l-3.5 3.5" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></i></button>
+    <button class="ld-mute" id="enterMute" type="button">Continue without sound</button>
+  </div>
+</div>
+
+<div id="track" aria-hidden="true"></div>
