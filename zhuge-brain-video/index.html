@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>诸葛亮的大脑</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{
+  --c10:#F4F7FB;--c20:#E8EEF6;--c30:#CCDBEB;--c40:#9FBDDA;--c50:#6C9AC4;
+  --c60:#497DAE;--c70:#376392;--c80:#2E5076;--c90:#2B4868;--c100:#263B54;
+  --serif:'Noto Serif SC',serif;--sans:'Noto Sans SC',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--c100)}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;font-family:var(--sans);color:#fff;background:var(--c100)}
+#bg{position:absolute;left:0;top:0}
+svg text{font-family:var(--sans)}
+.scene{position:absolute;left:0;top:0;width:1920px;height:1080px;display:none}
+.abs{position:absolute}
+.hdr{position:absolute;left:100px;top:50px}
+.hdr .row{display:flex;align-items:center;gap:24px}
+.pill{background:var(--c70);color:#fff;font-size:26px;font-weight:500;padding:6px 20px;border-radius:999px;letter-spacing:.1em}
+.hdr .ttl{font-family:var(--serif);font-weight:900;font-size:62px;letter-spacing:.06em;line-height:1.15}
+.hdr .sub{margin-top:8px;font-size:26px;color:var(--c40);letter-spacing:.04em}
+.lc{position:absolute;left:100px;top:212px;width:860px;height:620px}
+.quote{position:absolute;left:0;top:0;width:860px;background:var(--c10);color:var(--c100);border-left:10px solid var(--c70);border-radius:6px;padding:24px 34px 18px}
+.quote .qt{font-family:var(--serif);font-weight:600;font-size:38px;line-height:1.5}
+.quote .qs{margin-top:6px;font-size:22px;color:var(--c60);text-align:right}
+.quote .q{color:var(--c70)}
+.diag{position:absolute;left:0;top:200px;overflow:visible}
+.brainbox{position:absolute;left:1070px;top:178px}
+.ev{position:absolute;left:1070px;top:632px;width:750px;background:rgba(46,80,118,.94);border-left:6px solid var(--c50);border-radius:6px;padding:16px 26px 18px}
+.ev .k{display:inline-block;font-size:20px;padding:2px 12px;border-radius:4px;background:var(--c70);color:#fff;margin-right:14px;vertical-align:middle}
+.ev .k.k2{background:var(--c40);color:var(--c100)}
+.ev .k.k3{background:var(--c60)}
+.ev .c{display:inline-block;font-size:22px;color:var(--c30);vertical-align:middle;letter-spacing:.01em}
+.ev .t{margin-top:8px;font-size:27px;line-height:1.48;color:#fff}
+.ev .q{color:var(--c40)}
+.card{position:absolute;background:rgba(46,80,118,.92);border-left:6px solid var(--c40);border-radius:6px;padding:16px 28px}
+.card .ct{font-size:25px;color:var(--c40);font-weight:500;letter-spacing:.04em}
+.card .cq{font-family:var(--serif);font-weight:600;font-size:31px;line-height:1.45;margin-top:6px;color:var(--c10)}
+.card .cs{font-size:20px;color:var(--c40);margin-top:4px}
+.card .q{color:var(--c30)}
+#capwrap{position:absolute;left:0;top:800px;width:1920px;height:280px;background:linear-gradient(to bottom,rgba(38,59,84,0),rgba(38,59,84,.86) 34%,rgba(38,59,84,.96))}
+#cap{position:absolute;left:170px;width:1580px;top:872px;height:170px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:44px;line-height:1.5;font-weight:500;letter-spacing:.02em}
+#cap > div{text-wrap:balance}
+#cap .q{color:var(--c40)}
+#cap .tag{display:inline-block;font-size:28px;line-height:1.4;padding:2px 12px;margin-right:12px;border-radius:4px;background:var(--c70);vertical-align:5px}
+#prog{position:absolute;left:0;top:0;height:5px;background:var(--c50)}
+#nav{position:absolute;right:72px;top:30px;display:flex;gap:20px;font-size:20px;color:var(--c60);letter-spacing:.06em}
+#nav span.on{color:#fff}
+.sumcard{position:absolute;width:480px;height:168px;background:rgba(46,80,118,.92);border-radius:8px;border:2px solid var(--c60);padding:16px 22px 0 92px}
+.sumcard .n{position:absolute;left:20px;top:20px;width:54px;height:54px;border-radius:50%;background:var(--c70);font-family:var(--serif);font-weight:900;font-size:30px;display:flex;align-items:center;justify-content:center}
+.sumcard .st{font-family:var(--serif);font-weight:900;font-size:38px;letter-spacing:.05em}
+.sumcard .s1{font-size:25px;color:var(--c30);margin-top:4px}
+.sumcard .s2{font-size:21px;color:var(--c40);margin-top:4px}
+.sumcard.dash{border:2px dashed var(--c40);background:rgba(43,72,104,.7)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1920" height="1080"></canvas>
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <radialGradient id="glow">
+        <stop offset="0" stop-color="#CCDBEB" stop-opacity="1"/>
+        <stop offset=".35" stop-color="#9FBDDA" stop-opacity=".8"/>
+        <stop offset=".7" stop-color="#6C9AC4" stop-opacity=".35"/>
+        <stop offset="1" stop-color="#376392" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="brainFill" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#376392" stop-opacity=".55"/>
+        <stop offset="1" stop-color="#2B4868" stop-opacity=".75"/>
+      </linearGradient>
+      <radialGradient id="dotGlow">
+        <stop offset="0" stop-color="#F4F7FB" stop-opacity="1"/>
+        <stop offset=".4" stop-color="#CCDBEB" stop-opacity=".7"/>
+        <stop offset="1" stop-color="#6C9AC4" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+  </svg>
+  <div id="scenes"></div>
+  <div id="capwrap"></div>
+  <div id="cap"></div>
+  <div id="nav"></div>
+  <div id="prog"></div>
+</div>
+<script>
+'use strict';
+const W = 1920, H = 1080;
+const C = {c10:'#F4F7FB',c20:'#E8EEF6',c30:'#CCDBEB',c40:'#9FBDDA',c50:'#6C9AC4',c60:'#497DAE',c70:'#376392',c80:'#2E5076',c90:'#2B4868',c100:'#263B54'};
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+const easeIO = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const lerp = (a, b, t) => a + (b - a) * t;
+function rnd(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+const NS = 'http://www.w3.org/2000/svg';
+function h(tag, attrs = {}, parent, html) {
+  const el = document.createElement(tag);
+  for (const k in attrs) { if (k === 'style') el.style.cssText = attrs[k]; else if (k === 'class') el.className = attrs[k]; else el.setAttribute(k, attrs[k]); }
+  if (html !== undefined) el.innerHTML = html;
+  if (parent) parent.appendChild(el);
+  return el;
+}
+function s(tag, attrs = {}, parent, text) {
+  const el = document.createElementNS(NS, tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  if (text !== undefined) el.textContent = text;
+  if (parent) parent.appendChild(el);
+  return el;
+}
+const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+// 「」 quotes are tinted; 【】 become small tags.
+const fmt = t => esc(t).replace(/【(.+?)】/g, '<span class="tag">$1</span>').replace(/「(.+?)」/g, '<span class="q">「$1」</span>');
+// HTML element in/out: p in [0,1]
+function show(el, p, dy = 22, dx = 0, sc = null) {
+  el.style.opacity = p;
+  el.style.transform = `translate(${dx * (1 - p)}px,${dy * (1 - p)}px)` + (sc ? ` scale(${lerp(sc, 1, p)})` : '');
+  el.style.visibility = p <= 0.001 ? 'hidden' : 'visible';
+}
+const op = (el, v) => el.setAttribute('opacity', clamp(v));
+const win = (lt, a, b, fi = .5, fo = .4) => Math.min(ease((lt - a) / fi), b === undefined ? 1 : ease((b - lt) / fo));
+
+/* ---------------- background: slow neural mesh ---------------- */
+const bg = document.getElementById('bg').getContext('2d');
+const nodes = []; { const R = rnd(11); for (let i = 0; i < 72; i++) nodes.push({ x: R() * W, y: R() * H, ax: 18 + R() * 36, ay: 18 + R() * 36, fx: .04 + R() * .06, fy: .04 + R() * .06, ph: R() * 6.283, r: 1.4 + R() * 2.2 }); }
+function drawBG(t) {
+  const g = bg.createRadialGradient(W * .55, H * .42, 80, W * .55, H * .42, 1250);
+  g.addColorStop(0, '#2E5076'); g.addColorStop(.55, '#2B4868'); g.addColorStop(1, '#263B54');
+  bg.fillStyle = g; bg.fillRect(0, 0, W, H);
+  const P = nodes.map(n => [n.x + n.ax * Math.sin(t * n.fx + n.ph), n.y + n.ay * Math.cos(t * n.fy + n.ph * 1.3)]);
+  bg.lineWidth = 1.2;
+  for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+    const dx = P[i][0] - P[j][0], dy = P[i][1] - P[j][1], d = Math.hypot(dx, dy);
+    if (d < 200) { bg.strokeStyle = `rgba(73,125,174,${(1 - d / 200) * .22})`; bg.beginPath(); bg.moveTo(P[i][0], P[i][1]); bg.lineTo(P[j][0], P[j][1]); bg.stroke(); }
+  }
+  P.forEach((p, i) => {
+    const n = nodes[i], flash = Math.max(0, Math.sin(t * .55 + n.ph * 5) - .93) / .07;
+    bg.fillStyle = `rgba(108,154,196,${.45 + .4 * flash})`;
+    bg.beginPath(); bg.arc(p[0], p[1], n.r + flash * 2.5, 0, 6.283); bg.fill();
+  });
+}
+
+/* ---------------- schematic brain (lateral view, frontal pole on the left) ---------------- */
+const BR = {
+  cer: 'M150,275 C145,190 215,120 310,102 C400,85 500,100 560,150 C605,190 625,250 610,305 C600,340 570,358 535,358 C510,380 470,392 425,390 C370,390 310,385 275,365 C255,352 245,335 255,320 C230,322 200,330 175,320 C158,312 152,295 150,275 Z',
+  cbl: 'M500,368 C540,372 585,362 602,334 C618,362 604,402 562,414 C530,422 498,406 492,386 Z',
+  folia: ['M512,380 C545,384 580,375 600,352', 'M520,395 C550,398 580,390 598,372'],
+  stem: 'M440,382 C446,418 452,442 456,472 L488,472 C486,442 484,414 488,386 Z',
+  sulci: ['M255,322 C310,305 370,290 440,285', 'M385,98 C375,150 385,200 370,255', 'M200,185 C240,172 272,178 305,160', 'M178,240 C220,230 262,236 305,222',
+    'M445,128 C468,168 500,180 545,188', 'M425,200 C468,214 512,224 565,240', 'M300,348 C350,338 405,336 470,330', 'M560,282 C580,298 592,312 604,318',
+    'M232,132 C252,150 258,175 250,200', 'M520,300 C540,320 545,335 538,350', 'M330,120 C320,150 330,170 322,195'],
+};
+// region: centre (brain coords), size, whether it is a deep structure, label position (svg coords)
+const REG = {
+  dlpfc: { x: 238, y: 192, rx: 62, ry: 54, label: '背外侧前额叶 DLPFC', tx: 24, ty: 52, lx: 150, ly: 62 },
+  mpfc: { x: 176, y: 270, rx: 44, ry: 44, label: '内侧前额叶 mPFC（示意）', tx: 20, ty: 446, lx: 150, ly: 416 },
+  amy: { x: 298, y: 340, rx: 18, ry: 18, deep: 1, label: '杏仁核', tx: 330, ty: 506, lx: 360, ly: 482 },
+  hip: { x: 392, y: 346, rx: 74, ry: 22, deep: 1, label: '海马 / 内嗅皮层', tx: 610, ty: 508, lx: 650, ly: 486 },
+  tpj: { x: 478, y: 262, rx: 50, ry: 46, label: '颞顶联合区 TPJ', tx: 850, ty: 150, lx: 770, ly: 160, end: 1 },
+  str: { x: 335, y: 236, rx: 32, ry: 26, deep: 1, label: '背侧纹状体', tx: 560, ty: 44, lx: 590, ly: 54 },
+};
+const BX = 110, BY = 20;
+function makeBrain(parent, { labels = true, w = 700, note = true } = {}) {
+  const svg = s('svg', { viewBox: '0 0 860 520', width: w, height: w * 520 / 860, style: 'overflow:visible' }, parent);
+  const g = s('g', { transform: `translate(${BX},${BY})` });
+  const back = s('g', {}, g);
+  const stem = s('path', { d: BR.stem, fill: C.c90, stroke: C.c50, 'stroke-width': 2.2, pathLength: 1 }, back);
+  const cbl = s('path', { d: BR.cbl, fill: C.c90, stroke: C.c50, 'stroke-width': 2.2, pathLength: 1 }, back);
+  const fol = BR.folia.map(d => s('path', { d, fill: 'none', stroke: C.c60, 'stroke-width': 1.8, pathLength: 1 }, back));
+  const cer = s('path', { d: BR.cer, fill: 'url(#brainFill)', stroke: C.c40, 'stroke-width': 3.2, pathLength: 1, 'stroke-linejoin': 'round' }, g);
+  const sul = BR.sulci.map(d => s('path', { d, fill: 'none', stroke: C.c50, 'stroke-width': 2.2, 'stroke-linecap': 'round', pathLength: 1 }, g));
+  const regs = {};
+  const lab = s('g', {});
+  for (const k in REG) {
+    const r = REG[k];
+    const gg = s('g', { opacity: 0 }, g);
+    const glow = s('ellipse', { cx: r.x, cy: r.y, rx: r.rx * 1.5, ry: r.ry * 1.5, fill: 'url(#glow)' }, gg);
+    const ring = s('ellipse', { cx: r.x, cy: r.y, rx: r.rx, ry: r.ry, fill: 'none', stroke: C.c10, 'stroke-width': 2, 'stroke-dasharray': r.deep ? '7 6' : 'none', opacity: .85 }, gg);
+    let lg = null;
+    if (labels) {
+      lg = s('g', { opacity: 0 }, lab);
+      const px = r.x + BX, py = r.y + BY;
+      s('path', { d: `M${px},${py} L${r.lx},${r.ly}`, stroke: C.c30, 'stroke-width': 1.6, fill: 'none' }, lg);
+      s('circle', { cx: px, cy: py, r: 4, fill: C.c10 }, lg);
+      s('text', { x: r.tx, y: r.ty, fill: '#FFFFFF', 'font-size': 25, 'font-weight': 500, 'text-anchor': r.end ? 'end' : 'start' }, lg, r.label);
+    }
+    regs[k] = { gg, glow, ring, lg, r, ph: Object.keys(regs).length * 1.7 };
+  }
+  svg.appendChild(g); svg.appendChild(lab);
+  let noteEl = null;
+  if (labels && note) noteEl = s('text', { x: 850, y: 18, fill: C.c40, 'font-size': 18, 'text-anchor': 'end' }, svg, '示意图 · 虚线为深部结构');
+  const outline = [stem, cbl, cer, ...fol, ...sul];
+  return {
+    svg,
+    draw(p) { // stroke draw-on, then fill fades in
+      outline.forEach((e, i) => { const q = clamp(p * 1.25 - (i > 2 ? .25 : 0)); e.setAttribute('stroke-dasharray', '1 1'); e.setAttribute('stroke-dashoffset', 1 - q); });
+      const f = clamp((p - .55) / .45); [cer].forEach(e => e.setAttribute('fill-opacity', f)); [stem, cbl].forEach(e => e.setAttribute('fill-opacity', f));
+      if (noteEl) op(noteEl, f);
+    },
+    set(k, v, t, lab = v) {
+      const R = regs[k]; const pulse = .82 + .18 * Math.sin(t * 3.1 + R.ph);
+      op(R.gg, v); R.glow.setAttribute('opacity', pulse);
+      const sc = 1 + .05 * Math.sin(t * 3.1 + R.ph);
+      R.glow.setAttribute('rx', R.r.rx * 1.5 * sc); R.glow.setAttribute('ry', R.r.ry * 1.5 * sc);
+      if (R.lg) op(R.lg, lab);
+    },
+    dim(v) { op(g, v); },
+    // page-space position of a region, given where the svg sits
+    pos(k, left, top) { const R = REG[k], sc = w / 860; return [left + (R.x + BX) * sc, top + (R.y + BY) * sc]; },
+  };
+}
+function brainBox(root, opts) { const box = h('div', { class: 'brainbox' }, root); return makeBrain(box, opts); }
+
+/* ---------------- shared scene chrome ---------------- */
+function header(root, tag, title, sub) {
+  const el = h('div', { class: 'hdr' }, root);
+  const row = h('div', { class: 'row' }, el);
+  h('span', { class: 'pill' }, row, tag); h('span', { class: 'ttl' }, row, title);
+  h('div', { class: 'sub' }, el, sub);
+  return el;
+}
+function quote(parent, text, src, o = {}) {
+  const el = h('div', { class: 'quote' }, parent);
+  h('div', { class: 'qt', style: o.size ? `font-size:${o.size}px` : '' }, el, fmt(text));
+  if (o.extra) h('div', { class: 'qt', style: 'font-size:31px;margin-top:2px' }, el, fmt(o.extra));
+  h('div', { class: 'qs' }, el, src);
+  return el;
+}
+const KCLS = { '循证': '', '概念': 'k3', '推断': 'k3', '史料': 'k2', '争议': 'k2', '注': 'k2' };
+function evCards(root, list) {
+  const cards = list.map(c => { const el = h('div', { class: 'ev' }, root); h('span', { class: 'k ' + KCLS[c.k] }, el, c.k); h('span', { class: 'c' }, el, c.c); h('div', { class: 't' }, el, fmt(c.t)); return { el, c }; });
+  return (lt, at, dur) => cards.forEach((x, i) => {
+    const st = at(x.c.at) + (x.c.off || 0);
+    const en = i < cards.length - 1 ? at(cards[i + 1].c.at) + (cards[i + 1].c.off || 0) : dur + 1;
+    show(x.el, win(lt, st, en, .55, .35), 16);
+  });
+}
+function svgBox(parent, w, hgt, cls = 'diag') { return s('svg', { class: cls, width: w, height: hgt, viewBox: `0 0 ${w} ${hgt}` }, parent); }
+function txt(parent, x, y, str, o = {}) {
+  return s('text', Object.assign({ x, y, fill: '#FFFFFF', 'font-size': 26, 'text-anchor': 'middle' }, o), parent, str);
+}
+// quadratic arrow that stops short of node edges; returns setter for draw progress
+function arrow(parent, x0, y0, cx, cy, x1, y1, o = {}) {
+  const r0 = o.r0 || 0, r1 = o.r1 || 0;
+  const u0 = [cx - x0, cy - y0], l0 = Math.hypot(...u0); x0 += u0[0] / l0 * r0; y0 += u0[1] / l0 * r0;
+  const u1 = [x1 - cx, y1 - cy], l1 = Math.hypot(...u1); x1 -= u1[0] / l1 * r1; y1 -= u1[1] / l1 * r1;
+  const g = s('g', { opacity: 0 }, parent);
+  const p = s('path', { d: `M${x0},${y0} Q${cx},${cy} ${x1},${y1}`, fill: 'none', stroke: o.color || C.c30, 'stroke-width': o.w || 4, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': '1 1' }, g);
+  const a = Math.atan2(u1[1], u1[0]) * 180 / Math.PI, hs = o.head || 16;
+  const head = s('path', { d: `M0,0 L${-hs},${-hs * .55} L${-hs},${hs * .55} Z`, fill: o.color || C.c30, transform: `translate(${x1},${y1}) rotate(${a})` }, g);
+  let lab = null;
+  if (o.label) lab = txt(g, o.lx, o.ly, o.label, { 'font-size': o.fs || 23, fill: o.lc || C.c30 });
+  return { g, set(v) { op(g, v > 0 ? 1 : 0); p.setAttribute('stroke-dashoffset', 1 - clamp(v)); op(head, (v - .85) / .15); if (lab) op(lab, (v - .5) / .5); }, path: p };
+}
+
+/* ---------------- scenes ---------------- */
+const SCENES = [];
+const scenesEl = document.getElementById('scenes');
+function scene(def) { def.root = h('div', { class: 'scene' }, scenesEl); def.build(def.root, def); SCENES.push(def); }
+
+/* 0 · title */
+scene({
+  nav: null, fixed: 9.5, caps: [],
+  build(root, S) {
+    const box = h('div', { class: 'abs', style: 'left:540px;top:96px' }, root);
+    S.b = makeBrain(box, { labels: false, w: 840 });
+    S.t1 = h('div', { class: 'abs', style: 'left:0;width:1920px;top:640px;text-align:center;font-family:var(--serif);font-weight:900;font-size:128px;letter-spacing:.16em' }, root, '诸葛亮的大脑');
+    S.t2 = h('div', { class: 'abs', style: 'left:0;width:1920px;top:820px;text-align:center;font-size:46px;color:#CCDBEB;letter-spacing:.06em' }, root, fmt('用现代神经科学，拆解一位「用脑高手」'));
+    S.t3 = h('div', { class: 'abs', style: 'left:0;width:1920px;top:900px;text-align:center;font-size:28px;color:#9FBDDA;letter-spacing:.12em' }, root, '诸葛亮 · 字孔明 · 181—234 · 琅琊阳都人 · 蜀汉丞相');
+  },
+  update(lt, at, S) {
+    S.b.draw(ease((lt - .2) / 3.2));
+    ['dlpfc', 'mpfc', 'tpj', 'hip', 'amy', 'str'].forEach((k, i) => S.b.set(k, clamp(Math.sin(clamp((lt - 2.6 - i * .45) / 2.4) * Math.PI)) * .9, lt));
+    show(S.t1, ease((lt - 2.2) / 1.1), 30); show(S.t2, ease((lt - 3.3) / 1), 20); show(S.t3, ease((lt - 4.1) / 1), 16);
+  },
+});
+
+/* 1 · method */
+scene({
+  nav: '序', caps: [
+    '先立一条规矩：我们无法扫描一千八百年前的大脑。',
+    '本片只采信正史：陈寿《三国志》，以及裴松之注所引的史料。',
+    '草船借箭、借东风出自小说，空城计早被裴松之驳斥——一概不用。',
+    '神经科学在这里是一面「解释透镜」，而不是对古人的诊断。',
+  ],
+  build(root, S) {
+    S.hd = header(root, '序', '先立规矩', '史料边界 · 方法论');
+    const mk = (left, light, title, items, icon) => {
+      const el = h('div', { class: 'abs', style: `left:${left}px;top:240px;width:780px;height:400px;border-radius:10px;padding:34px 40px;${light ? 'background:#F4F7FB;color:#263B54' : 'background:rgba(46,80,118,.92);border:2px solid #497DAE;color:#CCDBEB'}` }, root);
+      h('div', { style: 'display:flex;align-items:center;gap:18px;font-family:var(--serif);font-weight:900;font-size:44px' }, el, icon + `<span>${title}</span>`);
+      const lis = items.map(t => h('span', { style: 'position:relative;display:table;margin-top:24px;font-size:30px;line-height:1.4' }, el, fmt(t)));
+      return { el, lis };
+    };
+    const ok = `<svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" fill="#376392"/><path d="M14 27 L23 35 L39 18" stroke="#F4F7FB" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const no = `<svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" fill="#9FBDDA"/><path d="M17 17 L35 35 M35 17 L17 35" stroke="#263B54" stroke-width="5" stroke-linecap="round"/></svg>`;
+    S.A = mk(160, true, '采信 · 正史', ['陈寿《三国志·蜀书·诸葛亮传》等', '裴松之注所引《魏略》《汉晋春秋》《襄阳记》《魏氏春秋》', '房玄龄等《晋书·宣帝纪》'], ok);
+    S.B = mk(980, false, '不用 · 小说与存疑', ['草船借箭 —— 《三国演义》虚构', '借东风 —— 《三国演义》虚构', '空城计 —— 出自郭冲所述，裴松之已驳其不实'], no);
+    S.strikes = S.B.lis.map(li => h('div', { class: 'abs', style: 'left:0;top:50%;height:3px;background:#9FBDDA;width:0' }, li));
+    S.lens = h('div', { class: 'abs', style: 'left:0;width:1920px;top:690px;text-align:center' }, root,
+      `<span style="display:inline-flex;align-items:center;gap:18px;background:#E8EEF6;color:#263B54;border-radius:999px;padding:12px 34px;font-size:34px;font-weight:700"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="17" cy="17" r="12" stroke="#376392" stroke-width="4" fill="none"/><path d="M26 26 L36 36" stroke="#376392" stroke-width="5" stroke-linecap="round"/></svg>神经科学 = 解释透镜　≠　诊断</span>`);
+  },
+  update(lt, at, S) {
+    show(S.hd, ease(lt / .8), 16);
+    show(S.A.el, ease((lt - at(1) + .2) / .8), 30);
+    show(S.B.el, ease((lt - at(2) + .2) / .8), 30);
+    S.strikes.forEach((e, i) => { e.style.width = (ease((lt - at(2) - .9 - i * .5) / .6) * 100) + '%'; });
+    show(S.lens, ease((lt - at(3)) / .7), 20, 0, .9);
+  },
+});
+
+/* 2 · 观其大略 */
+scene({
+  nav: '观其大略', caps: [
+    '年轻时在荆州游学，几位同窗读书「务于精熟」，',
+    '诸葛亮却「独观其大略」——不抠字句，先抓骨架。',
+    '这与大脑的一种高效学习策略不谋而合：把零散的经验，压缩成「图式」（schema）。',
+    '图式由内侧前额叶与海马协作维护，像一个可以不断挂上新知识的衣架。',
+    '动物实验发现：图式一旦建立，新的联想只需学一次，48 小时内就能完成巩固。',
+    '象棋大师也一样：他们记住的不是一颗颗棋子，而是成块的「棋型」。',
+  ],
+  build(root, S) {
+    S.hd = header(root, '第一招', '观其大略', '图式学习 · 内侧前额叶 mPFC × 海马');
+    const lc = h('div', { class: 'lc' }, root);
+    S.q = quote(lc, '「三人务于精熟，而亮独观其大略。」', '——《三国志》裴松之注引《魏略》');
+    const sv = svgBox(lc, 860, 420); S.sv = sv;
+    S.lblA = txt(sv, 20, 34, '细节 · 精熟', { 'text-anchor': 'start', fill: C.c40, 'font-size': 26 });
+    S.lblB = txt(sv, 20, 34, '骨架 · 大略', { 'text-anchor': 'start', fill: C.c30, 'font-size': 26, opacity: 0 });
+    const R = rnd(5); const cl = [[140, 300], [340, 320], [540, 320], [740, 300]]; S.rp = [440, 110];
+    S.lines = cl.map(c => s('path', { d: `M${S.rp[0]},${S.rp[1] + 46} L${c[0]},${c[1] - 48}`, stroke: C.c50, 'stroke-width': 3, fill: 'none', pathLength: 1, 'stroke-dasharray': '1 1', 'stroke-dashoffset': 1 }, sv));
+    S.dots = []; for (let i = 0; i < 36; i++) {
+      const k = i % 4, j = Math.floor(i / 4), a = j / 9 * 6.283;
+      S.dots.push({ A: [40 + R() * 780, 70 + R() * 330], B: [cl[k][0] + 36 * Math.cos(a), cl[k][1] + 36 * Math.sin(a)], ph: R() * 6.28, el: s('circle', { r: 7, fill: C.c40 }, sv) });
+    }
+    S.cl = cl.map((c, i) => { const g = s('g', { opacity: 0 }, sv); s('circle', { cx: c[0], cy: c[1], r: 50, fill: 'rgba(55,99,146,.35)', stroke: C.c50, 'stroke-width': 2 }, g); txt(g, c[0], c[1] + 92, ['地理形势', '各方实力', '人心向背', '时机变化'][i], { 'font-size': 27, fill: C.c30 }); return g; });
+    S.rootG = s('g', { opacity: 0 }, sv); s('circle', { cx: S.rp[0], cy: S.rp[1], r: 46, fill: C.c70, stroke: C.c30, 'stroke-width': 2.5 }, S.rootG); txt(S.rootG, S.rp[0], S.rp[1] + 12, '大略', { 'font-size': 34, 'font-weight': 700, style: 'font-family:var(--serif)' });
+    S.b = brainBox(root);
+    S.ev = evCards(root, [
+      { at: 2, k: '概念', c: 'Schema · 图式', t: '大脑对一类经验的抽象框架：先有骨架，新信息才有地方「挂」。' },
+      { at: 4, k: '循证', c: 'Tse D. et al. (2007) · Science', t: '大鼠先学会「图式」后，新的味道—地点联想一次习得，48 小时内即完成巩固。' },
+      { at: 5, k: '循证', c: 'Chase W.G. & Simon H.A. (1973) · Cognitive Psychology', t: '大师能迅速复原真实棋局，面对随机摆放的棋子则优势消失——记忆依赖「组块」。' },
+    ]);
+  },
+  update(lt, at, S) {
+    show(S.hd, ease(lt / .8), 16); show(S.q, ease((lt - .3) / .8), 24);
+    const t0 = at(1) + .6;
+    S.dots.forEach((d, i) => {
+      const p = easeIO((lt - t0 - i * .03) / 1.9), j = 6 * (1 - p);
+      const x = lerp(d.A[0] + j * Math.sin(lt * 1.3 + d.ph), d.B[0], p), y = lerp(d.A[1] + j * Math.cos(lt * 1.1 + d.ph), d.B[1], p);
+      d.el.setAttribute('cx', x); d.el.setAttribute('cy', y); op(d.el, ease((lt - .6 - i * .02) / .6));
+    });
+    const pc = ease((lt - t0 - 1.4) / .9);
+    S.cl.forEach(g => op(g, pc)); op(S.rootG, ease((lt - t0 - 2.0) / .7));
+    S.lines.forEach((l, i) => l.setAttribute('stroke-dashoffset', 1 - ease((lt - t0 - 2.2 - i * .12) / .8)));
+    op(S.lblA, 1 - pc); op(S.lblB, pc);
+    S.b.draw(ease((lt - .2) / 1.6));
+    const v = ease((lt - at(2) - .4) / 1.2); S.b.set('mpfc', v, lt); S.b.set('hip', v, lt);
+    S.ev(lt, at, S.dur);
+  },
+});
+
+/* 3 · 隆中对 */
+scene({
+  nav: '隆中对', caps: [
+    '公元 207 年，二十七岁的诸葛亮为刘备纵论天下，史称「隆中对」。',
+    '曹操「不可与争锋」，孙权「可以为援而不可图」，荆、益二州则可取而据之。',
+    '再外结孙权、内修政理，待「天下有变」两路北伐——这是一棵多步推演的决策树。',
+    '大脑中，海马与内嗅皮层不只给空间画地图，也给抽象关系画「认知地图」。',
+    '前额叶则在这张图上做「心理模拟」：不动一兵一卒，先在脑中把未来走一遍。',
+    '神经科学称之为「基于模型」的决策，与靠反复试错形成的「习惯系统」相对。',
+    '当然，隆中对后来没能完全实现：荆州失守，计划被现实改写——好模型也要不断更新。',
+  ],
+  build(root, S) {
+    S.hd = header(root, '第二招', '隆中对', '认知地图 × 心理模拟 · 海马—前额叶');
+    const lc = h('div', { class: 'lc' }, root);
+    S.q = quote(lc, '「曹操……此诚不可与争锋。孙权……此可以为援而不可图也。」', '——《三国志·诸葛亮传》', { size: 36 });
+    const sv = svgBox(lc, 860, 420); S.sv = sv;
+    const N = { cao: [430, 72, 60], sun: [745, 262, 52], jing: [430, 262, 44], yi: [120, 262, 44], liu: [430, 384, 30] };
+    S.N = N;
+    const node = (k, name, sub, fill) => { const [x, y, r] = N[k]; const g = s('g', { opacity: 0 }, sv); const c = s('circle', { cx: x, cy: y, r, fill, stroke: C.c30, 'stroke-width': 2.5 }, g); txt(g, x, y + 10, name, { 'font-size': r > 40 ? 30 : 24, 'font-weight': 700 }); if (sub) txt(g, x + (sub.dx || 0), y + r + 30 + (sub.dy || 0), sub.t, { 'font-size': 21, fill: C.c40, 'text-anchor': sub.a || 'middle' }); return { g, c }; };
+    S.wall = s('g', { opacity: 0 }, sv); s('path', { d: 'M300,170 L560,170', stroke: C.c40, 'stroke-width': 4, 'stroke-dasharray': '12 10' }, S.wall); txt(S.wall, 290, 178, '不可争锋', { 'text-anchor': 'end', 'font-size': 24, fill: C.c40 });
+    S.nCao = node('cao', '曹操', { t: '北方 · 挟天子以令诸侯', dx: 80, dy: -70, a: 'start' }, C.c80);
+    S.nSun = node('sun', '孙权', { t: '江东 · 已历三世' }, C.c80);
+    S.nJing = node('jing', '荆州', null, C.c70);
+    S.nYi = node('yi', '益州', { t: '沃野千里' }, C.c70);
+    S.nLiu = node('liu', '刘备', null, C.c60);
+    S.aSun = arrow(sv, 474, 262, 590, 230, 745, 262, { r0: 0, r1: 54, label: '外结孙权：可援不可图', lx: 600, ly: 205, color: C.c40, w: 3 });
+    S.aJing = arrow(sv, 430, 384, 450, 330, 430, 262, { r0: 30, r1: 46 });
+    S.aYi = arrow(sv, 430, 384, 250, 390, 120, 262, { r0: 30, r1: 46, label: '跨有荆、益', lx: 290, ly: 414 });
+    S.aN1 = arrow(sv, 430, 262, 470, 170, 430, 72, { r0: 46, r1: 62, color: C.c10, w: 5, label: '上将向宛、洛', lx: 330, ly: 136, fs: 22, lc: C.c10 });
+    S.aN2 = arrow(sv, 120, 262, 150, 90, 430, 72, { r0: 46, r1: 62, color: C.c10, w: 5, label: '主公出秦川', lx: 100, ly: 112, fs: 22, lc: C.c10 });
+    S.badges = [[300, 330, '①'], [640, 290, '②'], [492, 392, '③'], [250, 70, '④']].map(([x, y, n]) => { const g = s('g', { opacity: 0 }, sv); s('circle', { cx: x, cy: y, r: 19, fill: C.c10 }, g); txt(g, x, y + 8, n, { fill: C.c100, 'font-size': 22, 'font-weight': 700 }); return g; });
+    S.inner = txt(sv, 520, 401, '内修政理', { 'font-size': 22, fill: C.c30, 'text-anchor': 'start', opacity: 0 });
+    S.lost = s('g', { opacity: 0 }, sv); s('circle', { cx: 430, cy: 262, r: 52, fill: 'none', stroke: C.c10, 'stroke-width': 3, 'stroke-dasharray': '6 7' }, S.lost); txt(S.lost, 282, 252, '219 年 · 荆州失守', { 'font-size': 22, fill: C.c10 });
+    S.b = brainBox(root);
+    S.ev = evCards(root, [
+      { at: 3, k: '循证', c: 'Constantinescu A.O. et al. (2016) · Science', t: '人在学习抽象概念时，大脑也会出现与空间导航类似的「网格编码」。' },
+      { at: 4, k: '循证', c: 'Schacter D.L. & Addis D.R. (2007) · Phil Trans R Soc B', t: '想象未来与回忆过去调用同一套「建构性」网络，包括海马与前额叶。' },
+      { at: 5, k: '循证', c: 'Daw N.D., Niv Y. & Dayan P. (2005) · Nature Neuroscience', t: '前额叶的「基于模型」控制与背外侧纹状体的「习惯」控制并存、相互竞争。' },
+      { at: 6, k: '循证', c: 'Behrens T.E.J. et al. (2018) · Neuron', t: '认知地图的价值，在于能随新信息灵活更新，并迁移到新情境。' },
+    ]);
+  },
+  update(lt, at, S) {
+    show(S.hd, ease(lt / .8), 16); show(S.q, ease((lt - .3) / .8), 24);
+    const a1 = at(1), a2 = at(2);
+    op(S.nLiu.g, ease((lt - at(0) - 1) / .6)); op(S.nCao.g, ease((lt - a1) / .6));
+    op(S.wall, Math.min(ease((lt - a1 - .7) / .6), 1 - .7 * ease((lt - a2 - 1.6) / .8)));
+    op(S.nSun.g, ease((lt - a1 - 1.6) / .6)); op(S.nJing.g, Math.min(ease((lt - a1 - 2.6) / .6), 1 - .6 * ease((lt - at(6) - .4) / .8))); op(S.nYi.g, ease((lt - a1 - 2.6) / .6));
+    S.aSun.set(ease((lt - a2) / .9)); S.aJing.set(ease((lt - a1 - 2.9) / .8)); S.aYi.set(ease((lt - a1 - 3.1) / .9));
+    S.aN1.set(ease((lt - a2 - 1.6) / 1)); S.aN2.set(ease((lt - a2 - 1.9) / 1.1));
+    op(S.inner, ease((lt - a2 - .9) / .6));
+    S.badges.forEach((b, i) => op(b, ease((lt - a2 - .2 - i * .7) / .4)));
+    op(S.lost, ease((lt - at(6) - .4) / .7));
+    S.aN1.path.setAttribute('stroke-dasharray', lt > at(6) + .4 ? '0.03 0.025' : '1 1');
+    S.b.draw(ease((lt - .2) / 1.6));
+    S.b.set('hip', ease((lt - at(3) - .3) / 1.1), lt);
+    const pf = ease((lt - at(4) - .3) / 1.1); S.b.set('dlpfc', pf, lt); S.b.set('mpfc', pf * .8, lt);
+    S.b.set('str', ease((lt - at(5) - .5) / 1) * (1 - ease((lt - at(6)) / .6)), lt);
+    S.ev(lt, at, S.dur);
+  },
+});
+
+/* 4 · 攻心为上 */
+scene({
+  nav: '攻心', caps: [
+    '公元 225 年南征出发时，马谡献策：「攻心为上，攻城为下。」',
+    '据《汉晋春秋》，诸葛亮对孟获七纵七擒，孟获终于说：「南人不复反矣。」',
+    '攻下一座城靠兵力；让一方人心不再反叛，要靠读懂对方在想什么。',
+    '大脑有一套专门「读心」的网络：颞顶联合区与内侧前额叶，负责推测他人的信念与意图。',
+    '博弈实验发现：推理层级越深——「我猜你猜我怎么想」——内侧前额叶参与越明显。',
+    '【史料提示】「七擒」只见于东晋史书，细节或有夸大；但「攻心」的战略取向较为可信。',
+  ],
+  build(root, S) {
+    S.hd = header(root, '第三招', '攻心为上', '心智化网络 · 颞顶联合区 TPJ × 内侧前额叶');
+    const lc = h('div', { class: 'lc' }, root);
+    S.q = quote(lc, '「攻心为上，攻城为下；心战为上，兵战为下。」', '——《三国志》裴松之注引《襄阳记》（马谡语）', { size: 33 });
+    const sv = svgBox(lc, 860, 420); S.sv = sv;
+    S.seven = []; for (let i = 0; i < 7; i++) {
+      const x = 70 + i * 120, g = s('g', { opacity: 0 }, sv);
+      const c = s('circle', { cx: x, cy: 52, r: 32, fill: C.c80, stroke: C.c40, 'stroke-width': 2.5 }, g);
+      txt(g, x, 62, '擒', { 'font-size': 28, 'font-weight': 700, style: 'font-family:var(--serif)' });
+      if (i < 6) s('path', { d: `M${x + 30},${30} Q${x + 60},${4} ${x + 90},${30}`, stroke: C.c50, 'stroke-width': 2.5, fill: 'none' }, g);
+      if (i < 6) txt(g, x + 60, 12, '纵', { 'font-size': 20, fill: C.c40 });
+      S.seven.push({ g, c });
+    }
+    S.final = txt(sv, 430, 132, '孟获：「公，天威也，南人不复反矣。」', { 'font-size': 30, fill: C.c10, style: 'font-family:var(--serif)', 'font-weight': 600, opacity: 0 });
+    S.flag = s('g', { opacity: 0 }, sv); s('rect', { x: 690, y: 108, width: 120, height: 36, rx: 6, fill: C.c40 }, S.flag); txt(S.flag, 750, 134, '史料存疑', { 'font-size': 21, fill: C.c100, 'font-weight': 700 });
+    const cx = 175, cy = 300;
+    S.rings = [[118, 'rgba(55,99,146,.45)'], [82, 'rgba(73,125,174,.5)'], [46, 'rgba(108,154,196,.65)']].map(([r, f]) => s('circle', { cx, cy, r, fill: f, stroke: C.c40, 'stroke-width': 2.5, opacity: 0 }, sv));
+    S.core = txt(sv, cx, cy + 10, '心', { 'font-size': 30, 'font-weight': 900, style: 'font-family:var(--serif)', opacity: 0 });
+    const L = [['第 0 层：孟获想要什么？', cy + 72], ['第 1 层：他以为我想要什么？', cy], ['第 2 层：他猜我会怎样看他的选择？', cy - 76]];
+    S.lv = L.map(([t, ty], i) => { const g = s('g', { opacity: 0 }, sv); const r = [46, 82, 118][i], a = Math.atan2(ty - cy, 345 - cx); s('path', { d: `M${cx + r * Math.cos(a)},${cy + r * Math.sin(a)} L345,${ty}`, stroke: C.c30, 'stroke-width': 1.6, fill: 'none' }, g); s('circle', { cx: cx + r * Math.cos(a), cy: cy + r * Math.sin(a), r: 4, fill: C.c10 }, g); txt(g, 355, ty + 9, t, { 'text-anchor': 'start', 'font-size': 27 }); return g; });
+    S.b = brainBox(root);
+    S.ev = evCards(root, [
+      { at: 2, k: '概念', c: 'Theory of Mind · 心智理论', t: '推断他人信念、意图与情绪的能力，是一切社会博弈的核心工具。' },
+      { at: 3, k: '循证', c: 'Saxe R. & Kanwisher N. (2003) · NeuroImage', t: '颞顶联合区在思考「他人在想什么」时选择性激活。' },
+      { at: 4, k: '循证', c: 'Coricelli G. & Nagel R. (2009) · PNAS', t: '在「选美博弈」中，推理层级更深的人，内侧前额叶活动更强。' },
+      { at: 5, k: '史料', c: '《三国志·诸葛亮传》正文', t: '仅记「三年春，亮率众南征，其秋悉平」；「七纵七擒」出自东晋习凿齿《汉晋春秋》。' },
+    ]);
+  },
+  update(lt, at, S) {
+    show(S.hd, ease(lt / .8), 16); show(S.q, ease((lt - .3) / .8), 24);
+    const a1 = at(1);
+    S.seven.forEach((x, i) => { const p = ease((lt - a1 - .2 - i * .42) / .35); op(x.g, p); x.c.setAttribute('fill', p > .99 ? C.c70 : C.c80); });
+    op(S.final, ease((lt - a1 - 3.4) / .7));
+    op(S.flag, ease((lt - at(5) - .3) / .6));
+    const r0 = at(2) + .6; S.rings.forEach((r, i) => op(r, ease((lt - r0 - (2 - i) * .25) / .6))); op(S.core, ease((lt - r0) / .6));
+    // levels light up one after another when "depth of reasoning" is discussed
+    S.lv.forEach((g, i) => op(g, ease((lt - (i === 0 ? at(3) : at(4) + (i - 1) * 1.1) - .3) / .6)));
+    if (lt > at(4)) S.rings.forEach((r, i) => r.setAttribute('stroke', (2 - i) <= Math.floor((lt - at(4) - .3) / 1.1) + 1 ? C.c10 : C.c40));
+    S.b.draw(ease((lt - .2) / 1.6));
+    const v = ease((lt - at(3) - .3) / 1.1); S.b.set('tpj', v, lt);
+    S.b.set('mpfc', Math.max(v, ease((lt - at(4) - .3) / 1)), lt);
+    S.ev(lt, at, S.dur);
+  },
+});
+
+/* 5 · 宁静致远 */
+scene({
+  nav: '宁静', caps: [
+    '诸葛亮在《诫子书》中写道：「非淡泊无以明志，非宁静无以致远。」',
+    '又说：「险躁则不能治性。」——心浮气躁，就管不住自己。',
+    '这句话有清楚的神经基础：前额叶是大脑中对压力最敏感的区域之一。',
+    '急性压力下，去甲肾上腺素和多巴胺大量释放，前额叶网络会迅速「掉线」，',
+    '控制权交给更快、更原始的杏仁核与习惯回路——人变得冲动、僵化，只会用老办法。',
+    '唤醒水平与前额叶表现大致呈「倒 U 形」：太低则昏沉，太高则失控。',
+    '所谓「宁静」，不是没有情绪，而是把大脑稳在倒 U 形的顶点附近。',
+  ],
+  build(root, S) {
+    S.hd = header(root, '第四招', '宁静致远', '压力与前额叶 · 前额叶 ⇄ 杏仁核');
+    const lc = h('div', { class: 'lc' }, root);
+    S.q = quote(lc, '「非淡泊无以明志，非宁静无以致远。」', '——诸葛亮《诫子书》', { extra: '「险躁则不能治性。」' });
+    const sv = svgBox(lc, 860, 420, 'diag'); sv.style.top = '236px'; S.sv = sv;
+    S.ax = s('g', { opacity: 0 }, sv);
+    s('path', { d: 'M90,360 L820,360 M90,360 L90,30', stroke: C.c40, 'stroke-width': 3, fill: 'none' }, S.ax);
+    s('path', { d: 'M820,360 l-14,-8 v16 Z M90,30 l-8,14 h16 Z', fill: C.c40 }, S.ax);
+    txt(S.ax, 820, 396, '压力 / 唤醒水平 →', { 'text-anchor': 'end', 'font-size': 24, fill: C.c30 });
+    txt(S.ax, 104, 30, '前额叶表现', { 'text-anchor': 'start', 'font-size': 24, fill: C.c30 });
+    const f = x => 360 - 290 * Math.exp(-Math.pow((x - 455) / 165, 2));
+    let d = ''; for (let x = 100; x <= 810; x += 5) d += (x === 100 ? 'M' : 'L') + x + ',' + f(x).toFixed(1);
+    S.curve = s('path', { d, stroke: C.c30, 'stroke-width': 5, fill: 'none', pathLength: 1, 'stroke-dasharray': '1 1', 'stroke-dashoffset': 1, 'stroke-linecap': 'round' }, sv);
+    S.f = f;
+    S.zones = s('g', { opacity: 0 }, sv);
+    txt(S.zones, 165, 300, '昏沉', { 'font-size': 26, fill: C.c40 }); txt(S.zones, 560, 76, '最佳区', { 'font-size': 26, fill: C.c40, 'text-anchor': 'start' }); txt(S.zones, 760, 300, '失控', { 'font-size': 26, fill: C.c40 });
+    S.dotG = s('g', { opacity: 0 }, sv);
+    s('circle', { r: 34, fill: 'url(#dotGlow)' }, S.dotG); s('circle', { r: 13, fill: C.c10 }, S.dotG);
+    S.dl = txt(S.dotG, 0, -34, '', { 'font-size': 26, 'font-weight': 700, fill: C.c10 });
+    S.b = brainBox(root);
+    S.ev = evCards(root, [
+      { at: 2, k: '循证', c: 'Arnsten A.F.T. (2009) · Nature Reviews Neuroscience', t: '高水平儿茶酚胺会削弱前额叶网络，行为由「深思」转向「反射」，杏仁核与纹状体占上风。' },
+      { at: 5, k: '注', c: 'Yerkes R.M. & Dodson J.D. (1908)', t: '「倒 U」最早来自小鼠实验，后被广泛引申：作为直觉模型有用，但不是精确定律。' },
+      { at: 6, k: '循证', c: 'Ochsner K.N. & Gross J.J. (2005) · Trends Cogn Sci', t: '认知重评等调节策略，依靠前额叶下调杏仁核的情绪反应。' },
+    ]);
+  },
+  update(lt, at, S) {
+    show(S.hd, ease(lt / .8), 16); show(S.q, ease((lt - .3) / .8), 24);
+    op(S.ax, ease((lt - at(2)) / .6)); S.curve.setAttribute('stroke-dashoffset', 1 - ease((lt - at(2) - .3) / 1.4));
+    op(S.zones, ease((lt - at(5) - .3) / .6));
+    // dot position along the curve: start at peak, slide to "险躁", return to peak
+    const go = easeIO((lt - at(3) - .4) / 2), back = easeIO((lt - at(6) - .3) / 2);
+    const u = lerp(lerp(.5, .9, go), .5, back), x = 90 + u * 730;
+    op(S.dotG, ease((lt - at(2) - 1.4) / .6)); S.dotG.setAttribute('transform', `translate(${x},${S.f(x)})`);
+    S.dl.textContent = back > .5 ? '宁静' : go > .5 ? '险躁 · 前额叶掉线' : '适度';
+    const stressed = go > .5 && back <= .5;
+    S.dl.setAttribute('text-anchor', stressed ? 'end' : 'middle'); S.dl.setAttribute('x', stressed ? 70 : 0); S.dl.setAttribute('y', stressed ? -190 : -34);
+    S.b.draw(ease((lt - .2) / 1.6));
+    const on = ease((lt - at(2) - .2) / 1), stress = ease((lt - at(3) - .3) / 1.2) * (1 - ease((lt - at(6) - .3) / 1.5));
+    const fl = stress > .1 ? .75 + .25 * Math.sin(lt * 17) * Math.sin(lt * 5.3) : 1;
+    S.b.set('dlpfc', on * (1 - .8 * stress) * fl, lt, on); S.b.set('mpfc', on * (1 - .8 * stress) * fl * .8, lt, on);
+    S.b.set('amy', on * (.3 + .7 * stress), lt, on);
+    S.ev(lt, at, S.dur);
+  },
+});
+
+/* 6 · 巧思外化 */
+scene({
+  nav: '巧思', caps: [
+    '陈寿评价他「长于巧思」：改良连弩、造木牛流马，又推演兵法、作八阵图。',
+    '可大脑的「工作台」很小：工作记忆一次大约只能容纳 4 个信息组块。',
+    '高手的办法，是把需要反复思考的事，交给工具、阵法和制度去「记住」。',
+    '认知科学称之为「认知卸载」，哲学家称之为「延展心智」——思维并不止于头骨。',
+    '八阵图把复杂阵法固化成可训练的套路，木牛流马把运粮难题变成了机械问题。',
+  ],
+  build(root, S) {
+    S.hd = header(root, '第五招', '巧思外化', '认知卸载 · 工作记忆的边界');
+    const lc = h('div', { class: 'lc' }, root);
+    S.q = quote(lc, '「亮性长于巧思，损益连弩，木牛流马，皆出其意；推演兵法，作八阵图，咸得其要云。」', '——《三国志·诸葛亮传》', { size: 33 });
+    const sv = svgBox(lc, 860, 420); sv.style.top = '214px'; S.sv = sv;
+    S.title = txt(sv, 20, 30, '工作记忆 ≈ 4 个组块', { 'text-anchor': 'start', 'font-size': 26, fill: C.c30, opacity: 0 });
+    S.slotX = i => 30 + i * 205;
+    S.slots = [0, 1, 2, 3].map(i => s('rect', { x: S.slotX(i), y: 60, width: 180, height: 76, rx: 10, fill: 'rgba(46,80,118,.6)', stroke: C.c40, 'stroke-width': 2, 'stroke-dasharray': '8 6', opacity: 0 }, sv));
+    const names = ['粮草', '阵法', '赏罚', '兵器', '敌情', '地形'];
+    S.items = names.map((n, i) => { const g = s('g', { opacity: 0 }, sv); s('rect', { x: -78, y: -28, width: 156, height: 56, rx: 8, fill: i < 4 ? C.c60 : C.c50, stroke: C.c30, 'stroke-width': 1.5 }, g); txt(g, 0, 10, n, { 'font-size': 28, 'font-weight': 700 }); return g; });
+    S.over = txt(sv, 845, 30, '装不下！', { 'text-anchor': 'end', 'font-size': 24, fill: C.c10, opacity: 0, 'font-weight': 700 });
+    S.free = txt(sv, 430, 176, '腾出空间 → 思考全局', { 'font-size': 26, fill: C.c10, opacity: 0, 'font-weight': 700 });
+    const icons = [
+      g => { s('circle', { cx: 0, cy: 0, r: 26, fill: 'none', stroke: C.c10, 'stroke-width': 3 }, g); for (let k = 0; k < 6; k++) { const a = k * Math.PI / 3; s('path', { d: `M0,0 L${26 * Math.cos(a)},${26 * Math.sin(a)}`, stroke: C.c10, 'stroke-width': 2.5 }, g); } },
+      g => { let d = ''; for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4 + Math.PI / 8; d += (k ? 'L' : 'M') + (28 * Math.cos(a)).toFixed(1) + ',' + (28 * Math.sin(a)).toFixed(1); } s('path', { d: d + 'Z', fill: 'none', stroke: C.c10, 'stroke-width': 3 }, g); for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) s('circle', { cx: a * 11, cy: b * 11, r: 3.5, fill: C.c10 }, g); },
+      g => { s('rect', { x: -22, y: -26, width: 44, height: 52, rx: 4, fill: 'none', stroke: C.c10, 'stroke-width': 3 }, g); [-12, -2, 8, 18].forEach(y => s('path', { d: `M-13,${y} L13,${y}`, stroke: C.c10, 'stroke-width': 2.5 }, g)); },
+      g => { s('path', { d: 'M-10,-28 Q22,0 -10,28', fill: 'none', stroke: C.c10, 'stroke-width': 3 }, g); s('path', { d: 'M-10,-28 L-10,28 M-26,0 L28,0 M28,0 l-10,-6 M28,0 l-10,6', stroke: C.c10, 'stroke-width': 2.5, fill: 'none' }, g); },
+    ];
+    S.boxes = ['木牛流马', '八阵图', '法令制度', '损益连弩'].map((n, i) => { const g = s('g', { opacity: 0 }, sv); const x = S.slotX(i); const r = s('rect', { x, y: 250, width: 180, height: 150, rx: 12, fill: 'rgba(55,99,146,.5)', stroke: C.c50, 'stroke-width': 2 }, g); const ig = s('g', { transform: `translate(${x + 90},300)` }, g); icons[i](ig); txt(g, x + 90, 375, n, { 'font-size': 26, 'font-weight': 700 }); return { g, r }; });
+    S.extLbl = txt(sv, 845, 238, '外部「大脑」', { 'text-anchor': 'end', 'font-size': 22, fill: C.c40, opacity: 0 });
+    S.b = brainBox(root);
+    S.ev = evCards(root, [
+      { at: 1, k: '循证', c: 'Cowan N. (2001) · Behavioral and Brain Sciences', t: '成人工作记忆容量约为 3–5 个组块，而不是早年流行的「7±2」。' },
+      { at: 2, k: '循证', c: 'Risko E.F. & Gilbert S.J. (2016) · Trends Cogn Sci', t: '人会主动把记忆与计算负担转移到外部工具上，以减轻大脑内部负荷。' },
+      { at: 3, k: '循证', c: 'Clark A. & Chalmers D. (1998) · Analysis', t: '「延展心智」：可靠的外部工具，可以被视为认知过程本身的一部分。' },
+      { at: 4, k: '推断', c: '本片解读', t: '把运输、阵法与赏罚「制度化」，等于把思考写进环境——这是对史料的认知科学解读。' },
+    ]);
+  },
+  update(lt, at, S) {
+    show(S.hd, ease(lt / .8), 16); show(S.q, ease((lt - .3) / .8), 24);
+    const a1 = at(1), a2 = at(2), a3 = at(3);
+    op(S.title, ease((lt - a1) / .5)); S.slots.forEach((r, i) => op(r, ease((lt - a1 - i * .1) / .5)));
+    const cx = i => S.slotX(i) + 90;
+    S.items.forEach((g, i) => {
+      let x, y, o = 1, sc = 1;
+      if (i < 4) {
+        const pin = ease((lt - a1 - .5 - i * .45) / .5);
+        x = cx(i); y = lerp(-40, 98, pin); o = pin;
+        const out = easeIO((lt - a2 - .5 - i * .4) / .9);
+        if (out > 0) { y = lerp(98, 320, out); sc = lerp(1, .55, out); o = 1 - ease((out - .7) / .3); }
+      } else {
+        const k = i - 4, pin = ease((lt - a1 - 2.4 - k * .45) / .5);
+        const fall = easeIO((lt - a3 - .6 - k * .4) / .9);
+        x = lerp(400 + k * 170, cx(k), fall); y = lerp(lerp(-40, 30, pin), 98, fall); o = Math.max(pin * .55, fall);
+      }
+      g.setAttribute('transform', `translate(${x},${y}) scale(${sc})`); op(g, o);
+    });
+    op(S.over, Math.min(ease((lt - a1 - 3.2) / .4), 1 - ease((lt - a3 - .4) / .4)));
+    op(S.free, ease((lt - a3 - 1.6) / .6));
+    S.boxes.forEach((b, i) => { op(b.g, ease((lt - a2 - .1) / .6)); const hit = clamp(1 - Math.abs(lt - (a2 + 1.3 + i * .4)) / .5); b.r.setAttribute('fill', hit > 0 ? `rgba(108,154,196,${.5 + .4 * hit})` : 'rgba(55,99,146,.5)'); });
+    op(S.extLbl, ease((lt - a2 - .4) / .6));
+    S.b.draw(ease((lt - .2) / 1.6));
+    S.b.set('dlpfc', ease((lt - a1 - .3) / 1), lt);
+    S.ev(lt, at, S.dur);
+  },
+});
+
+/* 7 · 高手的盲点 */
+scene({
+  nav: '盲点', caps: [
+    '但这位用脑高手，也有明显的短板。',
+    '五丈原对峙时，司马懿不问军情，只问诸葛亮的寝食与公务繁简。使者答：',
+    '「诸葛公夙兴夜寐，罚二十以上，皆亲揽焉；所啖食不至数升。」',
+    '司马懿断言：「亮将死矣。」不久，诸葛亮病逝军中，年五十四岁。',
+    '长期睡眠不足会削弱前额叶功能，注意、判断与情绪调节一起下滑；',
+    '睡眠还负责清除大脑的代谢废物。事必躬亲的代价，大脑和身体都要支付。',
+    '他也看错过人：刘备临终叮嘱「马谡言过其实，不可大用」，他却「犹谓不然」。',
+    '街亭之败提醒我们：再聪明的大脑，也容易偏爱「像自己」、又能说会道的人。',
+    '陈寿的评价很克制：治国之才堪比管仲、萧何，但「应变将略，非其所长」。',
+    '长于深谋远虑，未必长于瞬息万变的临场——大脑的优势，往往也是它的边界。',
+  ],
+  build(root, S) {
+    S.hd = header(root, '反思', '高手的盲点', '睡眠剥夺 · 决策过载 · 认知偏误');
+    const lc = h('div', { class: 'lc' }, root);
+    const card = (top, t, q, src) => { const el = h('div', { class: 'card', style: `left:0;top:${top}px;width:860px;height:168px` }, lc); h('div', { class: 'ct' }, el, t); h('div', { class: 'cq' }, el, fmt(q)); h('div', { class: 'cs' }, el, src); return el; };
+    S.c1 = card(0, '① 过劳与少眠 · 234 年 五丈原', '「罚二十以上，皆亲揽焉；所啖食不至数升。」', '——《三国志》裴注引《魏氏春秋》；司马懿：「亮将死矣。」');
+    S.c2 = card(200, '② 用人偏误 · 228 年 街亭', '「马谡言过其实，不可大用，君其察之！」', '——刘备临终语，《三国志·马良传》附马谡');
+    S.c3 = card(400, '③ 规划 ≠ 应变 · 陈寿评', '「连年动众，未能成功，盖应变将略，非其所长欤！」', '——《三国志·诸葛亮传》评曰');
+    const box = h('div', { class: 'brainbox' }, root); S.b = makeBrain(box);
+    S.part = s('g', { opacity: 0 }, S.b.svg); const R = rnd(9);
+    S.pts = []; for (let i = 0; i < 26; i++) S.pts.push({ a: R() * 6.283, sp: .25 + R() * .3, ph: R(), el: s('circle', { r: 3 + R() * 3, fill: C.c30 }, S.part) });
+    S.ev = evCards(root, [
+      { at: 4, k: '循证', c: 'Krause A.J. et al. (2017) · Nature Reviews Neuroscience', t: '睡眠剥夺削弱前额叶对注意与决策的调控，并放大杏仁核的情绪反应。' },
+      { at: 5, k: '循证', c: 'Xie L. et al. (2013) · Science', t: '小鼠睡眠时脑细胞间隙扩大约 60%，β-淀粉样蛋白等代谢废物的清除明显加快。' },
+      { at: 6, k: '循证', c: 'Nickerson R.S. (1998) · Review of General Psychology', t: '确认偏误：人倾向于寻找、记住支持自己既有判断的证据。' },
+      { at: 7, k: '循证', c: 'Mitchell J.P., Macrae C.N. & Banaji M.R. (2006) · Neuron', t: '评估「与自己相似」的人时，腹内侧前额叶的活动与思考自己时相近。' },
+      { at: 9, k: '推断', c: '本片解读', t: '深谋远虑的规划与快速应变之间可能存在权衡；这是基于史评的类比，不是对其大脑的诊断。' },
+    ]);
+  },
+  update(lt, at, S) {
+    show(S.hd, ease(lt / .8), 16);
+    show(S.c1, ease((lt - at(1)) / .7), 24); show(S.c2, ease((lt - at(6)) / .7), 24); show(S.c3, ease((lt - at(8)) / .7), 24);
+    S.b.draw(ease((lt - .2) / 1.6));
+    const tired = ease((lt - at(4) - .3) / 1.2) * (1 - ease((lt - at(6)) / .8));
+    const fl = .55 + .45 * Math.abs(Math.sin(lt * 2.3) * Math.sin(lt * 7.1));
+    S.b.set('dlpfc', tired * .55 * fl, lt, tired); S.b.set('mpfc', Math.max(tired * .45 * fl, ease((lt - at(7) - .3) / 1) * (1 - ease((lt - at(8)) / .6))), lt, Math.max(tired, ease((lt - at(7) - .3) / 1) * (1 - ease((lt - at(8)) / .6))));
+    S.b.set('amy', tired * .9, lt);
+    S.b.dim(1 - .35 * tired);
+    // glymphatic clearance: particles drift out of the brain while sleep is discussed
+    const pc = ease((lt - at(5) - .2) / .8) * (1 - ease((lt - at(6)) / .6)); op(S.part, pc);
+    if (pc > 0) S.pts.forEach(p => { const f = (lt * p.sp + p.ph) % 1, rr = 60 + f * 230; p.el.setAttribute('cx', 490 + rr * Math.cos(p.a)); p.el.setAttribute('cy', 250 + rr * .7 * Math.sin(p.a)); op(p.el, Math.sin(f * Math.PI)); });
+    S.ev(lt, at, S.dur);
+  },
+});
+
+/* 8 · 总结 */
+scene({
+  nav: '总结', caps: [
+    '回看诸葛亮的用脑方式，可以归结为五个习惯：',
+    '一，观其大略：先建图式，再填细节。',
+    '二，隆中对：在认知地图上，先推演、后行动。',
+    '三，攻心为上：深度心智化，读懂对手的意图。',
+    '四，宁静致远：管理压力，让前额叶始终在线。',
+    '五，巧思外化：用工具与制度，为工作记忆减负。',
+    '再加一条他没做到的：睡够、放权——再强的大脑，也有带宽上限。',
+    { t: '「神机妙算」不是魔法，而是一个被长期训练、又懂得保护自己的规划型大脑。', big: 1, d: 8 },
+  ],
+  build(root, S) {
+    S.hd = header(root, '总结', '为什么他是用脑高手', '五个习惯 + 一个教训');
+    const BL = 690, BT = 360, BW = 540; S.BL = BL; S.BT = BT;
+    const box = h('div', { class: 'abs', style: `left:${BL}px;top:${BT}px` }, root); S.b = makeBrain(box, { labels: false, w: BW });
+    const data = [
+      ['一', '观其大略', '先建图式，再填细节', 'mPFC × 海马', 'mpfc', 110, 232],
+      ['二', '隆中对', '认知地图 + 心理模拟', '海马 × 前额叶', 'hip', 110, 430],
+      ['三', '攻心为上', '深度心智化，读懂对手', 'TPJ × mPFC', 'tpj', 1330, 232],
+      ['四', '宁静致远', '稳住压力，前额叶在线', '前额叶 ⇄ 杏仁核', 'amy', 1330, 430],
+      ['五', '巧思外化', '认知卸载，为工作记忆减负', '工具 × 制度 × DLPFC', 'dlpfc', 110, 628],
+      ['六', '睡够 · 放权', '他没做到的一条', '睡眠 × 授权', null, 1330, 628],
+    ];
+    // outline points (svg coords) each card's connector ends on: left cards -> frontal/temporal edge, right cards -> parietal/occipital edge
+    const anchors = [[300, 128], [262, 300], [610, 162], [728, 300], [372, 402], [640, 432]];
+    const lines = s('svg', { class: 'abs', width: 1920, height: 1080, style: 'left:0;top:0;overflow:visible' }, root);
+    S.cards = data.map(([n, t, a, b, reg, x, y], i) => {
+      const el = h('div', { class: 'sumcard' + (reg ? '' : ' dash'), style: `left:${x}px;top:${y}px` }, root);
+      h('div', { class: 'n' }, el, n); h('div', { class: 'st' }, el, t); h('div', { class: 's1' }, el, a); h('div', { class: 's2' }, el, b);
+      let ln = null, dot = null;
+      { const k = BW / 860, [ax, ay] = anchors[i], px = BL + ax * k, py = BT + ay * k; const sx = x < 900 ? x + 480 : x, sy = y + 84; ln = s('path', { d: `M${sx},${sy} C${(sx + px) / 2},${sy} ${(sx + px) / 2},${py} ${px},${py}`, stroke: C.c40, 'stroke-width': 2, fill: 'none', pathLength: 1, 'stroke-dasharray': '1 1', opacity: .8 }, lines); dot = s('circle', { cx: px, cy: py, r: 5, fill: C.c30, opacity: 0 }, lines); }
+      return { el, ln, dot, reg };
+    });
+    S.big = h('div', { class: 'abs', style: 'left:0;width:1920px;top:380px;text-align:center' }, root,
+      `<div style="font-family:var(--serif);font-weight:900;font-size:84px;letter-spacing:.08em">${fmt('「神机妙算」不是魔法')}</div><div style="margin-top:34px;font-size:42px;color:#CCDBEB;letter-spacing:.04em">而是一个被长期训练、又懂得保护自己的</div><div style="margin-top:14px;font-family:var(--serif);font-weight:900;font-size:60px;color:#F4F7FB;letter-spacing:.1em">规划型大脑</div>`);
+    S.veil = h('div', { class: 'abs', style: 'left:0;top:0;width:1920px;height:1080px;background:#263B54;opacity:0' }, root);
+    root.appendChild(S.big);
+  },
+  update(lt, at, S) {
+    show(S.hd, ease(lt / .8), 16);
+    S.b.draw(ease((lt - .2) / 1.8));
+    S.cards.forEach((c, i) => {
+      const st = at(i + 1); show(c.el, ease((lt - st) / .6), 0, i % 2 === 0 && i < 4 || i === 4 ? -40 : 40);
+      c.ln.setAttribute('stroke-dashoffset', 1 - ease((lt - st - .3) / .8)); op(c.dot, ease((lt - st - 1) / .3));
+      if (c.reg) S.b.set(c.reg, ease((lt - st - .5) / .8), lt);
+    });
+    if (lt > at(1)) S.b.set('mpfc', ease((lt - at(1) - .5) / .8), lt);
+    const fin = ease((lt - at(7)) / .9);
+    S.veil.style.opacity = fin * .82; show(S.big, fin, 30);
+  },
+});
+
+/* 9 · references + end */
+scene({
+  nav: null, fixed: 15, caps: [],
+  build(root, S) {
+    S.wrap = h('div', { class: 'abs', style: 'left:150px;top:90px;width:1620px' }, root);
+    h('div', { style: 'font-family:var(--serif);font-weight:900;font-size:50px;letter-spacing:.1em' }, S.wrap, '参考资料');
+    h('div', { style: 'margin-top:22px;font-size:25px;color:#CCDBEB;line-height:1.6' }, S.wrap, '<span style="color:#9FBDDA">史料 ·</span> 陈寿《三国志》（诸葛亮传、马良传）及裴松之注所引《魏略》《汉晋春秋》《襄阳记》《魏氏春秋》；《晋书·宣帝纪》；诸葛亮《诫子书》');
+    const refs = ['Tse et al. (2007) Science', 'Chase & Simon (1973) Cognitive Psychology', 'Constantinescu et al. (2016) Science', 'Schacter & Addis (2007) Phil Trans R Soc B', 'Daw, Niv & Dayan (2005) Nature Neuroscience', 'Behrens et al. (2018) Neuron', 'Saxe & Kanwisher (2003) NeuroImage', 'Coricelli & Nagel (2009) PNAS', 'Arnsten (2009) Nature Reviews Neuroscience',
+      'Yerkes & Dodson (1908) J Comp Neurol Psychol', 'Ochsner & Gross (2005) Trends Cogn Sci', 'Cowan (2001) Behavioral and Brain Sciences', 'Risko & Gilbert (2016) Trends Cogn Sci', 'Clark & Chalmers (1998) Analysis', 'Krause et al. (2017) Nature Reviews Neuroscience', 'Xie et al. (2013) Science', 'Nickerson (1998) Review of General Psychology', 'Mitchell, Macrae & Banaji (2006) Neuron'];
+    h('div', { style: 'margin-top:26px;font-size:25px;color:#9FBDDA' }, S.wrap, '神经科学 · 按出现顺序');
+    const grid = h('div', { style: 'margin-top:12px;display:grid;grid-template-columns:1fr 1fr;column-gap:60px;row-gap:10px;font-size:25px;color:#E8EEF6' }, S.wrap);
+    const col = [refs.slice(0, 9), refs.slice(9)];
+    for (let r = 0; r < 9; r++) for (let c = 0; c < 2; c++) h('div', {}, grid, col[c][r]);
+    h('div', { style: 'margin-top:34px;font-size:24px;color:#9FBDDA' }, S.wrap, '本片为科普解读：神经科学在此用作解释透镜，不构成对历史人物的医学或心理诊断。');
+    S.end = h('div', { class: 'abs', style: 'left:0;width:1920px;top:430px;text-align:center' }, root, '<div style="font-family:var(--serif);font-weight:900;font-size:100px;letter-spacing:.2em">诸葛亮的大脑</div><div style="margin-top:26px;font-size:34px;color:#9FBDDA;letter-spacing:.3em">完</div>');
+  },
+  update(lt, at, S) {
+    show(S.wrap, Math.min(ease(lt / .9), ease((10.2 - lt) / .7)), 20);
+    show(S.end, Math.min(ease((lt - 10.6) / 1), ease((S.dur - .2 - lt) / 1.2)), 20);
+  },
+});
+
+/* ---------------- timeline ---------------- */
+let T = 0; const CAPS = [];
+for (const S of SCENES) {
+  S.start = T; S.capT = [];
+  if (S.fixed) S.dur = S.fixed;
+  else {
+    let t = 1.3;
+    for (const c of S.caps) {
+      const text = typeof c === 'string' ? c : c.t;
+      const n = [...text.replace(/[\s【】「」（）]/g, '')].length;
+      const d = (typeof c === 'object' && c.d) || clamp(n / 6 + 1.3, 3.6, 9);
+      // typeof check: String.prototype.big exists, so a plain string would read as big
+      S.capT.push({ s: t, e: t + d, text, big: typeof c === 'object' && !!c.big }); CAPS.push({ s: S.start + t, e: S.start + t + d, text });
+      t += d;
+    }
+    S.dur = t + 1;
+  }
+  T += S.dur;
+}
+const TOTAL = T;
+const nav = document.getElementById('nav'); const navItems = SCENES.filter(S => S.nav).map(S => { S.navEl = h('span', {}, nav, S.nav); return S; });
+const cap = document.getElementById('cap'), capwrap = document.getElementById('capwrap'), prog = document.getElementById('prog');
+let lastCap = null;
+window.__render = t => {
+  drawBG(t);
+  let cur = null;
+  for (const S of SCENES) {
+    const lt = t - S.start;
+    if (lt < 0 || lt >= S.dur) { S.root.style.display = 'none'; continue; }
+    S.root.style.display = 'block'; cur = S;
+    S.root.style.opacity = Math.min(ease(lt / .5), ease((S.dur - lt) / .45));
+    S.update(lt, i => S.capT[i] ? S.capT[i].s : S.dur, S);
+  }
+  let ctext = '', cop = 0, show_bar = 0;
+  if (cur && cur.capT.length) {
+    const lt = t - cur.start;
+    show_bar = Math.min(ease((lt - .6) / .6), ease((cur.dur - lt) / .5));
+    for (const c of cur.capT) if (lt >= c.s && lt < c.e && !c.big) { ctext = c.text; cop = Math.min(ease((lt - c.s) / .3), ease((c.e - lt) / .25)); }
+    if (cur.capT.some(c => c.big && lt >= c.s - .2)) show_bar *= 0;
+  }
+  if (ctext !== lastCap) { cap.innerHTML = '<div>' + fmt(ctext) + '</div>'; lastCap = ctext; }
+  cap.style.opacity = cop; capwrap.style.opacity = show_bar;
+  prog.style.width = (t / TOTAL * 100) + '%';
+  const navOp = cur && cur.nav ? 1 : 0; nav.style.opacity = navOp;
+  navItems.forEach(S => S.navEl.className = S === cur ? 'on' : '');
+};
+window.__timeline = { total: TOTAL, scenes: SCENES.map(S => ({ start: S.start, dur: S.dur, nav: S.nav })), caps: CAPS };
+window.__ready = true;
+window.__render(0);
+</script>
+</body>
+</html>

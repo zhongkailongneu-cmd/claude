@@ -2,3 +2,5 @@ node_modules/
 .artifact/
 *.log
 .DS_Store
+zhuge-brain-video/build/
+.seg-*/
