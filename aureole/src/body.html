@@ -1,0 +1,139 @@
+<div id="stage">
+  <div id="amb" aria-hidden="true"><i></i><i></i><i></i></div>
+  <canvas id="fxb" aria-hidden="true"></canvas>
+
+  <div id="world">
+    <!-- 01 · Level -->
+    <section class="scene" id="s0" aria-label="Level">
+      <div class="lv" id="lv">
+        <h2 class="hd" id="lvHd"><span>Level</span><span class="sw kw" id="lvWord"></span></h2>
+        <div class="lv-stage" id="lvStage">
+          <canvas id="trackC"></canvas>
+          <div class="lv-sugg" id="lvSugg"><span class="tick"></span><span class="lab">Suggested</span></div>
+          <div class="cube" id="cube">
+            <div class="cube-halo"></div>
+            <div class="cube-glass">
+              <div class="cube-in"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div>
+              <div class="cube-flash"></div>
+            </div>
+            <div class="cube-solid"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 · Priority -->
+    <section class="scene" id="s1" aria-label="Priority">
+      <div class="pr" id="pr">
+        <h2 class="hd" id="prHd"><span>Priority</span><span class="sw kw" id="prWord"></span></h2>
+        <div class="pr-card glass" id="prCard">
+          <canvas id="dotC"></canvas>
+          <span class="ax ax-u" id="axU">Urgent</span>
+          <span class="ax ax-i" id="axI">Important</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · Capture -->
+    <section class="scene" id="s2" aria-label="Capture">
+      <div class="cp" id="cp">
+        <h1 class="cp-hello" id="hello">Good evening.</h1>
+        <div class="cp-card glass" id="cpCard">
+          <div class="cp-text" id="cpText"><span class="ph" id="ph">What’s on your mind today?</span><span id="words"></span></div>
+          <canvas id="waveC"></canvas>
+          <div class="cp-row" id="cpRow">
+            <button class="mic" id="mic" type="button" aria-label="Start voice capture">
+              <svg id="icMic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/></svg>
+              <i class="ic-stop" id="icStop"></i>
+            </button>
+            <span class="chip" id="chip">English <svg viewBox="0 0 24 24"><path d="M8 10l4-4 4 4M8 14l4 4 4-4"/></svg></span>
+            <span class="rec" id="rec"><i></i><span id="recT">00:00</span></span>
+            <span class="ondev" id="ondev">On-device</span>
+            <button class="send" id="send" type="button" aria-label="Send"><span class="fill"></span><svg viewBox="0 0 24 24"><path d="M12 19V6M6.5 11.5 12 6l5.5 5.5"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 · Task -->
+    <section class="scene" id="s3" aria-label="Task">
+      <div class="tk" id="tk">
+        <div class="tk-card glass tint" id="tkCard">
+          <div class="tk-glowdot" id="tkDot"></div>
+          <div class="tk-in" id="tkIn">
+            <div class="ring" id="ring">
+              <svg class="arc" viewBox="0 0 62 62"><circle cx="31" cy="31" r="28" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="2.2"/><circle id="arc" cx="31" cy="31" r="28" fill="none" stroke="var(--soft)" stroke-width="2.4" stroke-linecap="round"/></svg>
+              <div class="core"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8.5 12.2l2.5 2.5 4.5-4.8"/></svg></div>
+              <div class="fillc" id="ringFill"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+              <span id="spks"></span>
+            </div>
+            <div class="tm"><b id="tkTime"></b><small id="tkLeft">left</small></div>
+            <h3 class="tk-title"><span class="sw" id="tkTitle"></span><u class="strike" id="strike"></u></h3>
+            <p class="tk-sub"><span class="sw" id="tkSub"></span></p>
+            <div class="tk-bot">
+              <div class="slider" id="slider">
+                <canvas id="barC"></canvas>
+                <i class="knob" id="knob"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>
+              </div>
+              <button class="xb" id="xBtn" type="button" aria-label="Dismiss"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+              <button class="cb" id="cBtn" type="button" aria-label="Complete"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 · Completed -->
+    <section class="scene" id="s4" aria-label="Completed">
+      <div class="cm" id="cm">
+        <div class="cm-head" id="cmHead">
+          <h3>Completed <svg viewBox="0 0 24 24"><path d="M8 10l4-4 4 4M8 14l4 4 4-4"/></svg></h3>
+          <span>129 in 2026 · 13-day streak</span>
+        </div>
+        <div class="cm-months" id="months"></div>
+        <div class="cm-grid" id="grid"></div>
+        <div class="cm-leg" id="cmLeg">
+          <span>Less</span><i style="background:var(--h0)"></i><i style="background:var(--h1)"></i><i style="background:var(--h2)"></i><i style="background:var(--h3)"></i><i style="background:var(--h4)"></i><span>More</span>
+          <a>Activity <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></a>
+        </div>
+        <div class="cm-stats" id="cmStats">
+          <div><b data-v="10" data-d="0">0</b><small>This week</small></div>
+          <div><b data-v="32" data-d="0">0</b><small>This month</small></div>
+          <div><b data-v="7" data-d="0">0</b><small>Best day</small></div>
+          <div><b data-v="1.4" data-d="1">0</b><small>Daily avg</small></div>
+        </div>
+        <div class="tip" id="tip"></div>
+      </div>
+    </section>
+
+    <!-- 06 · Welcome -->
+    <section class="scene" id="s5" aria-label="Welcome">
+      <div class="wl" id="wl">
+        <div class="wl-soon" id="soon">COMING<br>SOON</div>
+        <h1 class="wl-title" id="wlTitle" aria-label="Welcome to Orbit."></h1>
+      </div>
+    </section>
+
+    <div class="tap" id="tap0"></div>
+  </div>
+
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <div class="mark" aria-hidden="true">AUREOLE</div>
+  <div class="hint" id="hint" aria-hidden="true">拖动 · 点击 · 悬停　空格 暂停　1 2 3 切换色系</div>
+
+  <nav id="dock" aria-label="播放与色系控制">
+    <div class="themes" id="themes" role="radiogroup" aria-label="色系">
+      <button type="button" role="radio" data-theme="orbit" aria-checked="false" title="视频原色（按 1）"><i class="sw3" style="--g:linear-gradient(135deg,#4a3fe0,#2e74e8 55%,#4cc3f5);--c:#3f63ff"></i><span>Orbit 原版</span></button>
+      <button type="button" role="radio" data-theme="loyel" aria-checked="false" title="Loyel 渐变蓝（按 2）"><i class="sw3" style="--g:linear-gradient(135deg,#263B54,#376392 40%,#6C9AC4 72%,#CCDBEB);--c:#6C9AC4"></i><span>Loyel 渐变蓝</span></button>
+      <button type="button" role="radio" data-theme="aurora" aria-checked="false" title="极光绿（按 3）"><i class="sw3" style="--g:linear-gradient(135deg,#153F34,#279470 40%,#5BCB9C 72%,#BDEBD6);--c:#5BCB9C"></i><span>极光绿</span></button>
+    </div>
+    <span class="sep"></span>
+    <div class="chap" id="chap"></div>
+    <span class="sep"></span>
+    <div class="ctl">
+      <button type="button" id="btnPlay" aria-label="暂停"><svg viewBox="0 0 24 24" id="icPause"><path d="M9 5v14M15 5v14"/></svg><svg viewBox="0 0 24 24" id="icPlay" style="display:none"><path d="M8 5.5v13l11-6.5z"/></svg></button>
+      <button type="button" id="btnReplay" aria-label="从头播放"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.6-5.9M4 4.5v4.2h4.2"/></svg></button>
+    </div>
+  </nav>
+</div>
